@@ -1,5 +1,6 @@
 <?php
 
+use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
 /**
@@ -28,6 +29,8 @@ $metadata['http://mfa-idp.local:8085'] = [
     'authproc' => [
         10 => [
             'class' => 'mfa:Mfa',
+            'accountNameAttr' => 'cn',
+            'mfaSetupUrl' => Env::get('MFA_SETUP_URL'),
             'loggerClass' => Psr3SamlLogger::class,
         ],
     ],
