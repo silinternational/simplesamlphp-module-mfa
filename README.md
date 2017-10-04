@@ -35,6 +35,21 @@ Example (in `metadata/saml20-idp-hosted.php`):
 The `loggerClass` parameter specifies the name of a PSR-3 compatible class that 
 can be autoloaded, to use as the logger within ExpiryDate.
 
+## Testing Locally ##
+
+### Setup ###
+Add entries to your hosts file to associate `mfa-sp.local` and `mfa-idp.local`
+with the IP address of your docker containers (which is the IP address from
+the Vagrantfile if you are running docker within the Vagrant VM).
+
+### Automated Testing ###
+Run `make test`.
+
+### Manual Testing ###
+Go to <http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp> in
+your browser and sign in with one of the users defined in
+``development/idp-local/config/authsources.php`.
+
 ## Contributing ##
 To contribute, please submit issues or pull requests at 
 https://github.com/silinternational/simplesamlphp-module-mfa
