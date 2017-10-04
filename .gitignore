@@ -1,0 +1,6 @@
+composer.lock
+local.*
+!local.*.dist
+/nbproject/
+.vagrant/
+vendor/

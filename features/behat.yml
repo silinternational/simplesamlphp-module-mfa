@@ -1,0 +1,5 @@
+default:
+    suites:
+        mfa_features:
+            paths:    [ %paths.base%/../features/mfa.feature ]
+            contexts: [ Sil\SspMfa\Behat\context\MfaContext ]

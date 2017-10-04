@@ -1,0 +1,90 @@
+version: "2"
+
+services:
+
+  idp:
+    image: silintl/ssp-base:develop
+    ports:
+      - "8085:80"
+      - "9000:9000"
+    volumes:
+      - ./:/mfa
+      - ./development/enable-debug.sh:/data/enable-debug.sh
+      - ./development/run-dev.sh:/data/run-dev.sh
+      - ./development/run-tests.sh:/data/run-tests.sh
+      - ./development/symlink.sh:/data/symlink.sh
+      - ./src:/data/src
+
+      # Revert to standard SSOService.php instead of using sildisco'saml20-idp-hosted
+      - ./development/idp-local/www_saml2_idp_SSOService.php:/data/vendor/simplesamlphp/simplesamlphp/www/saml2/idp/SSOService.php
+
+      # Utilize custom certs
+      - ./development/idp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
+
+      # Utilize custom configs
+      - ./development/idp-local/config/authsources.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
+
+      # Utilize custom metadata
+      - ./development/idp-local/metadata/saml20-idp-hosted.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-hosted.php
+      - ./development/idp-local/metadata/saml20-sp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-sp-remote.php
+
+    env_file:
+      - ./common.env
+      - ./local.env
+    environment:
+      - ADMIN_EMAIL=john_doe@there.com
+      - ADMIN_PASS=a
+      - IDP_NAME=Local IdP
+      - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
+      - SECURE_COOKIE=false
+      - SHOW_SAML_ERRORS=true
+    command: ["/data/run-dev.sh"]
+
+  sp:
+    image: silintl/ssp-base:develop
+    volumes:
+      # Utilize custom certs
+      - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
+
+      # Utilize custom configs
+      - ./development/sp-local/config/authsources.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
+
+      # Utilize custom metadata
+      - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
+    ports:
+      - "8081:80"
+    environment:
+      - ADMIN_EMAIL=john_doe@there.com
+      - ADMIN_PASS=sp1
+      - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
+      - SECRET_SALT=h57fjemb&d$n^nsJFGNjweJz1
+      - SECURE_COOKIE=false
+      - SHOW_SAML_ERRORS=true
+      - SAML20_IDP_ENABLE=false
+      - ADMIN_PROTECT_INDEX_PAGE=false
+
+  composer:
+    image: silintl/ssp-base:develop
+    volumes:
+      - ./composer.json:/data/composer.json
+      - ./composer.lock:/data/composer.lock
+      - ./vendor:/data/vendor
+    env_file:
+      - ./local.env
+    working_dir: /data
+
+  tests:
+    image: silintl/ssp-base:develop
+    volumes_from:
+      - idp
+    volumes:
+      - ./composer.json:/data/composer.json
+      - ./composer.lock:/data/composer.lock
+      - ./development/run-tests.sh:/data/run-tests.sh
+      - ./features:/data/features
+      - ./vendor:/data/vendor
+    env_file:
+      - ./common.env
+      - ./local.env
+    working_dir: /data
+    command: ["/data/run-tests.sh"]

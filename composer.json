@@ -1,0 +1,31 @@
+{
+  "name": "silinternational/simplesamlphp-module-mfa",
+  "description": "A simpleSAMLphp module for prompting the user for MFA credentials (such as a TOTP code, etc.).",
+  "type": "simplesamlphp-module",
+  "license": "LGPL-2.1",
+  "authors": [
+    {
+      "name": "Matt Henderson",
+      "email": "matt_henderson@sil.org"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.0",
+    "roave/security-advisories": "dev-master",
+    "silinternational/psr3-adapters": "^1.1",
+    "simplesamlphp/simplesamlphp": "^1.14.16"
+  },
+  "require-dev": {
+    "behat/behat": "^3.3",
+    "behat/mink": "^1.7",
+    "behat/mink-goutte-driver": "^1.2",
+    "phpunit/phpunit": "^6.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sil\\SspMfa\\": "src/",
+      "Sil\\SspMfa\\Behat\\": "features/"
+    }
+  }
+}
