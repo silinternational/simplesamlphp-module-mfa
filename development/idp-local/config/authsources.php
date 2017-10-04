@@ -4,7 +4,7 @@ $config = [
     'example-userpass' => [
         'exampleauth:UserPass',
         'no_mfa_needed:a' => [
-            'eduPersonPrincipalName' => ['NO_MFA_NEEDED@ssp-hub-idp.local'],
+            'eduPersonPrincipalName' => ['NO_MFA_NEEDED@mfa-idp.local'],
             'eduPersonTargetID' => ['11111111-1111-1111-1111-111111111111'],
             'sn' => ['Needed'],
             'givenName' => ['No MFA'],
@@ -15,7 +15,7 @@ $config = [
             'mfaOptions' => [],
         ],
         'must_set_up_mfa:a' => [
-            'eduPersonPrincipalName' => ['MUST_SET_UP_MFA@ssp-hub-idp.local'],
+            'eduPersonPrincipalName' => ['MUST_SET_UP_MFA@mfa-idp.local'],
             'eduPersonTargetID' => ['22222222-2222-2222-2222-222222222222'],
             'sn' => ['Set Up MFA'],
             'givenName' => ['Must'],
@@ -26,7 +26,7 @@ $config = [
             'mfaOptions' => [],
         ],
         'has_backupcode:a' => [
-            'eduPersonPrincipalName' => ['HAS_BACKUPCODE@ssp-hub-idp.local'],
+            'eduPersonPrincipalName' => ['HAS_BACKUPCODE@mfa-idp.local'],
             'eduPersonTargetID' => ['33333333-3333-3333-3333-333333333333'],
             'sn' => ['Backupcode'],
             'givenName' => ['Has'],
@@ -43,7 +43,7 @@ $config = [
             ],
         ],
         'has_totp:a' => [
-            'eduPersonPrincipalName' => ['HAS_TOTP@ssp-hub-idp.local'],
+            'eduPersonPrincipalName' => ['HAS_TOTP@mfa-idp.local'],
             'eduPersonTargetID' => ['33333333-3333-3333-3333-333333333333'],
             'sn' => ['TOTP'],
             'givenName' => ['Has'],
