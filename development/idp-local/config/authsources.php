@@ -12,7 +12,7 @@ $config = [
             'employeeNumber' => ['11111'],
             'cn' => ['NO_MFA_NEEDED'],
             'promptForMfa' => ['no'],
-            'mfaOptions' => [],
+            'mfaOptionsJson' => [],
         ],
         'must_set_up_mfa:a' => [
             'eduPersonPrincipalName' => ['MUST_SET_UP_MFA@mfa-idp.local'],
@@ -23,7 +23,7 @@ $config = [
             'employeeNumber' => ['22222'],
             'cn' => ['MUST_SET_UP_MFA'],
             'promptForMfa' => ['yes'],
-            'mfaOptions' => [],
+            'mfaOptionsJson' => [],
         ],
         'has_backupcode:a' => [
             'eduPersonPrincipalName' => ['HAS_BACKUPCODE@mfa-idp.local'],
@@ -34,7 +34,7 @@ $config = [
             'employeeNumber' => ['33333'],
             'cn' => ['HAS_BACKUPCODE'],
             'promptForMfa' => ['yes'],
-            'mfaOptions' => ['{"id":37, "type":"backupcode", "data":""}'],
+            'mfaOptionsJson' => ['{"id":37, "type":"backupcode", "data":""}'],
         ],
         'has_totp:a' => [
             'eduPersonPrincipalName' => ['HAS_TOTP@mfa-idp.local'],
@@ -45,7 +45,7 @@ $config = [
             'employeeNumber' => ['33333'],
             'cn' => ['HAS_TOTP'],
             'promptForMfa' => ['yes'],
-            'mfaOptions' => ['{"id":25, "type":"totp", "data":""}'],
+            'mfaOptionsJson' => ['{"id":25, "type":"totp", "data":""}'],
         ],
     ],
 ];
