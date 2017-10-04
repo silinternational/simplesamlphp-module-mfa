@@ -24,6 +24,8 @@ Example (in `metadata/saml20-idp-hosted.php`):
         10 => [
             // Required:
             'class' => 'mfa:Mfa',
+            'accountNameAttr' => 'cn',
+            'mfaSetupUrl' => 'https://idm.example.com/mfa/',
 
             // Optional:
             'loggerClass' => '\\Sil\\Psr3Adapters\\Psr3SamlLogger',
@@ -32,8 +34,15 @@ Example (in `metadata/saml20-idp-hosted.php`):
         // ...
     ],
 
+The `accountNameAttr` parameter represents the SAML attribute name which has 
+the user's account name stored in it. In certain situations, this will be 
+displayed to the user, as well as being used in log messages.
+
 The `loggerClass` parameter specifies the name of a PSR-3 compatible class that 
 can be autoloaded, to use as the logger within ExpiryDate.
+
+The `mfaSetupUrl` parameter is for the URL of where to send the user if they
+want/need to set up MFA.
 
 ## Testing Locally ##
 
