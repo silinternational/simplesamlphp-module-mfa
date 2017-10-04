@@ -3,40 +3,60 @@
 $config = [
     'example-userpass' => [
         'exampleauth:UserPass',
-        'distant_future:a' => [
-            'eduPersonPrincipalName' => ['DISTANT_FUTURE@ssp-hub-idp.local'],
+        'no_mfa_needed:a' => [
+            'eduPersonPrincipalName' => ['NO_MFA_NEEDED@ssp-hub-idp.local'],
             'eduPersonTargetID' => ['11111111-1111-1111-1111-111111111111'],
-            'sn' => ['Future'],
-            'givenName' => ['Distant'],
-            'mail' => ['distant_future@example.com'],
+            'sn' => ['Needed'],
+            'givenName' => ['No MFA'],
+            'mail' => ['no_mfa_needed@example.com'],
             'employeeNumber' => ['11111'],
-            'cn' => ['DISTANT_FUTURE'],
-            'schacExpiryDate' => [
-                gmdate('YmdHis\Z', strtotime('+6 months')), // Distant future
-            ],
+            'cn' => ['NO_MFA_NEEDED'],
+            'promptForMfa' => 'no',
+            'mfaOptions' => [],
         ],
-        'near_future:b' => [
-            'eduPersonPrincipalName' => ['NEAR_FUTURE@ssp-hub-idp.local'],
+        'must_set_up_mfa:a' => [
+            'eduPersonPrincipalName' => ['MUST_SET_UP_MFA@ssp-hub-idp.local'],
             'eduPersonTargetID' => ['22222222-2222-2222-2222-222222222222'],
-            'sn' => ['Future'],
-            'givenName' => ['Near'],
-            'mail' => ['near_future@example.com'],
+            'sn' => ['Set Up MFA'],
+            'givenName' => ['Must'],
+            'mail' => ['must_set_up_mfa@example.com'],
             'employeeNumber' => ['22222'],
-            'cn' => ['NEAR_FUTURE'],
-            'schacExpiryDate' => [
-                gmdate('YmdHis\Z', strtotime('+1 day')), // Very soon
+            'cn' => ['MUST_SET_UP_MFA'],
+            'promptForMfa' => 'yes',
+            'mfaOptions' => [],
+        ],
+        'has_backupcode:a' => [
+            'eduPersonPrincipalName' => ['HAS_BACKUPCODE@ssp-hub-idp.local'],
+            'eduPersonTargetID' => ['33333333-3333-3333-3333-333333333333'],
+            'sn' => ['Backupcode'],
+            'givenName' => ['Has'],
+            'mail' => ['has_backupcode@example.com'],
+            'employeeNumber' => ['33333'],
+            'cn' => ['HAS_BACKUPCODE'],
+            'promptForMfa' => 'yes',
+            'mfaOptions' => [
+                [
+                    'id' => 37,
+                    'type' => 'backupcode',
+                    'data' => '',
+                ],
             ],
         ],
-        'already_past:c' => [
-            'eduPersonPrincipalName' => ['ALREADY_PAST@ssp-hub-idp.local'],
+        'has_totp:a' => [
+            'eduPersonPrincipalName' => ['HAS_TOTP@ssp-hub-idp.local'],
             'eduPersonTargetID' => ['33333333-3333-3333-3333-333333333333'],
-            'sn' => ['Past'],
-            'givenName' => ['Already'],
-            'mail' => ['already_past@example.com'],
+            'sn' => ['TOTP'],
+            'givenName' => ['Has'],
+            'mail' => ['has_totp@example.com'],
             'employeeNumber' => ['33333'],
-            'cn' => ['ALREADY_PAST'],
-            'schacExpiryDate' => [
-                gmdate('YmdHis\Z', strtotime('-1 day')), // In the past
+            'cn' => ['HAS_TOTP'],
+            'promptForMfa' => 'yes',
+            'mfaOptions' => [
+                [
+                    'id' => 25,
+                    'type' => 'totp',
+                    'data' => '',
+                ],
             ],
         ],
     ],
