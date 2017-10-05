@@ -9,9 +9,9 @@ if (empty($stateId)) {
 
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
 
+// If the user has pressed the set-up-MFA button...
 if (array_key_exists('setUpMfa', $_REQUEST)) {
     
-    // The user has pressed the set-up-MFA button.
     $mfaSetupUrl = $state['mfaSetupUrl'];
     
     // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
