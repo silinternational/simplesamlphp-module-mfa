@@ -38,11 +38,11 @@ $config = [
         ],
         'has_totp:a' => [
             'eduPersonPrincipalName' => ['HAS_TOTP@mfa-idp.local'],
-            'eduPersonTargetID' => ['33333333-3333-3333-3333-333333333333'],
+            'eduPersonTargetID' => ['44444444-4444-4444-4444-444444444444'],
             'sn' => ['TOTP'],
             'givenName' => ['Has'],
             'mail' => ['has_totp@example.com'],
-            'employeeNumber' => ['33333'],
+            'employeeNumber' => ['44444'],
             'cn' => ['HAS_TOTP'],
             'promptForMfa' => ['yes'],
             'mfaOptionsJson' => ['{"id":25, "type":"totp", "data":""}'],
