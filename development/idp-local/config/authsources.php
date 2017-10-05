@@ -47,5 +47,16 @@ $config = [
             'promptForMfa' => ['yes'],
             'mfaOptionsJson' => ['{"id":25, "type":"totp", "data":""}'],
         ],
+        'has_u2f:a' => [
+            'eduPersonPrincipalName' => ['HAS_U2F@mfa-idp.local'],
+            'eduPersonTargetID' => ['55555555-5555-5555-5555-555555555555'],
+            'sn' => ['U2F'],
+            'givenName' => ['Has'],
+            'mail' => ['has_u2f@example.com'],
+            'employeeNumber' => ['55555'],
+            'cn' => ['HAS_U2F'],
+            'promptForMfa' => ['yes'],
+            'mfaOptionsJson' => ['{"id":96, "type":"u2f", "data":""}'],
+        ],
     ],
 ];
