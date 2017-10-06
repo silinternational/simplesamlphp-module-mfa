@@ -65,7 +65,7 @@ Run `make test`.
 ### Manual Testing ###
 Go to <http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp> in
 your browser and sign in with one of the users defined in
-``development/idp-local/config/authsources.php`.
+`development/idp-local/config/authsources.php`.
 
 ## Contributing ##
 To contribute, please submit issues or pull requests at 
