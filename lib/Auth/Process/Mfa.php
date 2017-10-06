@@ -1,6 +1,7 @@
 <?php
 
 use Psr\Log\LoggerInterface;
+use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
 /**
@@ -17,6 +18,11 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     
     private $employeeIdAttr = null;
     private $mfaSetupUrl = null;
+    
+    private $idBrokerAccessToken = null;
+    private $idBrokerAssertValidIp;
+    private $idBrokerBaseUri = null;
+    private $idBrokerTrustedIpRanges = [];
     
     /** @var LoggerInterface */
     protected $logger;
@@ -37,7 +43,15 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $this->loadValuesFromConfig($config, [
             'mfaSetupUrl',
             'employeeIdAttr',
+            'idBrokerAccessToken',
+            'idBrokerBaseUri',
         ]);
+        
+        $tempTrustedIpRanges = $config['idBrokerTrustedIpRanges'] ?? '';
+        if ( ! empty($tempTrustedIpRanges)) {
+            $this->idBrokerTrustedIpRanges = explode(',', $tempTrustedIpRanges);
+        }
+        $this->idBrokerAssertValidIp = (bool)($config['idBrokerAssertValidIp'] ?? true);
     }
     
     protected function loadValuesFromConfig($config, $attributes)
@@ -117,6 +131,28 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
     
     /**
+     * Get an ID Broker client.
+     *
+     * @param array $idBrokerConfig
+     * @return IdBrokerClient
+     */
+    protected static function getIdBrokerClient($idBrokerConfig)
+    {
+        $baseUri = $idBrokerConfig['baseUri'];
+        $accessToken = $idBrokerConfig['accessToken'];
+        $trustedIpRanges = $idBrokerConfig['trustedIpRanges'];
+        $assertValidIp = $idBrokerConfig['assertValidIp'];
+        
+        return new IdBrokerClient($baseUri, $accessToken, [
+            'http_client_options' => [
+                'timeout' => 10,
+            ],
+            IdBrokerClient::TRUSTED_IPS_CONFIG => $trustedIpRanges,
+            IdBrokerClient::ASSERT_VALID_BROKER_IP_CONFIG => $assertValidIp,
+        ]);
+    }
+    
+    /**
      * Extract the actual data from the array of JSON strings of MFA options.
      *
      * @param string[] $arrayOfJson An array of JSON strings.
@@ -144,6 +180,81 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         return $mfaOptions;
     }
     
+    /**
+     * Get the MFA type to use based on the available options.
+     *
+     * @param array[] $mfaOptions The available MFA options.
+     * @param int $mfaId The ID of the desired MFA option.
+     * @return array The MFA option to use.
+     * @throws \InvalidArgumentException
+     */
+    public static function getMfaOptionById($mfaOptions, $mfaId)
+    {
+        if (empty($mfaId)) {
+            throw new \Exception('No MFA ID was provided.');
+        }
+        
+        foreach ($mfaOptions as $mfaOption) {
+            if ($mfaOption['id'] === $mfaId) {
+                return $mfaOption;
+            }
+        }
+        
+        throw new \Exception(
+            'No MFA option has an ID of ' . var_export($mfaId, true)
+        );
+    }
+    
+    /**
+     * Get the MFA type to use based on the available options.
+     *
+     * @param array[] $mfaOptions The available MFA options.
+     * @return array The MFA option to use.
+     * @throws \InvalidArgumentException
+     */
+    public static function getMfaOptionToUse($mfaOptions)
+    {
+        if (empty($mfaOptions)) {
+            throw new \Exception('No MFA options were provided.');
+        }
+        
+        $mfaTypePriority = ['u2f', 'totp', 'backupcode'];
+        foreach ($mfaTypePriority as $mfaType) {
+            foreach ($mfaOptions as $mfaOption) {
+                if ($mfaOption['type'] === $mfaType) {
+                    return $mfaOption;
+                }
+            }
+        }
+        return $mfaOptions[0];
+    }
+    
+    /**
+     * Get the template identifier (string) to use for the specified MFA type.
+     *
+     * @param string $mfaType The desired MFA type, such as 'u2f', 'totp', or
+     *     'backupcode'.
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public static function getTemplateFor($mfaType)
+    {
+        $mfaOptionTemplates = [
+            'backupcode' => 'mfa:prompt-for-mfa-backupcode.php',
+            'totp' => 'mfa:prompt-for-mfa-totp.php',
+            'u2f' => 'mfa:prompt-for-mfa-u2f.php',
+        ];
+        $template = $mfaOptionTemplates[$mfaType] ?? null;
+        
+        if ($template === null) {
+            throw new \InvalidArgumentException(sprintf(
+                'No %s MFA template is available.',
+                var_export($mfaType, true)
+            ), 1507219338);
+        }
+        return $template;
+    }
+    
     protected function initComposerAutoloader()
     {
         $path = __DIR__ . '/../../../vendor/autoload.php';
@@ -163,6 +274,60 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 var_export($loggerClass, true)
             ), 1507139915);
         }
+    }
+    
+    /**
+     * Validate the given MFA submission. If successful, this function
+     * will NOT return. If the submission does not pass validation, an error
+     * message will be returned.
+     *
+     * @param int $mfaId The ID of the MFA option used.
+     * @param string $employeeId The Employee ID that this MFA option belongs to.
+     * @param string $mfaSubmission The value of the MFA submission.
+     * @param array $state The array of state information.
+     * @return void|string An error message, if validation is unsuccessful.
+     */
+    public static function validateMfaSubmission(
+        $mfaId,
+        $employeeId,
+        $mfaSubmission,
+        $state
+    ) {
+        if (empty($mfaId)) {
+            return 'No MFA ID was provided.';
+        } elseif (empty($employeeId)) {
+            return 'No Employee ID was provided.';
+        } elseif (empty($mfaSubmission)) {
+            return 'No MFA submission was provided.';
+        }
+        
+        try {
+            $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
+            $authenticatedUser = $idBrokerClient->mfaVerify(
+                $mfaId,
+                $employeeId,
+                $mfaSubmission
+            );
+            if ($authenticatedUser === null) {
+                return 'Incorrect 2-step verification code.';
+            }
+        } catch (\Throwable $t) {
+            $logger = new Psr3SamlLogger();
+            $logger->critical($t->getCode() . ': ' . $t->getMessage());
+            return 'Something went wrong while we were trying to do the '
+                 . '2-step verification.';
+        }
+        
+        /* Save the attributes we received from the login-function in the $state-array. */
+        assert('is_array($attributes)');
+        $state['Attributes'] = array_replace_recursive(
+            $state['Attributes'],
+            $authenticatedUser
+        );
+        
+        // The following function call will never return.
+        SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+        throw new \Exception('Failed to resume processing auth proc chain.');
     }
     
     /**
@@ -275,8 +440,19 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     {
         assert('is_array($state)');
         
-        $mfaOptions = $this->getMfaOptionsFromJson($mfaOptionsJson);
+        $logger = new Psr3SamlLogger();
+        $mfaOptions = $this->getMfaOptionsFromJson(
+            $mfaOptionsJson,
+            $employeeId,
+            $logger
+        );
         $state['mfaOptions'] = $mfaOptions;
+        $state['idBrokerConfig'] = [
+            'accessToken' => $this->idBrokerAccessToken,
+            'assertValidIp' => $this->idBrokerAssertValidIp,
+            'baseUri' => $this->idBrokerBaseUri,
+            'trustedIpRanges' => $this->idBrokerTrustedIpRanges,
+        ];
         
         $this->logger->info(sprintf(
             'mfa: Redirecting Employee ID %s to MFA prompt.',
