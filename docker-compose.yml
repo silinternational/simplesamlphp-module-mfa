@@ -57,7 +57,7 @@ services:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=sp1
       - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
-      - SECRET_SALT=h57fjemb&d$n^nsJFGNjweJz1
+      - SECRET_SALT=NOT-a-secret-h57fjemb&dn^nsJFGNjweJz1
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
       - SAML20_IDP_ENABLE=false
