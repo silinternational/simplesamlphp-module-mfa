@@ -28,7 +28,7 @@ Example (for `metadata/saml20-idp-hosted.php`):
         10 => [
             // Required:
             'class' => 'mfa:Mfa',
-            'accountNameAttr' => 'cn',
+            'employeeIdAttr' => 'employeeNumber',
             'idBrokerAccessToken' => Env::get('ID_BROKER_ACCESS_TOKEN'),
             'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
             'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
@@ -42,8 +42,8 @@ Example (for `metadata/saml20-idp-hosted.php`):
         // ...
     ],
 
-The `accountNameAttr` parameter represents the SAML attribute name which has 
-the user's account name stored in it. In certain situations, this will be 
+The `employeeIdAttr` parameter represents the SAML attribute name which has 
+the user's Employee ID stored in it. In certain situations, this may be 
 displayed to the user, as well as being used in log messages.
 
 The `loggerClass` parameter specifies the name of a PSR-3 compatible class that 
