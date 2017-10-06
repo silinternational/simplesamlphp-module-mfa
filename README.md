@@ -18,13 +18,21 @@ will discover this module and copy it into the `modules` folder within
 You will then need to set filter parameters in your config. We recommend adding 
 them to the `'authproc'` array in your `metadata/saml20-idp-hosted.php` file.
 
-Example (in `metadata/saml20-idp-hosted.php`):
+Example (for `metadata/saml20-idp-hosted.php`):
 
+    use Sil\PhpEnv\Env;
+    
+    // ...
+    
     'authproc' => [
         10 => [
             // Required:
             'class' => 'mfa:Mfa',
             'accountNameAttr' => 'cn',
+            'idBrokerAccessToken' => Env::get('ID_BROKER_ACCESS_TOKEN'),
+            'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
+            'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
+            'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
             'mfaSetupUrl' => 'https://idm.example.com/mfa/',
 
             // Optional:
