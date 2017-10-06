@@ -15,7 +15,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     const STAGE_SENT_TO_MFA_NEEDED_MESSAGE = 'mfa:sent_to_mfa_needed_message';
     const STAGE_SENT_TO_MFA_PROMPT = 'mfa:sent_to_mfa_prompt';
     
-    private $accountNameAttr = null;
+    private $employeeIdAttr = null;
     private $mfaSetupUrl = null;
     
     /** @var LoggerInterface */
@@ -36,7 +36,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         $this->loadValuesFromConfig($config, [
             'mfaSetupUrl',
-            'accountNameAttr',
+            'employeeIdAttr',
         ]);
     }
     
@@ -120,20 +120,20 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * Extract the actual data from the array of JSON strings of MFA options.
      *
      * @param string[] $arrayOfJson An array of JSON strings.
-     * @param string $accountName The name of the user account (for logging any
-     *     errors).
+     * @param string $employeeId The Employee ID of the user account (for
+     *     logging any errors).
      * @param LoggerInterface $logger The logger.
      * @return array[]
      */
-    protected function getMfaOptionsFromJson($arrayOfJson, $accountName, $logger)
+    protected function getMfaOptionsFromJson($arrayOfJson, $employeeId, $logger)
     {
         $mfaOptions = [];
         foreach ($arrayOfJson as $json) {
             $mfaOption = \json_decode($json, true);
             if ($mfaOption === null) {
                 $exception = new \InvalidArgumentException(sprintf(
-                    'Invalid JSON in mfaOptionsJson entry for %s: %s',
-                    $accountName,
+                    'Invalid JSON in mfaOptionsJson entry for Employee ID %s: %s',
+                    $employeeId,
                     var_export($json, true)
                 ));
                 $logger->error($exception->getMessage());
@@ -169,18 +169,18 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * Redirect the user to set up MFA.
      *
      * @param array $state
-     * @param string $accountName
+     * @param string $employeeId
      * @param string $mfaSetupUrl
      * @param string $mfaSetupSession
      * @param int $expiryTimestamp The timestamp when the password will expire.
      */
     public function redirectToMfaSetup(
         &$state,
-        $accountName,
+        $employeeId,
         $mfaSetupUrl
     ) {
         /* Save state and redirect. */
-        $state['accountName'] = $accountName;
+        $state['employeeId'] = $employeeId;
         
         /* If state already has the MFA-setup URL, go straight there to avoid
          * an eternal loop between that and the IdP. Otherwise add the original
@@ -207,8 +207,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
         
         $this->logger->warning(sprintf(
-            'mfa: Sending user (%s) to set up MFA at %s',
-            var_export($accountName, true),
+            'mfa: Sending Employee ID %s to set up MFA at %s',
+            var_export($employeeId, true),
             var_export($mfaSetupUrl, true)
         ));
         
@@ -223,15 +223,15 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     public function process(&$state)
     {
         // Get the necessary info from the state data.
-        $accountName = $this->getAttribute($this->accountNameAttr, $state);
+        $employeeId = $this->getAttribute($this->employeeIdAttr, $state);
         $promptForMfa = $this->getAttribute('promptForMfa', $state);
         
         if (strtolower($promptForMfa) !== 'no') {
             $mfaOptionsJson = $this->getAttributeAllValues('mfaOptionsJson', $state);
             if (empty($mfaOptionsJson)) {
-                $this->redirectToMfaNeededMessage($state, $accountName, $this->mfaSetupUrl);
+                $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
             } else {
-                $this->redirectToMfaPrompt($state, $accountName, $mfaOptionsJson);
+                $this->redirectToMfaPrompt($state, $employeeId, $mfaOptionsJson);
             }
         }
     }
@@ -240,21 +240,21 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * Redirect the user to a page telling them they must set up MFA.
      *
      * @param array $state The state data.
-     * @param string $accountName The name of the user account.
+     * @param string $employeeId The Employee ID of the user account.
      * @param string[] $mfaOptionsJson The list of MFA options, each
      *     individually encoded as a JSON string.
      */
-    protected function redirectToMfaNeededMessage(&$state, $accountName, $mfaSetupUrl)
+    protected function redirectToMfaNeededMessage(&$state, $employeeId, $mfaSetupUrl)
     {
         assert('is_array($state)');
         
         $this->logger->info(sprintf(
-            'mfa: Redirecting %s to must-set-up-MFA message.',
-            var_export($accountName, true)
+            'mfa: Redirecting Employee ID %s to must-set-up-MFA message.',
+            var_export($employeeId, true)
         ));
         
         /* Save state and redirect. */
-        $state['accountName'] = $accountName;
+        $state['employeeId'] = $employeeId;
         $state['mfaSetupUrl'] = $mfaSetupUrl;
         
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
@@ -267,11 +267,11 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * Redirect the user to the appropriate MFA-prompt page.
      *
      * @param array $state The state data.
-     * @param string $accountName The name of the user account.
+     * @param string $employeeId The Employee ID of the user account.
      * @param string[] $mfaOptionsJson The list of MFA options, each
      *     individually encoded as a JSON string.
      */
-    protected function redirectToMfaPrompt(&$state, $accountName, $mfaOptionsJson)
+    protected function redirectToMfaPrompt(&$state, $employeeId, $mfaOptionsJson)
     {
         assert('is_array($state)');
         
@@ -279,12 +279,12 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $state['mfaOptions'] = $mfaOptions;
         
         $this->logger->info(sprintf(
-            'mfa: Redirecting %s to MFA prompt.',
-            var_export($accountName, true)
+            'mfa: Redirecting Employee ID %s to MFA prompt.',
+            var_export($employeeId, true)
         ));
         
         /* Save state and redirect. */
-        $state['accountName'] = $accountName;
+        $state['employeeId'] = $employeeId;
         
         $id = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
         $url = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php');
