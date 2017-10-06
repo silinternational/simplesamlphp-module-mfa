@@ -30,6 +30,10 @@ $metadata['http://mfa-idp.local:8085'] = [
         10 => [
             'class' => 'mfa:Mfa',
             'accountNameAttr' => 'cn',
+            'idBrokerAccessToken' => Env::get('ID_BROKER_ACCESS_TOKEN'),
+            'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
+            'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
+            'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
             'mfaSetupUrl' => Env::get('MFA_SETUP_URL'),
             'loggerClass' => Psr3SamlLogger::class,
         ],
