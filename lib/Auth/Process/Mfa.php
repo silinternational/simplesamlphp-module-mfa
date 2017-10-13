@@ -15,7 +15,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     const STAGE_SENT_TO_MFA_CHANGE_URL = 'mfa:sent_to_mfa_change_url';
     const STAGE_SENT_TO_MFA_NEEDED_MESSAGE = 'mfa:sent_to_mfa_needed_message';
     const STAGE_SENT_TO_MFA_PROMPT = 'mfa:sent_to_mfa_prompt';
-    
+    const STAGE_SENT_TO_MFA_NAG = 'mfa:sent_to_mfa_nag';
+
     private $employeeIdAttr = null;
     private $mfaSetupUrl = null;
     
@@ -226,6 +227,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 }
             }
         }
+
         return $mfaOptions[0];
     }
     
@@ -390,14 +392,17 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         // Get the necessary info from the state data.
         $employeeId = $this->getAttribute($this->employeeIdAttr, $state);
         $promptForMfa = $this->getAttribute('promptForMfa', $state);
-        
+        $nagForMfa = $this->getAttribute('nagForMfa', $state);
+        $mfaOptions = $this->getAttributeAllValues('mfaOptions', $state);
+
         if (strtolower($promptForMfa) !== 'no') {
-            $mfaOptionsJson = $this->getAttributeAllValues('mfaOptionsJson', $state);
-            if (empty($mfaOptionsJson)) {
+            if (count($mfaOptions) == 0) {
                 $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
             } else {
-                $this->redirectToMfaPrompt($state, $employeeId, $mfaOptionsJson);
+                $this->redirectToMfaPrompt($state, $employeeId, $mfaOptions);
             }
+        } elseif ($nagForMfa == 'yes') {
+            $this->redirectToMfaNag($state, $employeeId, $this->mfaSetupUrl);
         }
     }
     
@@ -406,8 +411,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      *
      * @param array $state The state data.
      * @param string $employeeId The Employee ID of the user account.
-     * @param string[] $mfaOptionsJson The list of MFA options, each
-     *     individually encoded as a JSON string.
+     * @param string $mfaSetupUrl URL to MFA setup process
      */
     protected function redirectToMfaNeededMessage(&$state, $employeeId, $mfaSetupUrl)
     {
@@ -427,25 +431,45 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         SimpleSAML_Utilities::redirect($url, array('StateId' => $stateId));
     }
+
+    /**
+     * Redirect user to nag page encouraging them to setup MFA
+     *
+     * @param array $state The state data.
+     * @param string $employeeId The Employee ID of the user account.
+     * @param string $mfaSetupUrl URL to MFA setup process
+     */
+    protected function redirectToMfaNag(&$state, $employeeId, $mfaSetupUrl)
+    {
+        assert('is_array($state)');
+
+        $this->logger->info(sprintf(
+            'mfa: Redirecting Employee ID %s to MFA nag message.',
+            var_export($employeeId, true)
+        ));
+
+        /* Save state and redirect. */
+        $state['employeeId'] = $employeeId;
+        $state['mfaSetupUrl'] = $mfaSetupUrl;
+
+        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NAG);
+        $url = SimpleSAML_Module::getModuleURL('mfa/nag-for-mfa.php');
+
+        SimpleSAML_Utilities::redirect($url, array('StateId' => $stateId));
+    }
     
     /**
      * Redirect the user to the appropriate MFA-prompt page.
      *
      * @param array $state The state data.
      * @param string $employeeId The Employee ID of the user account.
-     * @param string[] $mfaOptionsJson The list of MFA options, each
-     *     individually encoded as a JSON string.
+     * @param array $mfaOptions Array of MFA options
      */
-    protected function redirectToMfaPrompt(&$state, $employeeId, $mfaOptionsJson)
+    protected function redirectToMfaPrompt(&$state, $employeeId, $mfaOptions)
     {
         assert('is_array($state)');
         
         $logger = new Psr3SamlLogger();
-        $mfaOptions = $this->getMfaOptionsFromJson(
-            $mfaOptionsJson,
-            $employeeId,
-            $logger
-        );
         $state['mfaOptions'] = $mfaOptions;
         $state['idBrokerConfig'] = [
             'accessToken' => $this->idBrokerAccessToken,
