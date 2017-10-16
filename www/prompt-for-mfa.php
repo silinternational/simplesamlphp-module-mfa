@@ -17,7 +17,7 @@ if (empty($mfaId)) {
     $mfaOption = Mfa::getMfaOptionToUse($mfaOptions);
     $mfaId = $mfaOption['id'];
 } else {
-    $mfaOption = Mfa::getMfaOptionById($mfaId);
+    $mfaOption = Mfa::getMfaOptionById($mfaOptions, $mfaId);
 }
 
 // If the user has submitted their MFA value...
@@ -41,6 +41,8 @@ $t = new SimpleSAML_XHTML_Template($globalConfig, $mfaTemplateToUse);
 $t->data['formTarget'] = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php');
 $t->data['formData'] = ['StateId' => $stateId];
 $t->data['errorMessage'] = $errorMessage ?? null;
+$t->data['mfaOptions'] = $mfaOptions;
+$t->data['stateId'] = $stateId;
 $t->show();
 
 SimpleSAML_Logger::info(sprintf(
