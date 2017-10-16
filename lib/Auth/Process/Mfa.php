@@ -305,27 +305,28 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         try {
             $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
-            $authenticatedUser = $idBrokerClient->mfaVerify(
+            $validMfa = $idBrokerClient->mfaVerify(
                 $mfaId,
                 $employeeId,
                 $mfaSubmission
             );
-            if ($authenticatedUser === null) {
+            if ( ! $validMfa) {
                 return 'Incorrect 2-step verification code.';
             }
         } catch (\Throwable $t) {
             $logger = new Psr3SamlLogger();
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
             return 'Something went wrong while we were trying to do the '
-                 . '2-step verification.';
+                 . '2-step verification.' . $t->getMessage();
         }
-        
+
+        // TODO should we strip MFA related attributes here?
         /* Save the attributes we received from the login-function in the $state-array. */
-        assert('is_array($attributes)');
-        $state['Attributes'] = array_replace_recursive(
-            $state['Attributes'],
-            $authenticatedUser
-        );
+//        assert('is_array($attributes)');
+//        $state['Attributes'] = array_replace_recursive(
+//            $state['Attributes'],
+//            $authenticatedUser
+//        );
         
         // The following function call will never return.
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);

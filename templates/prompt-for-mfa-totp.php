@@ -27,6 +27,26 @@ if ( ! empty($this->data['errorMessage'])) {
         <button type="submit" id="submitMfa" name="submitMfa"
                 style="padding: 4px 8px;">Submit</button>
     </p>
+    <?php
+    if (count($this->data['mfaOptions']) > 1) {
+        ?>
+        <p>
+            Don't have your app handy? You may also use:
+        <ul>
+            <?php
+            foreach ($this->data['mfaOptions'] as $mfaOpt) {
+                if ($mfaOpt['type'] != 'totp'){
+                    ?>
+                    <li><a href="<?=htmlentities($this->data['formTarget'])?>?StateId=<?=$this->data['stateId']?>&mfaId=<?=$mfaOpt['id']?>"><?=$mfaOpt['type']?></a></li>
+                    <?php
+                }
+            }
+            ?>
+        </ul>
+        </p>
+        <?php
+    }
+    ?>
 </form>
 <?php
 

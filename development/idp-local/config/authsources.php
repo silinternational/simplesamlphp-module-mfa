@@ -12,6 +12,7 @@ $config = [
             'employeeNumber' => ['11111'],
             'cn' => ['NO_MFA_NEEDED'],
             'promptForMfa' => 'no',
+            'nagForMfa' => 'yes',
             'mfaOptions' => '',
         ],
         'must_set_up_mfa:a' => [
@@ -21,24 +22,29 @@ $config = [
             'mfaOptions' => '',
         ],
         'has_backupcode:a' => [
+            'eduPersonPrincipalName' => ['has_backupcode@mfa-idp.local'],
+            'eduPersonTargetID' => ['11111111-1111-1111-1111-111111111111'],
+            'sn' => ['Has'],
+            'givenName' => ['Backupcode'],
+            'mail' => ['hasBackupcode@example.com'],
             'employeeNumber' => ['33333'],
             'promptForMfa' => 'yes',
             'nagForMfa' => 'no',
             'mfaOptions' => [
                 [
-                    'id' => '37',
+                    'id' => '1',
                     'type' => 'backupcode',
                     'data' => '',
                 ],
             ],
         ],
         'has_totp:a' => [
-            'employeeNumber' => ['44444'],
+            'employeeNumber' => ['33333'],
             'promptForMfa' => 'yes',
             'nagForMfa' => 'no',
             'mfaOptions' => [
                 [
-                    'id' => '25',
+                    'id' => '2',
                     'type' => 'totp',
                     'data' => '',
                 ],
@@ -61,6 +67,33 @@ $config = [
             'promptForMfa' => 'no',
             'nagForMfa' => 'yes',
             'mfaOptions' => '',
+        ],
+        'has_all:a' => [
+            'eduPersonPrincipalName' => ['has_all@mfa-idp.local'],
+            'eduPersonTargetID' => ['11111111-1111-1111-1111-111111111111'],
+            'sn' => ['Has'],
+            'givenName' => ['All'],
+            'mail' => ['has-all@example.com'],
+            'employeeNumber' => ['66666'],
+            'promptForMfa' => 'yes',
+            'nagForMfa' => 'no',
+            'mfaOptions' => [
+                [
+                    'id' => '1',
+                    'type' => 'backupcode',
+                    'data' => '',
+                ],
+                [
+                    'id' => '2',
+                    'type' => 'totp',
+                    'data' => '',
+                ],
+                [
+                    'id' => '3',
+                    'type' => 'u2f',
+                    'data' => '',
+                ],
+            ],
         ],
     ],
 ];
