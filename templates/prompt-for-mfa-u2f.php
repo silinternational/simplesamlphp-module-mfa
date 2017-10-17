@@ -4,7 +4,25 @@ $this->data['header'] = '2-step verification';
 $this->includeAtTemplateBase('includes/header.php');
 
 ?>
-<form action="<?= htmlentities($this->data['formTarget']); ?>">
+<script src="https://demo.yubico.com/js/u2f-api.js"></script>
+<script type="application/javascript">
+    window.onload = function() {
+      var mfa = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT)?>;
+      console.log(mfa);
+      u2f.sign(mfa.appId, mfa.challenge, [mfa], function(response) {
+        console.log(response);
+        if (response.errorCode && response.errorCode != 0) {
+          alert("Error from U2F, code: " + response.errorCode);
+          return;
+        }
+        var mfaForm = document.getElementById('mfaForm');
+        var mfaResponse = document.getElementById('mfaSubmission');
+        mfaResponse.value = response;
+        mfaForm.submit();
+      });
+    }
+</script>
+<form action="<?= htmlentities($this->data['formTarget']); ?>" method="POST" id="mfaForm">
   
     <?php foreach ($this->data['formData'] as $name => $value): ?>
         <input type="hidden"
@@ -12,11 +30,11 @@ $this->includeAtTemplateBase('includes/header.php');
                value="<?= htmlentities($value); ?>" />
     <?php endforeach; ?>
     
-    <p>Please insert your security key and press its button.</p>
+    <p id="mfaInstructions">Please insert your security key and press its button.</p>
     <p>
         <input type="hidden" id="mfaSubmission" name="mfaSubmission" />
-        <button type="submit" name="submitMfa" id="submitMfa"
-                style="padding: 4px 8px;">Submit</button>
+        <input type="hidden" id="submitMfa" name="submitMfa" />
+
     </p>
 
     <?php
