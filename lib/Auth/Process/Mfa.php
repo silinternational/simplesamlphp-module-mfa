@@ -196,7 +196,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
         
         foreach ($mfaOptions as $mfaOption) {
-            if ($mfaOption['id'] === $mfaId) {
+            if ((int)$mfaOption['id'] === (int)$mfaId) {
                 return $mfaOption;
             }
         }
