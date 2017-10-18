@@ -13,7 +13,7 @@ if ( ! empty($this->data['errorMessage'])) {
 }
 
 ?>
-<form action="<?= htmlentities($this->data['formTarget']); ?>" method=POST">
+<form action="<?= htmlentities($this->data['formTarget']); ?>" method="POST">
   
     <?php foreach ($this->data['formData'] as $name => $value): ?>
         <input type="hidden"
