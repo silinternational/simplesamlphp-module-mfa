@@ -25,6 +25,9 @@ if (empty($mfaId)) {
 // If the user has submitted their MFA value...
 if (filter_has_var(INPUT_POST, 'submitMfa')) {
     $mfaSubmission = filter_input(INPUT_POST, 'mfaSubmission');
+    if (substr($mfaSubmission, 0, 1) == '{') {
+        $mfaSubmission = json_decode($mfaSubmission, true);
+    }
     
     // NOTE: This will only return if validation fails.
     $errorMessage = Mfa::validateMfaSubmission(
