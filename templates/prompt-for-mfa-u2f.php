@@ -4,11 +4,13 @@ $this->data['header'] = '2-step verification';
 $this->includeAtTemplateBase('includes/header.php');
 
 ?>
-<script src="https://demo.yubico.com/js/u2f-api.js"></script>
+<script src="<?=SimpleSAML_Module::getModuleURL('mfa/u2f-api.js');?>"></script>
 <script type="application/javascript">
     window.onload = function() {
+
       console.log('data:');
       console.log(<?=json_encode($this->data)?>);
+
       var mfa = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT);?>;
       console.log(mfa);
       u2f.sign(mfa.appId, mfa.challenge, [mfa], function(response) {
