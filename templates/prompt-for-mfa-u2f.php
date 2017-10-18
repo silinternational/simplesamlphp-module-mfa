@@ -7,7 +7,9 @@ $this->includeAtTemplateBase('includes/header.php');
 <script src="https://demo.yubico.com/js/u2f-api.js"></script>
 <script type="application/javascript">
     window.onload = function() {
-      var mfa = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT)?>;
+      console.log('data:');
+      console.log(<?=json_encode($this->data)?>);
+      var mfa = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT);?>;
       console.log(mfa);
       u2f.sign(mfa.appId, mfa.challenge, [mfa], function(response) {
         console.log(response);
