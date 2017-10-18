@@ -21,7 +21,7 @@ $this->includeAtTemplateBase('includes/header.php');
         }
         var mfaForm = document.getElementById('mfaForm');
         var mfaResponse = document.getElementById('mfaSubmission');
-        mfaResponse.value = response;
+        mfaResponse.value = JSON.stringify(response);
         mfaForm.submit();
       });
     }
