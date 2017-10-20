@@ -1,6 +1,7 @@
 <?php
 
 use Psr\Log\LoggerInterface;
+use Sil\PhpEnv\Env;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
@@ -287,13 +288,15 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * @param string $employeeId The Employee ID that this MFA option belongs to.
      * @param string $mfaSubmission The value of the MFA submission.
      * @param array $state The array of state information.
+     * @param bool $rememberMe Whether or not to set remember me cookies
      * @return void|string An error message, if validation is unsuccessful.
      */
     public static function validateMfaSubmission(
         $mfaId,
         $employeeId,
         $mfaSubmission,
-        $state
+        $state,
+        $rememberMe
     ) {
         if (empty($mfaId)) {
             return 'No MFA ID was provided.';
@@ -327,7 +330,12 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
 //            $state['Attributes'],
 //            $authenticatedUser
 //        );
-        
+
+        // Set remember me cookies if requested
+        if ($rememberMe) {
+            self::setRememberMeCookies($state['employeeId'], $state['mfaOptions']);
+        }
+
         // The following function call will never return.
         // TODO should we strip MFA related attributes here?
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
@@ -494,5 +502,74 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $url = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php');
         
         SimpleSAML_Utilities::redirect($url, array('StateId' => $id));
+    }
+
+    /**
+     * Validate that remember me cookie values are legit and valid
+     * @param string $cookieHash
+     * @param string $expireDate
+     * @param $mfaOptions
+     * @param $state
+     * @return bool
+     */
+    public static function isRememberMeCookieValid(
+        string $cookieHash,
+        string $expireDate,
+        $mfaOptions,
+        $state
+    ): bool {
+        $rememberSecret = Env::requireEnv('REMEMBER_ME_SECRET');
+        if (! empty($cookieHash) && ! empty($expireDate) && is_numeric($expireDate)) {
+            // Check if value of expireDate is in future
+            if ((int)$expireDate > time()) {
+                $expectedString = self::generateRememberMeCookieString($rememberSecret, $state['employeeId'], $expireDate, $mfaOptions);
+                return password_verify($expectedString, $cookieHash);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Generate and return a string to be hashed for remember me cookie
+     * @param string $rememberSecret
+     * @param string $employeeId
+     * @param int $expireDate
+     * @param array $mfaOptions
+     * @return string
+     */
+    public static function generateRememberMeCookieString(
+        string $rememberSecret,
+        string $employeeId,
+        int $expireDate,
+        array $mfaOptions
+    ): string {
+        $allMfaIds = '';
+        foreach ($mfaOptions as $opt) {
+            $allMfaIds .= $opt['id'];
+        }
+
+        $string = $rememberSecret . $employeeId . $expireDate . $allMfaIds;
+        return $string;
+    }
+
+    /**
+     * Set cookies c1 and c2
+     * @param string $employeeId
+     * @param array $mfaOptions
+     * @param string $rememberDuration
+     */
+    public static function setRememberMeCookies(
+        string $employeeId,
+        array $mfaOptions,
+        string $rememberDuration = '+30 days'
+    ) {
+        $rememberSecret = Env::requireEnv('REMEMBER_ME_SECRET');
+        $secureCookie = Env::get('SECURE_COOKIE', true);
+        $expireDate = strtotime($rememberDuration);
+        $cookieString = self::generateRememberMeCookieString($rememberSecret, $employeeId, $expireDate, $mfaOptions);
+        $cookieHash = password_hash($cookieString, PASSWORD_DEFAULT);
+        setcookie('c1', base64_encode($cookieHash), $expireDate, '/', null, $secureCookie, true);
+        setcookie('c2', $expireDate, $expireDate, '/', null, $secureCookie, true);
     }
 }

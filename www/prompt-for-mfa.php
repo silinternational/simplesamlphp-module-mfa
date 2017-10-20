@@ -1,6 +1,7 @@
 <?php
 
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
+use Sil\PhpEnv\Env;
 
 $stateId = filter_input(INPUT_POST, 'StateId') ?? null;
 $stateId = $stateId ?? filter_input(INPUT_GET, 'StateId');
@@ -10,6 +11,18 @@ if (empty($stateId)) {
 
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_PROMPT);
 $mfaOptions = $state['mfaOptions'] ?? [];
+
+/*
+ * Check for "Remember me for 30 days" cookies and if valid bypass mfa prompt
+ */
+$cookieHash = filter_input(INPUT_COOKIE, 'c1') ?? ''; // hashed string
+$expireDate = filter_input(INPUT_COOKIE, 'c2') ?? 0;  // expiration timestamp
+if (Mfa::isRememberMeCookieValid(base64_decode($cookieHash), $expireDate, $mfaOptions, $state)) {
+    // This condition should never return
+    // TODO should we strip MFA related attributes here?
+    SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+    throw new \Exception('Failed to resume processing auth proc chain.');
+}
 
 // If the user specified an MFA id, try to get that MFA option.
 $mfaId = filter_input(INPUT_POST, 'mfaId');
@@ -28,13 +41,16 @@ if (filter_has_var(INPUT_POST, 'submitMfa')) {
     if (substr($mfaSubmission, 0, 1) == '{') {
         $mfaSubmission = json_decode($mfaSubmission, true);
     }
+
+    $rememberMe = filter_input(INPUT_POST, 'rememberMe') ?? false;
     
     // NOTE: This will only return if validation fails.
     $errorMessage = Mfa::validateMfaSubmission(
         $mfaId,
         $state['employeeId'],
         $mfaSubmission,
-        $state
+        $state,
+        $rememberMe
     );
 }
 

@@ -36,6 +36,9 @@ $this->includeAtTemplateBase('includes/header.php');
     
     <p id="mfaInstructions">Please insert your security key and press its button.</p>
     <p>
+        <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
+        <label for="rememberMe">Remember this computer for 30 days</label>
+        <br />
         <input type="hidden" id="mfaSubmission" name="mfaSubmission" />
         <input type="hidden" id="submitMfa" name="submitMfa" />
 
