@@ -39,6 +39,7 @@ services:
       - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
+      - REMEMBER_ME_SECRET=cccccchkrdjcidfdrrfbhgbftfllliubddrhglnnglbh
     command: ["/data/run-dev.sh"]
 
   sp:

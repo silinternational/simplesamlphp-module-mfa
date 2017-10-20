@@ -11,15 +11,19 @@ $config = [
             'mail' => ['no_mfa_needed@example.com'],
             'employeeNumber' => ['11111'],
             'cn' => ['NO_MFA_NEEDED'],
-            'promptForMfa' => 'no',
-            'nagForMfa' => 'yes',
-            'mfaOptions' => '',
+            'mfa' => [
+                'prompt' => 'no',
+                'nag' => 'yes',
+                'options' => [],
+            ],
         ],
         'must_set_up_mfa:a' => [
             'employeeNumber' => ['22222'],
-            'promptForMfa' => 'yes',
-            'nagForMfa' => 'no',
-            'mfaOptions' => '',
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [],
+            ],
         ],
         'has_backupcode:a' => [
             'eduPersonPrincipalName' => ['has_backupcode@mfa-idp.local'],
@@ -28,45 +32,58 @@ $config = [
             'givenName' => ['Backupcode'],
             'mail' => ['hasBackupcode@example.com'],
             'employeeNumber' => ['33333'],
-            'promptForMfa' => 'yes',
-            'nagForMfa' => 'no',
-            'mfaOptions' => [
-                [
-                    'id' => '1',
-                    'type' => 'backupcode',
-                    'data' => '',
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '7',
+                        'type' => 'backupcode',
+                        'data' => '',
+                    ],
                 ],
             ],
         ],
         'has_totp:a' => [
             'employeeNumber' => ['33333'],
-            'promptForMfa' => 'yes',
-            'nagForMfa' => 'no',
-            'mfaOptions' => [
-                [
-                    'id' => '2',
-                    'type' => 'totp',
-                    'data' => '',
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '2',
+                        'type' => 'totp',
+                        'data' => '',
+                    ],
                 ],
             ],
         ],
         'has_u2f:a' => [
             'employeeNumber' => ['55555'],
-            'promptForMfa' => 'yes',
-            'nagForMfa' => 'no',
-            'mfaOptions' => [
-                [
-                    'id' => '96',
-                    'type' => 'u2f',
-                    'data' => '',
-                ],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '3',
+                        'type' => 'u2f',
+                        'data' => json_decode('{
+"version": "U2F_V2",
+"challenge": "qqrXfXOaMzusztKTsGQxdQe6Lf5zmKlL8VpIM2PHo34",
+"appId": "https://appsdev-pw.iidp.net/app-id.json",
+"keyHandle": "72mYgeyaSqKfHD9S-v01gBlPFtPqnVfCA-CO-OS1Daq9UwZv7sdB-g8tRw6Ka3CUyNHEUOIRoz2khBNYP-zGrw"
+}'),
+                    ],
+                ]
             ],
         ],
         'nag_for_mfa:a' => [
             'employeeNumber' => ['55555'],
-            'promptForMfa' => 'no',
-            'nagForMfa' => 'yes',
-            'mfaOptions' => '',
+            'mfa' => [
+                'prompt' => 'no',
+                'nag' => 'yes',
+                'options' => [],
+            ],
         ],
         'has_all:a' => [
             'eduPersonPrincipalName' => ['has_all@mfa-idp.local'],
@@ -75,23 +92,25 @@ $config = [
             'givenName' => ['All'],
             'mail' => ['has-all@example.com'],
             'employeeNumber' => ['66666'],
-            'promptForMfa' => 'yes',
-            'nagForMfa' => 'no',
-            'mfaOptions' => [
-                [
-                    'id' => '1',
-                    'type' => 'backupcode',
-                    'data' => '',
-                ],
-                [
-                    'id' => '2',
-                    'type' => 'totp',
-                    'data' => '',
-                ],
-                [
-                    'id' => '3',
-                    'type' => 'u2f',
-                    'data' => '',
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '1',
+                        'type' => 'backupcode',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '2',
+                        'type' => 'totp',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '3',
+                        'type' => 'u2f',
+                        'data' => '',
+                    ],
                 ],
             ],
         ],
