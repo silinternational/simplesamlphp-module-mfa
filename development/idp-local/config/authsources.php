@@ -67,12 +67,7 @@ $config = [
                     [
                         'id' => '3',
                         'type' => 'u2f',
-                        'data' => json_decode('{
-"version": "U2F_V2",
-"challenge": "qqrXfXOaMzusztKTsGQxdQe6Lf5zmKlL8VpIM2PHo34",
-"appId": "https://appsdev-pw.iidp.net/app-id.json",
-"keyHandle": "72mYgeyaSqKfHD9S-v01gBlPFtPqnVfCA-CO-OS1Daq9UwZv7sdB-g8tRw6Ka3CUyNHEUOIRoz2khBNYP-zGrw"
-}'),
+                        'data' => '',
                     ],
                 ]
             ],
