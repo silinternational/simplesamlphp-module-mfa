@@ -323,14 +323,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                  . '2-step verification.' . $t->getMessage();
         }
 
-
-        /* Save the attributes we received from the login-function in the $state-array. */
-//        assert('is_array($attributes)');
-//        $state['Attributes'] = array_replace_recursive(
-//            $state['Attributes'],
-//            $authenticatedUser
-//        );
-
         // Set remember me cookies if requested
         if ($rememberMe) {
             self::setRememberMeCookies($state['employeeId'], $state['mfaOptions']);
@@ -485,10 +477,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             'baseUri' => $this->idBrokerBaseUri,
             'trustedIpRanges' => $this->idBrokerTrustedIpRanges,
         ];
-
-        /*
-         * TODO: Before prompting user for MFA, check if they have asked to be remembered
-         */
         
         $this->logger->info(sprintf(
             'mfa: Redirecting Employee ID %s to MFA prompt.',
