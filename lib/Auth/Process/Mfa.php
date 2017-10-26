@@ -155,34 +155,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
     
     /**
-     * Extract the actual data from the array of JSON strings of MFA options.
-     *
-     * @param string[] $arrayOfJson An array of JSON strings.
-     * @param string $employeeId The Employee ID of the user account (for
-     *     logging any errors).
-     * @param LoggerInterface $logger The logger.
-     * @return array[]
-     */
-    protected function getMfaOptionsFromJson($arrayOfJson, $employeeId, $logger)
-    {
-        $mfaOptions = [];
-        foreach ($arrayOfJson as $json) {
-            $mfaOption = \json_decode($json, true);
-            if ($mfaOption === null) {
-                $exception = new \InvalidArgumentException(sprintf(
-                    'Invalid JSON in mfaOptionsJson entry for Employee ID %s: %s',
-                    $employeeId,
-                    var_export($json, true)
-                ));
-                $logger->error($exception->getMessage());
-                throw $exception;
-            }
-            $mfaOptions[] = $mfaOption;
-        }
-        return $mfaOptions;
-    }
-    
-    /**
      * Get the MFA type to use based on the available options.
      *
      * @param array[] $mfaOptions The available MFA options.
@@ -329,7 +301,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
 
         // The following function call will never return.
-        // TODO should we strip MFA related attributes here?
+        unset($state['Attributes']['mfa']);
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
         throw new \Exception('Failed to resume processing auth proc chain.');
     }
@@ -365,6 +337,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
              */
             if (strpos($relayState, $mfaSetupUrl) !== false) {             
                 // NOTE: This function call will never return.
+                unset($state['Attributes']['mfa']);
                 SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             } else {
