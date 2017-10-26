@@ -18,8 +18,8 @@ $mfaOptions = $state['mfaOptions'] ?? [];
 $cookieHash = filter_input(INPUT_COOKIE, 'c1') ?? ''; // hashed string
 $expireDate = filter_input(INPUT_COOKIE, 'c2') ?? 0;  // expiration timestamp
 if (Mfa::isRememberMeCookieValid(base64_decode($cookieHash), $expireDate, $mfaOptions, $state)) {
-    // This condition should never return
     unset($state['Attributes']['mfa']);
+    // This condition should never return
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
     throw new \Exception('Failed to resume processing auth proc chain.');
 }

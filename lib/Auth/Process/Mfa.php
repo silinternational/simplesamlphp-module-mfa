@@ -300,8 +300,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             self::setRememberMeCookies($state['employeeId'], $state['mfaOptions']);
         }
 
-        // The following function call will never return.
         unset($state['Attributes']['mfa']);
+        // The following function call will never return.
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
         throw new \Exception('Failed to resume processing auth proc chain.');
     }
@@ -335,9 +335,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
              *       words, make sure the user is really just going to the MFA
              *       setup website.
              */
-            if (strpos($relayState, $mfaSetupUrl) !== false) {             
-                // NOTE: This function call will never return.
+            if (strpos($relayState, $mfaSetupUrl) !== false) {
                 unset($state['Attributes']['mfa']);
+                // NOTE: This function call will never return.
                 SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             } else {
