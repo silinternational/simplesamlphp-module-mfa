@@ -27,7 +27,7 @@ if (filter_has_var(INPUT_GET, 'setUpMfa')) {
     return;
 } elseif (filter_has_var(INPUT_GET, 'continue')) {
     // The user has pressed the continue button.
-    unset($state['Attributes']['mfa']);
+    //unset($state['Attributes']['mfa']);
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
 }
 
