@@ -2,6 +2,7 @@
 
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 use Sil\PhpEnv\Env;
+use Sil\Psr3Adapters\Psr3SamlLogger;
 
 $stateId = filter_input(INPUT_POST, 'StateId') ?? null;
 $stateId = $stateId ?? filter_input(INPUT_GET, 'StateId');
@@ -11,6 +12,8 @@ if (empty($stateId)) {
 
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_PROMPT);
 $mfaOptions = $state['mfaOptions'] ?? [];
+
+$logger = new Psr3SamlLogger();
 
 /*
  * Check for "Remember me for 30 days" cookies and if valid bypass mfa prompt
@@ -67,7 +70,7 @@ $t->data['mfaOptions'] = $mfaOptions;
 $t->data['stateId'] = $stateId;
 $t->show();
 
-SimpleSAML_Logger::info(sprintf(
-    'mfa: Prompted Employee ID %s for MFA.',
-    $state['employeeId']
-));
+$logger->info(json_encode([
+    'event' => 'Prompted user for MFA',
+    'employeeId' => $state['employeeId'],
+]));
