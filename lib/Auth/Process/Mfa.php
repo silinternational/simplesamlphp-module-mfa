@@ -295,7 +295,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         } catch (\Throwable $t) {
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
             return 'Something went wrong while we were trying to do the '
-                 . '2-step verification.' . $t->getMessage();
+                 . '2-step verification.';
         }
 
         // Set remember me cookies if requested
