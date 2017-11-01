@@ -54,8 +54,16 @@ if (filter_has_var(INPUT_POST, 'submitMfa')) {
         $mfaSubmission,
         $state,
         $rememberMe,
-        $logger
+        $logger,
+        $mfaOption['type']
     );
+    
+    $logger->warning(json_encod([
+        'event' => 'MFA validation result: failed',
+        'employeeId' => $state['employeeId'],
+        'mfaType' => $mfaOption['type'],
+        'error' => $errorMessage,
+    ]));
 }
 
 $globalConfig = SimpleSAML_Configuration::getInstance();
@@ -74,4 +82,5 @@ $t->show();
 $logger->info(json_encode([
     'event' => 'Prompted user for MFA',
     'employeeId' => $state['employeeId'],
+    'mfaType' => $mfaOption['type'],
 ]));
