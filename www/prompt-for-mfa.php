@@ -58,7 +58,7 @@ if (filter_has_var(INPUT_POST, 'submitMfa')) {
         $mfaOption['type']
     );
     
-    $logger->warning(json_encod([
+    $logger->warning(json_encode([
         'event' => 'MFA validation result: failed',
         'employeeId' => $state['employeeId'],
         'mfaType' => $mfaOption['type'],

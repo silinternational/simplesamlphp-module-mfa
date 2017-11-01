@@ -303,7 +303,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             self::setRememberMeCookies($state['employeeId'], $state['mfaOptions']);
         }
         
-        $logger->warning(json_encod([
+        $logger->warning(json_encode([
             'event' => 'MFA validation result: success',
             'employeeId' => $employeeId,
             'mfaType' => $mfaType,
