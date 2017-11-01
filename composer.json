@@ -13,8 +13,10 @@
   "require": {
     "php": ">=7.0",
     "roave/security-advisories": "dev-master",
+    "silinternational/php-env": "^2.1",
     "silinternational/psr3-adapters": "^1.1",
-    "simplesamlphp/simplesamlphp": "^1.14.16"
+    "simplesamlphp/simplesamlphp": "^1.14.16",
+    "silinternational/idp-id-broker-php-client": "^2.1.1"
   },
   "require-dev": {
     "behat/behat": "^3.3",

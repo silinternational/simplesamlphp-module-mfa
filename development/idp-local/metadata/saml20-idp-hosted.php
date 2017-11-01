@@ -1,5 +1,6 @@
 <?php
 
+use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
 /**
@@ -7,7 +8,7 @@ use Sil\Psr3Adapters\Psr3SamlLogger;
  *
  * See: https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-hosted
  */
-$metadata['http://ssp-hub-idp.local:8085'] = [
+$metadata['http://mfa-idp.local:8085'] = [
 	/*
 	 * The hostname of the server (VHOST) that will use this SAML entity.
 	 *
@@ -28,6 +29,12 @@ $metadata['http://ssp-hub-idp.local:8085'] = [
     'authproc' => [
         10 => [
             'class' => 'mfa:Mfa',
+            'employeeIdAttr' => 'employeeNumber',
+            'idBrokerAccessToken' => Env::get('ID_BROKER_ACCESS_TOKEN'),
+            'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
+            'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
+            'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
+            'mfaSetupUrl' => Env::get('MFA_SETUP_URL'),
             'loggerClass' => Psr3SamlLogger::class,
         ],
     ],

@@ -3,7 +3,7 @@ version: "2"
 services:
 
   idp:
-    image: silintl/ssp-base:develop
+    image: silintl/ssp-base:feature_mfa
     ports:
       - "8085:80"
       - "9000:9000"
@@ -13,6 +13,7 @@ services:
       - ./development/run-dev.sh:/data/run-dev.sh
       - ./development/run-tests.sh:/data/run-tests.sh
       - ./development/symlink.sh:/data/symlink.sh
+      - ./development/idp-local/UserPass.php:/data/vendor/simplesamlphp/simplesamlphp/modules/exampleauth/lib/Auth/Source/UserPass.php
       - ./src:/data/src
 
       # Revert to standard SSOService.php instead of using sildisco'saml20-idp-hosted
@@ -38,10 +39,11 @@ services:
       - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
+      - REMEMBER_ME_SECRET=cccccchkrdjcidfdrrfbhgbftfllliubddrhglnnglbh
     command: ["/data/run-dev.sh"]
 
   sp:
-    image: silintl/ssp-base:develop
+    image: silintl/ssp-base:feature_mfa
     volumes:
       # Utilize custom certs
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
@@ -57,24 +59,24 @@ services:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=sp1
       - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
-      - SECRET_SALT=h57fjemb&d$n^nsJFGNjweJz1
+      - SECRET_SALT=NOT-a-secret-h57fjemb&dn^nsJFGNjweJz1
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
       - SAML20_IDP_ENABLE=false
       - ADMIN_PROTECT_INDEX_PAGE=false
 
   composer:
-    image: silintl/ssp-base:develop
+    image: silintl/ssp-base:feature_mfa
     volumes:
       - ./composer.json:/data/composer.json
-      - ./composer.lock:/data/composer.lock
+      #- ./composer.lock:/data/composer.lock
       - ./vendor:/data/vendor
     env_file:
       - ./local.env
     working_dir: /data
 
   tests:
-    image: silintl/ssp-base:develop
+    image: silintl/ssp-base:feature_mfa
     volumes_from:
       - idp
     volumes:
