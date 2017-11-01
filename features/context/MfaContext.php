@@ -198,7 +198,11 @@ class MfaContext implements Context
      */
     public function iShouldSeeAPromptForABackupCode()
     {
-        throw new PendingException();
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'Please enter one of your backup codes',
+            $page->getHtml()
+        );
     }
     
     /**
@@ -216,6 +220,32 @@ class MfaContext implements Context
      */
     public function iShouldSeeAPromptForATotpCode()
     {
-        throw new PendingException();
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'Please enter the 6-digit number from your app',
+            $page->getHtml()
+        );
+    }
+
+    /**
+     * @Given I provide credentials that need MFA and have U2F available
+     */
+    public function iProvideCredentialsThatNeedMfaAndHaveUfAvailable()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_u2f';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Then I should see a prompt for a U2F security key
+     */
+    public function iShouldSeeAPromptForAUfSecurityKey()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'Please insert your security key',
+            $page->getHtml()
+        );
     }
 }
