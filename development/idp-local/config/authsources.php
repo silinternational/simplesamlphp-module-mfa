@@ -13,7 +13,7 @@ $config = [
             'cn' => ['NO_MFA_NEEDED'],
             'mfa' => [
                 'prompt' => 'no',
-                'nag' => 'yes',
+                'nag' => 'no',
                 'options' => [],
             ],
         ],
