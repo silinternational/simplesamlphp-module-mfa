@@ -53,7 +53,8 @@ if (filter_has_var(INPUT_POST, 'submitMfa')) {
         $state['employeeId'],
         $mfaSubmission,
         $state,
-        $rememberMe
+        $rememberMe,
+        $logger
     );
 }
 
