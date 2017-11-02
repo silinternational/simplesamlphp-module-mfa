@@ -20,3 +20,8 @@ Feature: Prompt for MFA credentials
     Given I provide credentials that need MFA and have TOTP available
     When I login
     Then I should see a prompt for a TOTP code
+
+  Scenario: Needs MFA, has U2F option available
+    Given I provide credentials that need MFA and have U2F available
+    When I login
+    Then I should see a prompt for a U2F security key

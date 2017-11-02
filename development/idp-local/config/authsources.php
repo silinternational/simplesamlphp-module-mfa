@@ -13,7 +13,7 @@ $config = [
             'cn' => ['NO_MFA_NEEDED'],
             'mfa' => [
                 'prompt' => 'no',
-                'nag' => 'yes',
+                'nag' => 'no',
                 'options' => [],
             ],
         ],
@@ -57,7 +57,7 @@ $config = [
             'sn' => ['TOTP'],
             'givenName' => ['Has'],
             'mail' => ['has_totp@example.com'],
-            'employeeNumber' => ['33333'],
+            'employeeNumber' => ['44444'],
             'cn' => ['HAS_TOTP'],
             'mfa' => [
                 'prompt' => 'yes',

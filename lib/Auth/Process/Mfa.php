@@ -261,6 +261,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * @param string $mfaSubmission The value of the MFA submission.
      * @param array $state The array of state information.
      * @param bool $rememberMe Whether or not to set remember me cookies
+     * @param LoggerInterface $logger A PSR-3 compatible logger.
+     * @param string $mfaType The type of the MFA ('u2f', 'totp', 'backupcode').
      * @return void|string An error message, if validation is unsuccessful.
      */
     public static function validateMfaSubmission(
@@ -268,7 +270,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $employeeId,
         $mfaSubmission,
         $state,
-        $rememberMe
+        $rememberMe,
+        LoggerInterface $logger,
+        string $mfaType
     ) {
         if (empty($mfaId)) {
             return 'No MFA ID was provided.';
@@ -289,17 +293,22 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 return 'Incorrect 2-step verification code.';
             }
         } catch (\Throwable $t) {
-            $logger = new Psr3SamlLogger();
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
             return 'Something went wrong while we were trying to do the '
-                 . '2-step verification.' . $t->getMessage();
+                 . '2-step verification.';
         }
 
         // Set remember me cookies if requested
         if ($rememberMe) {
             self::setRememberMeCookies($state['employeeId'], $state['mfaOptions']);
         }
-
+        
+        $logger->warning(json_encode([
+            'event' => 'MFA validation result: success',
+            'employeeId' => $employeeId,
+            'mfaType' => $mfaType,
+        ]));
+        
         //unset($state['Attributes']['mfa']);
         // The following function call will never return.
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
