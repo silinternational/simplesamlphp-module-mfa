@@ -8,6 +8,7 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
+use Sil\PhpEnv\Env;
 
 /**
  * Defines application features from the specific context.
@@ -108,7 +109,11 @@ class MfaContext implements Context
      */
     public function iLogin()
     {
-        $this->session->visit('http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp');
+        $spHostAndPort = 'mfasp' . Env::get('TEST_SP_PORT');
+        $this->session->visit(sprintf(
+            'http://%s/module.php/core/authenticate.php?as=mfa-idp',
+            $spHostAndPort
+        ));
         $page = $this->session->getPage();
         $page->fillField('username', $this->username);
         $page->fillField('password', $this->password);

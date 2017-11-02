@@ -1,5 +1,10 @@
 <?php
 
+use Sil\PhpEnv\Env;
+
+$idpHostAndPort = 'mfaidp' . Env::get('TEST_IDP_PORT');
+$spHostAndPort = 'mfasp' . Env::get('TEST_SP_PORT');
+
 $config = [
 
     // This is a authentication source which handles admin authentication.
@@ -18,11 +23,11 @@ $config = [
 
         // The entity ID of this SP.
         // Can be NULL/unset, in which case an entity ID is generated based on the metadata URL.
-        'entityID' => 'http://mfa-sp.local:8081',
+        'entityID' => 'http://' . $spHostAndPort,
 
         // The entity ID of the IdP this should SP should contact.
         // Can be NULL/unset, in which case the user will be shown a list of available IdPs.
-        'idp' => 'http://mfa-idp.local:8085',
+        'idp' => 'http://' . $idpHostAndPort,
 
         // The URL to the discovery service.
         // Can be NULL/unset, in which case a builtin discovery service will be used.

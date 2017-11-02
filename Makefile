@@ -3,19 +3,19 @@
 start: web
 
 bash:
-	docker-compose run --rm idp bash
+	docker-compose run --rm mfaidp bash
 
-bashtests:
-	docker-compose run --rm tests bash
+#bashtests:
+#	docker-compose run --rm tests bash
 
 behat:
-	docker-compose run --rm tests bash -c "vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure"
+	TEST_IDP_PORT=":8085" TEST_SP_PORT=":8081" ./vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure
 
 behatappend:
-	docker-compose run --rm tests bash -c "vendor/bin/behat --config=features/behat.yml --strict --append-snippets"
+	TEST_IDP_PORT=":8085" TEST_SP_PORT=":8081" ./vendor/bin/behat --config=features/behat.yml --strict --append-snippets
 
 behatv:
-	docker-compose run --rm tests bash -c "vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure -v"
+	TEST_IDP_PORT=":8085" TEST_SP_PORT=":8081" ./vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure -v
 
 clean:
 	docker-compose kill
@@ -28,7 +28,7 @@ composerupdate:
 	docker-compose run --rm composer bash -c "composer update --no-scripts"
 
 enabledebug:
-	docker-compose exec idp bash -c "/data/enable-debug.sh"
+	docker-compose exec mfaidp bash -c "/data/enable-debug.sh"
 
 ps:
 	docker-compose ps
@@ -38,4 +38,4 @@ test: composer web
 	make behat
 
 web:
-	docker-compose up -d idp sp
+	docker-compose up -d mfaidp mfasp
