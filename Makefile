@@ -5,17 +5,17 @@ start: web
 bash:
 	docker-compose run --rm mfaidp bash
 
-#bashtests:
-#	docker-compose run --rm tests bash
+bashtests:
+	docker-compose run --rm tests bash
 
 behat:
-	TEST_IDP_PORT=":8085" TEST_SP_PORT=":8081" ./vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure
+	docker-compose run --rm tests bash -c "vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure"
 
 behatappend:
-	TEST_IDP_PORT=":8085" TEST_SP_PORT=":8081" ./vendor/bin/behat --config=features/behat.yml --strict --append-snippets
+	docker-compose run --rm tests bash -c "vendor/bin/behat --config=features/behat.yml --strict --append-snippets"
 
 behatv:
-	TEST_IDP_PORT=":8085" TEST_SP_PORT=":8081" ./vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure -v
+	docker-compose run --rm tests bash -c "vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure -v"
 
 clean:
 	docker-compose kill

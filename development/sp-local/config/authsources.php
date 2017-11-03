@@ -1,10 +1,5 @@
 <?php
 
-use Sil\PhpEnv\Env;
-
-$idpHostAndPort = 'mfaidp' . Env::get('TEST_IDP_PORT');
-$spHostAndPort = 'mfasp' . Env::get('TEST_SP_PORT');
-
 $config = [
 
     // This is a authentication source which handles admin authentication.
@@ -15,26 +10,19 @@ $config = [
         'core:AdminPassword',
     ],
 
-
-    // An authentication source which can authenticate against both SAML 2.0
-    // and Shibboleth 1.3 IdPs.
     'mfa-idp' => [
         'saml:SP',
-
-        // The entity ID of this SP.
-        // Can be NULL/unset, in which case an entity ID is generated based on the metadata URL.
-        'entityID' => 'http://' . $spHostAndPort,
-
-        // The entity ID of the IdP this should SP should contact.
-        // Can be NULL/unset, in which case the user will be shown a list of available IdPs.
-        'idp' => 'http://' . $idpHostAndPort,
-
-        // The URL to the discovery service.
-        // Can be NULL/unset, in which case a builtin discovery service will be used.
+        'entityID' => 'http://mfasp:8081',
+        'idp' => 'http://mfaidp:8085',
         'discoURL' => null,
-
-        // Tell the Hub which format to use for the NameID
         'NameIDPolicy' => "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
     ],
 
+    'mfa-idp-no-port' => [
+        'saml:SP',
+        'entityID' => 'http://mfasp',
+        'idp' => 'http://mfaidp',
+        'discoURL' => null,
+        'NameIDPolicy' => "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+    ],
 ];

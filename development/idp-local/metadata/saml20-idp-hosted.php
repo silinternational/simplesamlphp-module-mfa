@@ -3,14 +3,12 @@
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
-$idpHostAndPort = 'mfaidp' . Env::get('TEST_IDP_PORT');
-
 /**
  * SAML 2.0 IdP configuration for SimpleSAMLphp.
  *
  * See: https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-hosted
  */
-$metadata['http://' . $idpHostAndPort] = [
+$metadata['http://mfaidp'] = [
 	/*
 	 * The hostname of the server (VHOST) that will use this SAML entity.
 	 *
@@ -41,3 +39,6 @@ $metadata['http://' . $idpHostAndPort] = [
         ],
     ],
 ];
+
+// Copy the metadata to also work from a browser on the host O/S.
+$metadata['http://mfaidp:8085'] = $metadata['http://mfaidp'];

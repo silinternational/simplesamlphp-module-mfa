@@ -4,8 +4,6 @@ services:
   
   mfaidp:
     image: silintl/ssp-base:feature_mfa
-    ports:
-      - "8085:80"
     volumes:
       - ./:/mfa
       - ./development/enable-debug.sh:/data/enable-debug.sh
@@ -57,8 +55,6 @@ services:
 
       # Utilize custom metadata
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
-    ports:
-      - "8081:80"
     env_file:
       - ./common.env
     environment:

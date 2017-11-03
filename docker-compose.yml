@@ -37,8 +37,6 @@ services:
       IDP_NAME: Local IdP
       SHOW_SAML_ERRORS: "true"
       REMEMBER_ME_SECRET: not-a-secret-570c5b18dacd45bd
-      TEST_IDP_PORT: ":8085"
-      TEST_SP_PORT: ":8081"
     command: ["/data/run-dev.sh"]
 
   mfasp:
@@ -62,8 +60,6 @@ services:
       SECURE_COOKIE: "false"
       SHOW_SAML_ERRORS: "true"
       SAML20_IDP_ENABLE: "false"
-      TEST_IDP_PORT: ":8085"
-      TEST_SP_PORT: ":8081"
       ADMIN_PROTECT_INDEX_PAGE: "false"
 
   composer:
@@ -76,21 +72,18 @@ services:
       - ./local.env
     working_dir: /data
 
-#  tests:
-#    image: silintl/ssp-base:feature_mfa
-#    volumes_from:
-#      - mfaidp
-#    volumes:
-#      - ./composer.json:/data/composer.json
-#      - ./composer.lock:/data/composer.lock
-#      - ./development/run-tests.sh:/data/run-tests.sh
-#      - ./features:/data/features
-#      - ./vendor:/data/vendor
-#    env_file:
-#      - ./common.env
-#      - ./local.env
-#    environment:
-#      TEST_IDP_PORT: ":8085"
-#      TEST_SP_PORT: ":8081"
-#    working_dir: /data
-#    command: ["/data/run-tests.sh"]
+  tests:
+    image: silintl/ssp-base:feature_mfa
+    volumes_from:
+      - mfaidp
+    volumes:
+      - ./composer.json:/data/composer.json
+      - ./composer.lock:/data/composer.lock
+      - ./development/run-tests.sh:/data/run-tests.sh
+      - ./features:/data/features
+      - ./vendor:/data/vendor
+    env_file:
+      - ./common.env
+      - ./local.env
+    working_dir: /data
+    command: ["/data/run-tests.sh"]
