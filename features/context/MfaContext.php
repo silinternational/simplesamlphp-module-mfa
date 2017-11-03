@@ -8,7 +8,6 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
-use Sil\PhpEnv\Env;
 
 /**
  * Defines application features from the specific context.

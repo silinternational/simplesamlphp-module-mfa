@@ -33,10 +33,14 @@ services:
       - ./common.env
       - ./local.env
     environment:
-      APPLICATION_ENV: dev
-      IDP_NAME: Local IdP
-      SHOW_SAML_ERRORS: "true"
-      REMEMBER_ME_SECRET: not-a-secret-570c5b18dacd45bd
+      - APPLICATION_ENV=dev
+      - ADMIN_EMAIL=john_doe@there.com
+      - ADMIN_PASS=a
+      - IDP_NAME=Local IdP
+      - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
+      - SECURE_COOKIE=false
+      - SHOW_SAML_ERRORS=true
+      - REMEMBER_ME_SECRET=not-a-secret-570c5b18dacd45bd
     command: ["/data/run-dev.sh"]
 
   mfasp:
@@ -53,14 +57,14 @@ services:
     ports:
       - "8081:80"
     environment:
-      ADMIN_EMAIL: john_doe@there.com
-      ADMIN_PASS: sp1
-      IDP_NAME: THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
-      SECRET_SALT: NOT-a-secret-h57fjemb&dn^nsJFGNjweJz1
-      SECURE_COOKIE: "false"
-      SHOW_SAML_ERRORS: "true"
-      SAML20_IDP_ENABLE: "false"
-      ADMIN_PROTECT_INDEX_PAGE: "false"
+      - ADMIN_EMAIL=john_doe@there.com
+      - ADMIN_PASS=sp1
+      - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
+      - SECRET_SALT=NOT-a-secret-h57fjemb&dn^nsJFGNjweJz1
+      - SECURE_COOKIE=false
+      - SHOW_SAML_ERRORS=true
+      - SAML20_IDP_ENABLE=false
+      - ADMIN_PROTECT_INDEX_PAGE=false
 
   composer:
     image: silintl/ssp-base:feature_mfa
