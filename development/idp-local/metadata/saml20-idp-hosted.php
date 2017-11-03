@@ -8,13 +8,13 @@ use Sil\Psr3Adapters\Psr3SamlLogger;
  *
  * See: https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-hosted
  */
-$metadata['http://mfaidp'] = [
+$metadata['http://mfa-idp.local:8085'] = [
 	/*
 	 * The hostname of the server (VHOST) that will use this SAML entity.
 	 *
 	 * Can be '__DEFAULT__', to use this entry by default.
 	 */
-	'host' => '__DEFAULT__',
+	'host' => 'mfa-idp.local',
 
 	// X.509 key and certificate. Relative to the cert directory.
 	'privatekey' => 'dummy.pem',
@@ -40,5 +40,6 @@ $metadata['http://mfaidp'] = [
     ],
 ];
 
-// Copy the metadata to also work from a browser on the host O/S.
-$metadata['http://mfaidp:8085'] = $metadata['http://mfaidp'];
+// Copy the metadata to also work from another docker container.
+$metadata['http://mfaidp'] = $metadata['http://mfa-idp.local:8085'];
+$metadata['http://mfaidp']['host'] = 'mfaidp';

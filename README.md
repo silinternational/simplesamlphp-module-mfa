@@ -55,7 +55,7 @@ want/need to set up MFA.
 ## Testing Locally ##
 
 ### Setup ###
-Add entries to your hosts file to associate `mfasp` and `mfaidp`
+Add entries to your hosts file to associate `mfa-sp.local` and `mfa-idp.local`
 with the IP address of your docker containers (which is the IP address from
 the Vagrantfile if you are running docker within the Vagrant VM).
 
@@ -63,7 +63,7 @@ the Vagrantfile if you are running docker within the Vagrant VM).
 Run `make test`.
 
 ### Manual Testing ###
-Go to <http://mfasp:8081/module.php/core/authenticate.php?as=mfa-idp> in
+Go to <http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp> in
 your browser and sign in with one of the users defined in
 `development/idp-local/config/authsources.php`.
 

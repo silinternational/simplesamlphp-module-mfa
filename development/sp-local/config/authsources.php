@@ -12,8 +12,8 @@ $config = [
 
     'mfa-idp' => [
         'saml:SP',
-        'entityID' => 'http://mfasp:8081',
-        'idp' => 'http://mfaidp:8085',
+        'entityID' => 'http://mfa-sp.local:8081',
+        'idp' => 'http://mfa-idp.local:8085',
         'discoURL' => null,
         'NameIDPolicy' => "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
     ],
