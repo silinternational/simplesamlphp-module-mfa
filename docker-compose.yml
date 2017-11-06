@@ -14,7 +14,7 @@ services:
       - ./development/run-tests.sh:/data/run-tests.sh
       - ./development/symlink.sh:/data/symlink.sh
       - ./development/idp-local/UserPass.php:/data/vendor/simplesamlphp/simplesamlphp/modules/exampleauth/lib/Auth/Source/UserPass.php
-      - ./src:/data/src
+      - ./features:/data/features
 
       # Revert to standard SSOService.php instead of using sildisco'saml20-idp-hosted
       - ./development/idp-local/www_saml2_idp_SSOService.php:/data/vendor/simplesamlphp/simplesamlphp/www/saml2/idp/SSOService.php

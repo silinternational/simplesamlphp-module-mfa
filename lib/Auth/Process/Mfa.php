@@ -24,6 +24,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     private $idBrokerAccessToken = null;
     private $idBrokerAssertValidIp;
     private $idBrokerBaseUri = null;
+    private $idBrokerClientClass = null;
     private $idBrokerTrustedIpRanges = [];
     
     /** @var LoggerInterface */
@@ -54,6 +55,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             $this->idBrokerTrustedIpRanges = explode(',', $tempTrustedIpRanges);
         }
         $this->idBrokerAssertValidIp = (bool)($config['idBrokerAssertValidIp'] ?? true);
+        $this->idBrokerClientClass = $config['idBrokerClientClass'] ?? IdBrokerClient::class;
     }
     
     protected function loadValuesFromConfig($config, $attributes)
@@ -140,12 +142,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      */
     protected static function getIdBrokerClient($idBrokerConfig)
     {
+        $clientClass = $idBrokerConfig['clientClass'];
         $baseUri = $idBrokerConfig['baseUri'];
         $accessToken = $idBrokerConfig['accessToken'];
         $trustedIpRanges = $idBrokerConfig['trustedIpRanges'];
         $assertValidIp = $idBrokerConfig['assertValidIp'];
         
-        return new IdBrokerClient($baseUri, $accessToken, [
+        return new $clientClass($baseUri, $accessToken, [
             'http_client_options' => [
                 'timeout' => 10,
             ],
@@ -457,6 +460,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             'accessToken' => $this->idBrokerAccessToken,
             'assertValidIp' => $this->idBrokerAssertValidIp,
             'baseUri' => $this->idBrokerBaseUri,
+            'clientClass' => $this->idBrokerClientClass,
             'trustedIpRanges' => $this->idBrokerTrustedIpRanges,
         ];
         
