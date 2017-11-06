@@ -29,14 +29,14 @@ Feature: Prompt for MFA credentials
   Scenario: Allow some failed MFA attempts
     Given I provide credentials that need MFA and have backup codes available
       And I have logged in
-      And I have submitted an incorrect backup code 2 times
+      And I have submitted nearly too many incorrect backup codes
     When I submit a correct backup code
     Then I should end up at my intended destination
 
   Scenario: Prevent too many failed MFA attempts
     Given I provide credentials that need MFA and have backup codes available
       And I have logged in
-      And I have submitted an incorrect backup code 2 times
+      And I have submitted nearly too many incorrect backup codes
     When I submit another incorrect backup code
     Then I should have to provide my username and password again
 
@@ -45,6 +45,6 @@ Feature: Prompt for MFA credentials
       And I have logged in
       And I have submitted too many incorrect backup codes
       And I have logged in again
-      And I have submitted an incorrect backup code 2 times
+      And I have submitted nearly too many incorrect backup codes
     When I submit another incorrect backup code
     Then that account should not be allowed to log in for awhile
