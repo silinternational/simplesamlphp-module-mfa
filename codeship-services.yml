@@ -1,12 +1,9 @@
-version: "2"
+version: '2'
 
 services:
-
+  
   mfaidp:
     image: silintl/ssp-base:feature_mfa
-    ports:
-      - "8085:80"
-      - "9000:9000"
     volumes:
       - ./:/mfa
       - ./development/enable-debug.sh:/data/enable-debug.sh
@@ -28,21 +25,25 @@ services:
       # Utilize custom metadata
       - ./development/idp-local/metadata/saml20-idp-hosted.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-hosted.php
       - ./development/idp-local/metadata/saml20-sp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-sp-remote.php
-
+    
     env_file:
       - ./common.env
-      - ./local.env
     environment:
-      - APPLICATION_ENV=dev
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
+      - APPLICATION_ENV=test
       - IDP_NAME=Local IdP
+      - MFA_SETUP_URL=https://www.google.com/
+      - ID_BROKER_ACCESS_TOKEN=dummy
+      - ID_BROKER_ASSERT_VALID_IP=false
+      - ID_BROKER_BASE_URI=dummy
+      - ID_BROKER_TRUSTED_IP_RANGES=192.168.0.1/8
       - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
       - REMEMBER_ME_SECRET=not-a-secret-570c5b18dacd45bd
-    command: ["/data/run-dev.sh"]
-
+    command: /data/run-dev.sh
+  
   mfasp:
     image: silintl/ssp-base:feature_mfa
     volumes:
@@ -54,40 +55,25 @@ services:
 
       # Utilize custom metadata
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
-    ports:
-      - "8081:80"
+    env_file:
+      - ./common.env
     environment:
-      - ADMIN_EMAIL=john_doe@there.com
-      - ADMIN_PASS=sp1
       - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
-      - SECRET_SALT=NOT-a-secret-h57fjemb&dn^nsJFGNjweJz1
-      - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
       - SAML20_IDP_ENABLE=false
       - ADMIN_PROTECT_INDEX_PAGE=false
-
-  composer:
-    image: silintl/ssp-base:feature_mfa
-    volumes:
-      - ./composer.json:/data/composer.json
-      - ./composer.lock:/data/composer.lock
-      - ./vendor:/data/vendor
-    env_file:
-      - ./local.env
-    working_dir: /data
-
+  
   tests:
     image: silintl/ssp-base:feature_mfa
-    volumes_from:
+    links:
       - mfaidp
+      - mfasp
     volumes:
+      - ./development/run-tests.sh:/data/run-tests.sh
       - ./composer.json:/data/composer.json
       - ./composer.lock:/data/composer.lock
-      - ./development/run-tests.sh:/data/run-tests.sh
       - ./features:/data/features
-      - ./vendor:/data/vendor
     env_file:
       - ./common.env
-      - ./local.env
     working_dir: /data
-    command: ["/data/run-tests.sh"]
+    command: /data/run-tests.sh

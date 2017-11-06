@@ -108,7 +108,9 @@ class MfaContext implements Context
      */
     public function iLogin()
     {
-        $this->session->visit('http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp');
+        $this->session->visit(
+            'http://mfasp/module.php/core/authenticate.php?as=mfa-idp-no-port'
+        );
         $page = $this->session->getPage();
         $page->fillField('username', $this->username);
         $page->fillField('password', $this->password);
