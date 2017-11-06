@@ -8,6 +8,7 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
+use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
 
 /**
  * Defines application features from the specific context.
@@ -104,6 +105,19 @@ class MfaContext implements Context
     }
     
     /**
+     * Get the button for submitting the MFA form.
+     *
+     * @param DocumentElement $page The page.
+     * @return NodeElement
+     */
+    protected function getSubmitMfaButton($page)
+    {
+        $submitMfaButton = $page->findById('submitMfa');
+        Assert::assertNotNull($submitMfaButton, 'Failed to find the submit-MFA button');
+        return $submitMfaButton;
+    }
+    
+    /**
      * @When I login
      */
     public function iLogin()
@@ -136,7 +150,32 @@ class MfaContext implements Context
     {
         $loginButton = $this->getLoginButton($page);
         $loginButton->click();
-        
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+    
+    
+    /**
+     * Submit the MFA form, including the secondary page's form (if
+     * simpleSAMLphp shows another page because JavaScript isn't supported).
+     *
+     * @param DocumentElement $page The page.
+     */
+    protected function submitMfaForm($page)
+    {
+        $loginButton = $this->getSubmitMfaButton($page);
+        $loginButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+    
+    
+    /**
+     * Submit the secondary page's form (if simpleSAMLphp shows another page
+     * because JavaScript isn't supported).
+     *
+     * @param DocumentElement $page The page.
+     */
+    protected function submitSecondarySspFormIfPresent($page)
+    {
         $body = $page->find('css', 'body');
         if ($body instanceof NodeElement) {
             $onload = $body->getAttribute('onload');
@@ -249,5 +288,84 @@ class MfaContext implements Context
             'Please insert your security key',
             $page->getHtml()
         );
+    }
+
+    /**
+     * @Given I have logged in (again)
+     */
+    public function iHaveLoggedIn()
+    {
+        $this->iLogin();
+    }
+
+    /**
+     * @Given I have submitted nearly too many incorrect backup codes
+     */
+    public function iHaveSubmittedNearlyTooManyIncorrectBackupCodes()
+    {
+        for ($i = 1; $i <= 2; $i++) {
+            
+            $responsePageHtml = $this->submitMfaValue(
+                FakeIdBrokerClient::INCORRECT_VALUE
+            );
+            
+            Assert::assertContains(
+                'Incorrect 2-step verification code',
+                $responsePageHtml
+            );
+        }
+    }
+    
+    protected function submitMfaValue($mfaValue)
+    {
+        $page = $this->session->getPage();
+        $page->fillField('mfaSubmission', $mfaValue);
+        $this->submitMfaForm($page);
+        return $page->getHtml();
+    }
+
+    /**
+     * @When I submit a correct backup code
+     */
+    public function iSubmitACorrectBackupCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::CORRECT_VALUE);
+    }
+
+    /**
+     * @When I submit an(other) incorrect backup code
+     */
+    public function iSubmitAnotherIncorrectBackupCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::INCORRECT_VALUE);
+    }
+
+    /**
+     * @Then I should have to provide my username and password again
+     */
+    public function iShouldHaveToProvideMyUsernameAndPasswordAgain()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'Login with your Local IdP account',
+            $page->getHtml()
+        );
+    }
+
+    /**
+     * @Given I have submitted too many incorrect backup codes
+     */
+    public function iHaveSubmittedTooManyIncorrectBackupCodes()
+    {
+        $this->iHaveSubmittedNearlyTooManyIncorrectBackupCodes();
+        $this->iSubmitAnotherIncorrectBackupCode();
+    }
+
+    /**
+     * @Then that account should not be allowed to log in for awhile
+     */
+    public function thatAccountShouldNotBeAllowedToLogInForAwhile()
+    {
+        throw new PendingException();
     }
 }
