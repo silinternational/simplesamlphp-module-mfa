@@ -6,17 +6,8 @@ namespace Sil\SspMfa\Behat\fakes;
  */
 class FakeIdBrokerClient
 {
-    /**
-     * The list of (FAKE) acceptable MFA submissions, indexed by the
-     * MFA option's ID.
-     *
-     * @var array<int,string>
-     */
-    private $fakeMfaAnswers = [
-        1 => '111111',
-        2 => '222222',
-        7 => '777777',
-    ];
+    const CORRECT_VALUE = '111111';
+    const INCORRECT_VALUE = '999999';
     
     /**
      * Constructor.
@@ -42,12 +33,6 @@ class FakeIdBrokerClient
      */
     public function mfaVerify($id, $employeeId, $value)
     {
-        $fakeMfaAnswer = $this->fakeMfaAnswers[$id] ?? null;
-        
-        if ($fakeMfaAnswer === null) {
-            return false;
-        }
-        
-        return ($fakeMfaAnswer === $value);
+        return ($value === self::CORRECT_VALUE);
     }
 }
