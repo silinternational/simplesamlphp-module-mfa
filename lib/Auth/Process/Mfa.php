@@ -469,6 +469,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     {
         assert('is_array($state)');
         
+        /** @todo Check for valid remember-me cookies here rather doing a redirect first. */
+        
         $logger = new Psr3SamlLogger();
         $state['mfaOptions'] = $mfaOptions;
         $state['idBrokerConfig'] = [
