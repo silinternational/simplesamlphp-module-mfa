@@ -296,6 +296,20 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 return 'Incorrect 2-step verification code.';
             }
         } catch (\Throwable $t) {
+            
+            /** @todo Improve this check (custom exception type, etc.) */
+            if (strpos($t->getMessage(), '429')) {
+                $logger->error(json_encode([
+                    'event' => 'MFA is rate-limited',
+                    'employeeId' => $employeeId,
+                    'mfaId' => $mfaId,
+                    'mfaType' => $mfaType,
+                ]));
+                return 'There have been too wrong answers for this '
+                     . '2-Step Verification. Please wait a minute, then '
+                     . 'try again.';
+            }
+            
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
             return 'Something went wrong while we were trying to do the '
                  . '2-step verification.';
