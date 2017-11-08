@@ -266,7 +266,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * @param bool $rememberMe Whether or not to set remember me cookies
      * @param LoggerInterface $logger A PSR-3 compatible logger.
      * @param string $mfaType The type of the MFA ('u2f', 'totp', 'backupcode').
-     * @return void|string An error message, if validation is unsuccessful.
+     * @return void|string If validation fails, an error message to show to the
+     *     end user will be returned.
      */
     public static function validateMfaSubmission(
         $mfaId,
