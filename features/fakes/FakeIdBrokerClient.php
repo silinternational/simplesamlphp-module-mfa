@@ -9,6 +9,8 @@ class FakeIdBrokerClient
     const CORRECT_VALUE = '111111';
     const INCORRECT_VALUE = '999999';
     
+    const RATE_LIMITED_MFA_ID = '987';
+    
     /**
      * Constructor.
      *
@@ -33,6 +35,9 @@ class FakeIdBrokerClient
      */
     public function mfaVerify($id, $employeeId, $value)
     {
+        if ($id === self::RATE_LIMITED_MFA_ID) {
+            throw new \Exception('Unexpected response: 429 Too Many Requests');
+        }
         return ($value === self::CORRECT_VALUE);
     }
 }
