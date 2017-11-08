@@ -26,25 +26,26 @@ Feature: Prompt for MFA credentials
     When I login
     Then I should see a prompt for a U2F security key
 
-  Scenario: Allow some failed MFA attempts
+  Scenario: Accepting a (non-rate-limited) correct MFA value
     Given I provide credentials that need MFA and have backup codes available
       And I have logged in
-      And I have submitted nearly too many incorrect backup codes
     When I submit a correct backup code
     Then I should end up at my intended destination
 
-  Scenario: Prevent too many failed MFA attempts
+  Scenario: Rejecting a (non-rate-limited) wrong MFA value
     Given I provide credentials that need MFA and have backup codes available
       And I have logged in
-      And I have submitted nearly too many incorrect backup codes
-    When I submit another incorrect backup code
-    Then I should have to provide my username and password again
+    When I submit an incorrect backup code
+    Then I should see a message that it was incorrect
 
-  Scenario: Prevent too many valid user/pass and failed MFA sequences
-    Given I provide credentials that need MFA and have backup codes available
+  Scenario: Blocking an incorrect MFA value while rate-limited
+    Given I provide credentials that have a rate-limited MFA
       And I have logged in
-      And I have submitted too many incorrect backup codes
-      And I have logged in again
-      And I have submitted nearly too many incorrect backup codes
-    When I submit another incorrect backup code
-    Then that account should not be allowed to log in for awhile
+    When I submit an incorrect backup code
+    Then I should see a message that I have to wait before trying again
+
+  Scenario: Blocking a correct MFA value while rate-limited
+    Given I provide credentials that have a rate-limited MFA
+      And I have logged in
+    When I submit a correct backup code
+    Then I should see a message that I have to wait before trying again
