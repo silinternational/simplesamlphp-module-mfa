@@ -62,28 +62,6 @@ class MfaContext implements Context
     }
     
     /**
-     * Assert that the given page does NOT have a form that contains the given
-     * text.
-     *
-     * @param string $text The text (or HTML) to search for.
-     * @param DocumentElement $page The page to search in.
-     * @return void
-     */
-    protected function assertFormNotContains($text, $page)
-    {
-        $forms = $page->findAll('css', 'form');
-        foreach ($forms as $form) {
-            if (strpos($form->getHtml(), $text) !== false) {
-                Assert::fail(sprintf(
-                    "Found a form containing %s in this HTML:\n%s",
-                    var_export($text, true),
-                    $page->getHtml()
-                ));
-            }
-        }
-    }
-    
-    /**
      * Get the login button from the given page.
      *
      * @param DocumentElement $page The page.
@@ -298,24 +276,6 @@ class MfaContext implements Context
         $this->iLogin();
     }
 
-    /**
-     * @Given I have submitted nearly too many incorrect backup codes
-     */
-    public function iHaveSubmittedNearlyTooManyIncorrectBackupCodes()
-    {
-        for ($i = 1; $i <= 2; $i++) {
-            
-            $responsePageHtml = $this->submitMfaValue(
-                FakeIdBrokerClient::INCORRECT_VALUE
-            );
-            
-            Assert::assertContains(
-                'Incorrect 2-step verification code',
-                $responsePageHtml
-            );
-        }
-    }
-    
     protected function submitMfaValue($mfaValue)
     {
         $page = $this->session->getPage();
@@ -333,39 +293,40 @@ class MfaContext implements Context
     }
 
     /**
-     * @When I submit an(other) incorrect backup code
+     * @When I submit an incorrect backup code
      */
-    public function iSubmitAnotherIncorrectBackupCode()
+    public function iSubmitAnIncorrectBackupCode()
     {
         $this->submitMfaValue(FakeIdBrokerClient::INCORRECT_VALUE);
     }
 
     /**
-     * @Then I should have to provide my username and password again
+     * @Then I should see a message that I have to wait before trying again
      */
-    public function iShouldHaveToProvideMyUsernameAndPasswordAgain()
+    public function iShouldSeeAMessageThatIHaveToWaitBeforeTryingAgain()
     {
         $page = $this->session->getPage();
-        Assert::assertContains(
-            'Login with your Local IdP account',
-            $page->getHtml()
-        );
+        $pageHtml = $page->getHtml();
+        Assert::assertContains(' wait ', $pageHtml);
+        Assert::assertContains('try again', $pageHtml);
     }
 
     /**
-     * @Given I have submitted too many incorrect backup codes
+     * @Then I should see a message that it was incorrect
      */
-    public function iHaveSubmittedTooManyIncorrectBackupCodes()
+    public function iShouldSeeAMessageThatItWasIncorrect()
     {
-        $this->iHaveSubmittedNearlyTooManyIncorrectBackupCodes();
-        $this->iSubmitAnotherIncorrectBackupCode();
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Incorrect 2-step verification code', $pageHtml);
     }
 
     /**
-     * @Then that account should not be allowed to log in for awhile
+     * @Given I provide credentials that have a rate-limited MFA
      */
-    public function thatAccountShouldNotBeAllowedToLogInForAwhile()
+    public function iProvideCredentialsThatHaveARateLimitedMfa()
     {
-        throw new PendingException();
+        $this->username = 'has_rate_limited_mfa';
+        $this->password = 'a';
     }
 }
