@@ -1,6 +1,8 @@
 <?php
 namespace Sil\SspMfa\Behat\fakes;
 
+use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
+
 /**
  * FAKE IdP ID Broker API client, used for testing.
  */
@@ -36,7 +38,7 @@ class FakeIdBrokerClient
     public function mfaVerify($id, $employeeId, $value)
     {
         if ($id === self::RATE_LIMITED_MFA_ID) {
-            throw new \Exception('Unexpected response: 429 Too Many Requests');
+            throw new MfaRateLimitException('Too many recent failures for this MFA');
         }
         return ($value === self::CORRECT_VALUE);
     }
