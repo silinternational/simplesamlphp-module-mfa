@@ -21,10 +21,9 @@ if ( ! empty($this->data['errorMessage'])) {
                value="<?= htmlentities($value); ?>" />
     <?php endforeach; ?>
     
-    <p>Please enter the 6-digit number from your app: </p>
+    <p><b>Verification app</b></p>
     <p>
-
-        <input type="text" autofocus id="mfaSubmission" name="mfaSubmission" />
+        Enter 6-digit code: <input type="text" autofocus id="mfaSubmission" name="mfaSubmission" />
         <br />
         <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
         <label for="rememberMe">Remember this computer for 30 days</label>

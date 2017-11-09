@@ -25,3 +25,27 @@ Feature: Prompt for MFA credentials
     Given I provide credentials that need MFA and have U2F available
     When I login
     Then I should see a prompt for a U2F security key
+
+  Scenario: Accepting a (non-rate-limited) correct MFA value
+    Given I provide credentials that need MFA and have backup codes available
+      And I have logged in
+    When I submit a correct backup code
+    Then I should end up at my intended destination
+
+  Scenario: Rejecting a (non-rate-limited) wrong MFA value
+    Given I provide credentials that need MFA and have backup codes available
+      And I have logged in
+    When I submit an incorrect backup code
+    Then I should see a message that it was incorrect
+
+  Scenario: Blocking an incorrect MFA value while rate-limited
+    Given I provide credentials that have a rate-limited MFA
+      And I have logged in
+    When I submit an incorrect backup code
+    Then I should see a message that I have to wait before trying again
+
+  Scenario: Blocking a correct MFA value while rate-limited
+    Given I provide credentials that have a rate-limited MFA
+      And I have logged in
+    When I submit a correct backup code
+    Then I should see a message that I have to wait before trying again

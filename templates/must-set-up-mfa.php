@@ -6,10 +6,8 @@ $this->includeAtTemplateBase('includes/header.php');
 
 ?>
 <p>
-  It is time to set up 2-step verification for your account.
-</p>
-<p>
-  You will need to do this before you can continue to where you were going.
+  Your account requires additional security. 
+  You must set up 2-step verification at this time.
 </p>
 <form action="<?= htmlentities($this->data['formTarget']); ?>">
   
