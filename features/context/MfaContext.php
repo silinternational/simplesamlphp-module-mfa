@@ -90,7 +90,7 @@ class MfaContext implements Context
      */
     protected function getSubmitMfaButton($page)
     {
-        $submitMfaButton = $page->findById('submitMfa');
+        $submitMfaButton = $page->find('css', '[name=submitMfa]');
         Assert::assertNotNull($submitMfaButton, 'Failed to find the submit-MFA button');
         return $submitMfaButton;
     }
@@ -189,8 +189,7 @@ class MfaContext implements Context
     public function iShouldSeeAMessageThatIHaveToSetUpMfa()
     {
         $page = $this->session->getPage();
-        Assert::assertContains('need to', $page->getHtml());
-        Assert::assertContains('set up 2-step verification', $page->getHtml());
+        Assert::assertContains('must set up 2-', $page->getHtml());
     }
     
     /**
@@ -199,7 +198,7 @@ class MfaContext implements Context
     public function thereShouldBeAWayToGoSetUpMfaNow()
     {
         $page = $this->session->getPage();
-        $this->assertFormContains('id="setUpMfa"', $page);
+        $this->assertFormContains('name="setUpMfa"', $page);
     }
     
     /**
@@ -218,10 +217,9 @@ class MfaContext implements Context
     public function iShouldSeeAPromptForABackupCode()
     {
         $page = $this->session->getPage();
-        Assert::assertContains(
-            'Please enter one of your backup codes',
-            $page->getHtml()
-        );
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Backup code', $pageHtml);
+        Assert::assertContains('Enter code', $pageHtml);
     }
     
     /**
@@ -240,10 +238,9 @@ class MfaContext implements Context
     public function iShouldSeeAPromptForATotpCode()
     {
         $page = $this->session->getPage();
-        Assert::assertContains(
-            'Please enter the 6-digit number from your app',
-            $page->getHtml()
-        );
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Verification app', $pageHtml);
+        Assert::assertContains('Enter 6-digit code', $pageHtml);
     }
 
     /**
@@ -262,10 +259,7 @@ class MfaContext implements Context
     public function iShouldSeeAPromptForAUfSecurityKey()
     {
         $page = $this->session->getPage();
-        Assert::assertContains(
-            'Please insert your security key',
-            $page->getHtml()
-        );
+        Assert::assertContains('insert your security key', $page->getHtml());
     }
 
     /**
