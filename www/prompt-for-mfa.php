@@ -21,6 +21,11 @@ $logger = new Psr3SamlLogger();
 $cookieHash = filter_input(INPUT_COOKIE, 'c1') ?? ''; // hashed string
 $expireDate = filter_input(INPUT_COOKIE, 'c2') ?? 0;  // expiration timestamp
 if (Mfa::isRememberMeCookieValid(base64_decode($cookieHash), $expireDate, $mfaOptions, $state)) {
+    $logger->warning(json_encode([
+        'event' => 'MFA skipped due to valid remember-me cookie',
+        'employeeId' => $state['employeeId'],
+    ]));
+    
     //unset($state['Attributes']['mfa']);
     // This condition should never return
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);

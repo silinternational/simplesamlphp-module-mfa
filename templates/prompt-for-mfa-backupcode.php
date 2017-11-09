@@ -21,13 +21,13 @@ if ( ! empty($this->data['errorMessage'])) {
                value="<?= htmlentities($value); ?>" />
     <?php endforeach; ?>
     
+    <p><b>Backup code</b></p>
     <p>
-      Please enter one of your backup codes. Remember that each codes can
-      only be used once, so the code you enter this time will be used up and
-      will not be available for later use.
+      Each code can only be used once, so the code you enter this time will be
+      used up and will not be available again.
     </p>
     <p>
-        <input type="text" id="mfaSubmission" name="mfaSubmission" />
+        Enter code: <input type="text" id="mfaSubmission" name="mfaSubmission" />
         <br />
         <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
         <label for="rememberMe">Remember this computer for 30 days</label>

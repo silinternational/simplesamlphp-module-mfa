@@ -8,6 +8,7 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
+use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
 
 /**
  * Defines application features from the specific context.
@@ -61,28 +62,6 @@ class MfaContext implements Context
     }
     
     /**
-     * Assert that the given page does NOT have a form that contains the given
-     * text.
-     *
-     * @param string $text The text (or HTML) to search for.
-     * @param DocumentElement $page The page to search in.
-     * @return void
-     */
-    protected function assertFormNotContains($text, $page)
-    {
-        $forms = $page->findAll('css', 'form');
-        foreach ($forms as $form) {
-            if (strpos($form->getHtml(), $text) !== false) {
-                Assert::fail(sprintf(
-                    "Found a form containing %s in this HTML:\n%s",
-                    var_export($text, true),
-                    $page->getHtml()
-                ));
-            }
-        }
-    }
-    
-    /**
      * Get the login button from the given page.
      *
      * @param DocumentElement $page The page.
@@ -101,6 +80,19 @@ class MfaContext implements Context
         }
         Assert::assertNotNull($loginButton, 'Failed to find the login button');
         return $loginButton;
+    }
+    
+    /**
+     * Get the button for submitting the MFA form.
+     *
+     * @param DocumentElement $page The page.
+     * @return NodeElement
+     */
+    protected function getSubmitMfaButton($page)
+    {
+        $submitMfaButton = $page->find('css', '[name=submitMfa]');
+        Assert::assertNotNull($submitMfaButton, 'Failed to find the submit-MFA button');
+        return $submitMfaButton;
     }
     
     /**
@@ -136,7 +128,32 @@ class MfaContext implements Context
     {
         $loginButton = $this->getLoginButton($page);
         $loginButton->click();
-        
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+    
+    
+    /**
+     * Submit the MFA form, including the secondary page's form (if
+     * simpleSAMLphp shows another page because JavaScript isn't supported).
+     *
+     * @param DocumentElement $page The page.
+     */
+    protected function submitMfaForm($page)
+    {
+        $loginButton = $this->getSubmitMfaButton($page);
+        $loginButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+    
+    
+    /**
+     * Submit the secondary page's form (if simpleSAMLphp shows another page
+     * because JavaScript isn't supported).
+     *
+     * @param DocumentElement $page The page.
+     */
+    protected function submitSecondarySspFormIfPresent($page)
+    {
         $body = $page->find('css', 'body');
         if ($body instanceof NodeElement) {
             $onload = $body->getAttribute('onload');
@@ -172,8 +189,7 @@ class MfaContext implements Context
     public function iShouldSeeAMessageThatIHaveToSetUpMfa()
     {
         $page = $this->session->getPage();
-        Assert::assertContains('need to', $page->getHtml());
-        Assert::assertContains('set up 2-step verification', $page->getHtml());
+        Assert::assertContains('must set up 2-', $page->getHtml());
     }
     
     /**
@@ -182,7 +198,7 @@ class MfaContext implements Context
     public function thereShouldBeAWayToGoSetUpMfaNow()
     {
         $page = $this->session->getPage();
-        $this->assertFormContains('id="setUpMfa"', $page);
+        $this->assertFormContains('name="setUpMfa"', $page);
     }
     
     /**
@@ -201,10 +217,9 @@ class MfaContext implements Context
     public function iShouldSeeAPromptForABackupCode()
     {
         $page = $this->session->getPage();
-        Assert::assertContains(
-            'Please enter one of your backup codes',
-            $page->getHtml()
-        );
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Backup code', $pageHtml);
+        Assert::assertContains('Enter code', $pageHtml);
     }
     
     /**
@@ -223,10 +238,9 @@ class MfaContext implements Context
     public function iShouldSeeAPromptForATotpCode()
     {
         $page = $this->session->getPage();
-        Assert::assertContains(
-            'Please enter the 6-digit number from your app',
-            $page->getHtml()
-        );
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Verification app', $pageHtml);
+        Assert::assertContains('Enter 6-digit code', $pageHtml);
     }
 
     /**
@@ -245,9 +259,68 @@ class MfaContext implements Context
     public function iShouldSeeAPromptForAUfSecurityKey()
     {
         $page = $this->session->getPage();
-        Assert::assertContains(
-            'Please insert your security key',
-            $page->getHtml()
-        );
+        Assert::assertContains('insert your security key', $page->getHtml());
+    }
+
+    /**
+     * @Given I have logged in (again)
+     */
+    public function iHaveLoggedIn()
+    {
+        $this->iLogin();
+    }
+
+    protected function submitMfaValue($mfaValue)
+    {
+        $page = $this->session->getPage();
+        $page->fillField('mfaSubmission', $mfaValue);
+        $this->submitMfaForm($page);
+        return $page->getHtml();
+    }
+
+    /**
+     * @When I submit a correct backup code
+     */
+    public function iSubmitACorrectBackupCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::CORRECT_VALUE);
+    }
+
+    /**
+     * @When I submit an incorrect backup code
+     */
+    public function iSubmitAnIncorrectBackupCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::INCORRECT_VALUE);
+    }
+
+    /**
+     * @Then I should see a message that I have to wait before trying again
+     */
+    public function iShouldSeeAMessageThatIHaveToWaitBeforeTryingAgain()
+    {
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains(' wait ', $pageHtml);
+        Assert::assertContains('try again', $pageHtml);
+    }
+
+    /**
+     * @Then I should see a message that it was incorrect
+     */
+    public function iShouldSeeAMessageThatItWasIncorrect()
+    {
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Incorrect 2-step verification code', $pageHtml);
+    }
+
+    /**
+     * @Given I provide credentials that have a rate-limited MFA
+     */
+    public function iProvideCredentialsThatHaveARateLimitedMfa()
+    {
+        $this->username = 'has_rate_limited_mfa';
+        $this->password = 'a';
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
+
 $config = [
     'example-userpass' => [
         'exampleauth:UserPass',
@@ -130,6 +132,26 @@ $config = [
                     [
                         'id' => '3',
                         'type' => 'u2f',
+                        'data' => '',
+                    ],
+                ],
+            ],
+        ],
+        'has_rate_limited_mfa:a' => [
+            'eduPersonPrincipalName' => ['HAS_RATE_LIMITED_MFA@mfaidp'],
+            'eduPersonTargetID' => ['88888888-8888-8888-8888-888888888888'],
+            'sn' => ['Rate-Limited MFA'],
+            'givenName' => ['Has'],
+            'mail' => ['has_rate_limited_mfa@example.com'],
+            'employeeNumber' => ['88888'],
+            'cn' => ['HAS_RATE_LIMITED_MFA'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => FakeIdBrokerClient::RATE_LIMITED_MFA_ID,
+                        'type' => 'backupcode',
                         'data' => '',
                     ],
                 ],

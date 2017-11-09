@@ -2,6 +2,7 @@
 
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3SamlLogger;
+use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
 
 /**
  * SAML 2.0 IdP configuration for SimpleSAMLphp.
@@ -33,6 +34,7 @@ $metadata['http://mfa-idp.local:8085'] = [
             'idBrokerAccessToken' => Env::get('ID_BROKER_ACCESS_TOKEN'),
             'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
             'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
+            'idBrokerClientClass' => FakeIdBrokerClient::class,
             'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
             'mfaLearnMoreUrl' => Env::get('MFA_LEARN_MORE_URL'),
             'mfaSetupUrl' => Env::get('MFA_SETUP_URL'),

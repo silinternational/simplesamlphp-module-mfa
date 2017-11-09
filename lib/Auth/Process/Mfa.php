@@ -2,6 +2,7 @@
 
 use Psr\Log\LoggerInterface;
 use Sil\PhpEnv\Env;
+use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
@@ -25,6 +26,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     private $idBrokerAccessToken = null;
     private $idBrokerAssertValidIp;
     private $idBrokerBaseUri = null;
+    private $idBrokerClientClass = null;
     private $idBrokerTrustedIpRanges = [];
     
     /** @var LoggerInterface */
@@ -57,6 +59,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             $this->idBrokerTrustedIpRanges = explode(',', $tempTrustedIpRanges);
         }
         $this->idBrokerAssertValidIp = (bool)($config['idBrokerAssertValidIp'] ?? true);
+        $this->idBrokerClientClass = $config['idBrokerClientClass'] ?? IdBrokerClient::class;
     }
     
     protected function loadValuesFromConfig($config, $attributes)
@@ -143,12 +146,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      */
     protected static function getIdBrokerClient($idBrokerConfig)
     {
+        $clientClass = $idBrokerConfig['clientClass'];
         $baseUri = $idBrokerConfig['baseUri'];
         $accessToken = $idBrokerConfig['accessToken'];
         $trustedIpRanges = $idBrokerConfig['trustedIpRanges'];
         $assertValidIp = $idBrokerConfig['assertValidIp'];
         
-        return new IdBrokerClient($baseUri, $accessToken, [
+        return new $clientClass($baseUri, $accessToken, [
             'http_client_options' => [
                 'timeout' => 10,
             ],
@@ -266,7 +270,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * @param bool $rememberMe Whether or not to set remember me cookies
      * @param LoggerInterface $logger A PSR-3 compatible logger.
      * @param string $mfaType The type of the MFA ('u2f', 'totp', 'backupcode').
-     * @return void|string An error message, if validation is unsuccessful.
+     * @return void|string If validation fails, an error message to show to the
+     *     end user will be returned.
      */
     public static function validateMfaSubmission(
         $mfaId,
@@ -296,6 +301,18 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 return 'Incorrect 2-step verification code.';
             }
         } catch (\Throwable $t) {
+            
+            if ($t instanceof MfaRateLimitException) {
+                $logger->error(json_encode([
+                    'event' => 'MFA is rate-limited',
+                    'employeeId' => $employeeId,
+                    'mfaId' => $mfaId,
+                    'mfaType' => $mfaType,
+                ]));
+                return 'There have been too many wrong answers recently. '
+                     . 'Please wait a minute, then try again.';
+            }
+            
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
             return 'Something went wrong while we were trying to do the '
                  . '2-step verification.';
@@ -456,12 +473,15 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     {
         assert('is_array($state)');
         
+        /** @todo Check for valid remember-me cookies here rather doing a redirect first. */
+        
         $logger = new Psr3SamlLogger();
         $state['mfaOptions'] = $mfaOptions;
         $state['idBrokerConfig'] = [
             'accessToken' => $this->idBrokerAccessToken,
             'assertValidIp' => $this->idBrokerAssertValidIp,
             'baseUri' => $this->idBrokerBaseUri,
+            'clientClass' => $this->idBrokerClientClass,
             'trustedIpRanges' => $this->idBrokerTrustedIpRanges,
         ];
         
