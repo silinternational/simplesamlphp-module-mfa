@@ -2,6 +2,7 @@
 
 use Psr\Log\LoggerInterface;
 use Sil\PhpEnv\Env;
+use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
@@ -298,8 +299,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             }
         } catch (\Throwable $t) {
             
-            /** @todo Improve this check (custom exception type, etc.) */
-            if (strpos($t->getMessage(), '429')) {
+            if ($t instanceof MfaRateLimitException) {
                 $logger->error(json_encode([
                     'event' => 'MFA is rate-limited',
                     'employeeId' => $employeeId,
