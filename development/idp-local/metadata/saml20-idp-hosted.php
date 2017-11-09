@@ -34,6 +34,7 @@ $metadata['http://mfa-idp.local:8085'] = [
             'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
             'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
             'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
+            'mfaLearnMoreUrl' => Env::get('MFA_LEARN_MORE_URL'),
             'mfaSetupUrl' => Env::get('MFA_SETUP_URL'),
             'loggerClass' => Psr3SamlLogger::class,
         ],

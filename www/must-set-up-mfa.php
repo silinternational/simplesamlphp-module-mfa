@@ -32,6 +32,7 @@ $globalConfig = SimpleSAML_Configuration::getInstance();
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:must-set-up-mfa.php');
 $t->data['formTarget'] = SimpleSAML_Module::getModuleURL('mfa/must-set-up-mfa.php');
 $t->data['formData'] = ['StateId' => $stateId];
+$t->data['learnMoreUrl'] = $state['mfaLearnMoreUrl'];
 $t->show();
 
 SimpleSAML_Logger::info(sprintf(
