@@ -306,9 +306,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                     'mfaId' => $mfaId,
                     'mfaType' => $mfaType,
                 ]));
-                return 'There have been too wrong answers for this '
-                     . '2-Step Verification. Please wait a minute, then '
-                     . 'try again.';
+                return 'There have been too many wrong answers recently. '
+                     . 'Please wait a minute, then try again.';
             }
             
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
