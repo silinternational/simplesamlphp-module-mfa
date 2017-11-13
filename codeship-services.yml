@@ -78,6 +78,7 @@ services:
     env_file:
       - ./common.env
     environment:
+      - MFA_SETUP_URL=https://www.google.com
       - THEME_USE=default:default
     working_dir: /data
     command: /data/run-tests.sh
