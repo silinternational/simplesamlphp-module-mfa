@@ -12,14 +12,7 @@ if ( ! empty($this->data['errorMessage'])) {
 }
 
 ?>
-<form action="<?= htmlentities($this->data['formTarget']); ?>" method="POST">
-  
-    <?php foreach ($this->data['formData'] as $name => $value): ?>
-        <input type="hidden"
-               name="<?= htmlentities($name); ?>"
-               value="<?= htmlentities($value); ?>" />
-    <?php endforeach; ?>
-    
+<form method="post">
     <p><b>Verification app</b></p>
     <p>
         Enter 6-digit code: <input type="text" autofocus id="mfaSubmission" name="mfaSubmission" />
@@ -40,7 +33,9 @@ if ( ! empty($this->data['errorMessage'])) {
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
                 if ($mfaOpt['type'] != 'totp'){
                     ?>
-                    <li><a href="<?=htmlentities($this->data['formTarget'])?>?StateId=<?=$this->data['stateId']?>&mfaId=<?=$mfaOpt['id']?>"><?=$mfaOpt['type']?></a></li>
+                    <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
+                       htmlentities($mfaOpt['type'])
+                    ?></a></li>
                     <?php
                 }
             }
@@ -52,5 +47,4 @@ if ( ! empty($this->data['errorMessage'])) {
     ?>
 </form>
 <?php
-
 $this->includeAtTemplateBase('includes/footer.php');

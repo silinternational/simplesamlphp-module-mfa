@@ -90,8 +90,6 @@ $globalConfig = SimpleSAML_Configuration::getInstance();
 $mfaTemplateToUse = Mfa::getTemplateFor($mfaOption['type']);
 
 $t = new SimpleSAML_XHTML_Template($globalConfig, $mfaTemplateToUse);
-$t->data['formTarget'] = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php');
-$t->data['formData'] = ['StateId' => $stateId, 'mfaId' => $mfaId];
 $t->data['errorMessage'] = $errorMessage ?? null;
 $t->data['mfaOption'] = $mfaOption;
 $t->data['mfaOptions'] = $mfaOptions;
