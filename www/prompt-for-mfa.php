@@ -11,8 +11,7 @@ use sspmod_mfa_Auth_Process_Mfa as Mfa;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
-$stateId = filter_input(INPUT_POST, 'StateId') ?? null;
-$stateId = $stateId ?? filter_input(INPUT_GET, 'StateId');
+$stateId = filter_input(INPUT_GET, 'StateId');
 if (empty($stateId)) {
     throw new SimpleSAML_Error_BadRequest('Missing required StateId query parameter.');
 }
