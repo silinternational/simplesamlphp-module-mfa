@@ -71,7 +71,6 @@ class MfaContext implements Context
     protected function getContinueButton($page)
     {
         $continueButton = $page->find('css', '[name=continue]');
-        Assert::assertNotNull($continueButton, 'Failed to find the continue button');
         return $continueButton;
     }
     
@@ -390,6 +389,7 @@ class MfaContext implements Context
     {
         $page = $this->session->getPage();
         $continueButton = $this->getContinueButton($page);
+        Assert::assertNotNull($continueButton, 'Failed to find the continue button');
         $continueButton->click();
         $this->submitSecondarySspFormIfPresent($page);
     }
@@ -414,5 +414,15 @@ class MfaContext implements Context
         Assert::assertNotEmpty($mfaSetupUrl);
         $currentUrl = $this->session->getCurrentUrl();
         Assert::assertStringStartsWith($mfaSetupUrl, $currentUrl);
+    }
+
+    /**
+     * @Then there should NOT be a way to continue to my intended destination
+     */
+    public function thereShouldNotBeAWayToContinueToMyIntendedDestination()
+    {
+        $page = $this->session->getPage();
+        $continueButton = $this->getContinueButton($page);
+        Assert::assertNull($continueButton, 'Should not have found a continue button');
     }
 }

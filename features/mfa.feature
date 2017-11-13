@@ -29,6 +29,13 @@ Feature: Prompt for MFA credentials
     When I login
     Then I should see a message that I have to set up MFA
       And there should be a way to go set up MFA now
+      And there should NOT be a way to continue to my intended destination
+
+  Scenario: Following the requirement to go set up MFA
+    Given I provide credentials that need MFA but have no MFA options available
+      And I login
+    When I click the set-up-MFA button
+    Then I should end up at the mfa-setup URL
 
   Scenario: Needs MFA, has backup code option available
     Given I provide credentials that need MFA and have backup codes available
