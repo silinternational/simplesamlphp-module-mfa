@@ -10,7 +10,7 @@ if (empty($stateId)) {
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_NAG);
 
 // If the user has pressed the set-up-MFA button...
-if (filter_has_var(INPUT_GET, 'setUpMfa')) {
+if (filter_has_var(INPUT_POST, 'setUpMfa')) {
     $mfaSetupUrl = $state['mfaSetupUrl'];
 
     // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
@@ -25,7 +25,7 @@ if (filter_has_var(INPUT_GET, 'setUpMfa')) {
 
     SimpleSAML_Utilities::redirect($mfaSetupUrl);
     return;
-} elseif (filter_has_var(INPUT_GET, 'continue')) {
+} elseif (filter_has_var(INPUT_POST, 'continue')) {
     // The user has pressed the continue button.
     //unset($state['Attributes']['mfa']);
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
@@ -34,8 +34,6 @@ if (filter_has_var(INPUT_GET, 'setUpMfa')) {
 $globalConfig = SimpleSAML_Configuration::getInstance();
 
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:nag-for-mfa.php');
-$t->data['formTarget'] = SimpleSAML_Module::getModuleURL('mfa/nag-for-mfa.php');
-$t->data['formData'] = ['StateId' => $stateId];
 $t->show();
 
 SimpleSAML_Logger::info(sprintf(
