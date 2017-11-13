@@ -34,6 +34,7 @@ if (filter_has_var(INPUT_POST, 'setUpMfa')) {
 $globalConfig = SimpleSAML_Configuration::getInstance();
 
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:nag-for-mfa.php');
+$t->data['learnMoreUrl'] = $state['mfaLearnMoreUrl'];
 $t->show();
 
 SimpleSAML_Logger::info(sprintf(
