@@ -1,7 +1,5 @@
 <?php
-
-$this->data['header'] = 'Set up 2-step verification';
-
+$this->data['header'] = 'Set up 2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 
 ?>
