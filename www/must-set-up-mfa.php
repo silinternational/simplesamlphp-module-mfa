@@ -10,7 +10,7 @@ if (empty($stateId)) {
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
 
 // If the user has pressed the set-up-MFA button...
-if (filter_has_var(INPUT_GET, 'setUpMfa')) {
+if (filter_has_var(INPUT_POST, 'setUpMfa')) {
     $mfaSetupUrl = $state['mfaSetupUrl'];
     
     // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
@@ -30,8 +30,6 @@ if (filter_has_var(INPUT_GET, 'setUpMfa')) {
 $globalConfig = SimpleSAML_Configuration::getInstance();
 
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:must-set-up-mfa.php');
-$t->data['formTarget'] = SimpleSAML_Module::getModuleURL('mfa/must-set-up-mfa.php');
-$t->data['formData'] = ['StateId' => $stateId];
 $t->show();
 
 SimpleSAML_Logger::info(sprintf(
