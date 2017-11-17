@@ -5,11 +5,37 @@ Feature: Prompt for MFA credentials
     When I login
     Then I should end up at my intended destination
 
+  Scenario: Nag to set up MFA
+    Given I provide credentials that will be nagged to set up MFA
+    When I login
+    Then I should see a message encouraging me to set up MFA
+      And there should be a way to go set up MFA now
+      And there should be a way to continue to my intended destination
+
+  Scenario: Obeying the nag to set up MFA
+    Given I provide credentials that will be nagged to set up MFA
+      And I login
+    When I click the set-up-MFA button
+    Then I should end up at the mfa-setup URL
+
+  Scenario: Ignoring the nag to set up MFA
+    Given I provide credentials that will be nagged to set up MFA
+      And I login
+    When I click the remind-me-later button
+    Then I should end up at my intended destination
+
   Scenario: Needs MFA, but no MFA options are available
     Given I provide credentials that need MFA but have no MFA options available
     When I login
     Then I should see a message that I have to set up MFA
       And there should be a way to go set up MFA now
+      And there should NOT be a way to continue to my intended destination
+
+  Scenario: Following the requirement to go set up MFA
+    Given I provide credentials that need MFA but have no MFA options available
+      And I login
+    When I click the set-up-MFA button
+    Then I should end up at the mfa-setup URL
 
   Scenario: Needs MFA, has backup code option available
     Given I provide credentials that need MFA and have backup codes available

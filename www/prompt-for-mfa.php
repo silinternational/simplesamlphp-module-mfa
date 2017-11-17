@@ -1,11 +1,17 @@
 <?php
 
+/**
+ * This "controller" (per MVC) must be called with the following query string
+ * parameters:
+ * - StateId
+ * - mfaId
+ */
+
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
-$stateId = filter_input(INPUT_POST, 'StateId') ?? null;
-$stateId = $stateId ?? filter_input(INPUT_GET, 'StateId');
+$stateId = filter_input(INPUT_GET, 'StateId');
 if (empty($stateId)) {
     throw new SimpleSAML_Error_BadRequest('Missing required StateId query parameter.');
 }
@@ -32,16 +38,24 @@ if (Mfa::isRememberMeCookieValid(base64_decode($cookieHash), $expireDate, $mfaOp
     throw new \Exception('Failed to resume processing auth proc chain.');
 }
 
-// If the user specified an MFA id, try to get that MFA option.
-$mfaId = filter_input(INPUT_POST, 'mfaId');
-$mfaId = $mfaId ?? filter_input(INPUT_GET, 'mfaId');
+$mfaId = filter_input(INPUT_GET, 'mfaId');
 
 if (empty($mfaId)) {
+    $logger->critical(json_encode([
+        'event' => 'MFA ID missing in URL. Choosing one and doing a redirect.',
+        'employeeId' => $state['employeeId'],
+    ]));
+    
+    // Pick an MFA ID and do a redirect to put that into the URL.
     $mfaOption = Mfa::getMfaOptionToUse($mfaOptions);
-    $mfaId = $mfaOption['id'];
-} else {
-    $mfaOption = Mfa::getMfaOptionById($mfaOptions, $mfaId);
+    $moduleUrl = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php', [
+        'mfaId' => $mfaOption['id'],
+        'StateId' => $stateId,
+    ]);
+    SimpleSAML_Utilities::redirect($moduleUrl);
+    return;
 }
+$mfaOption = Mfa::getMfaOptionById($mfaOptions, $mfaId);
 
 // If the user has submitted their MFA value...
 if (filter_has_var(INPUT_POST, 'submitMfa')) {
@@ -76,8 +90,6 @@ $globalConfig = SimpleSAML_Configuration::getInstance();
 $mfaTemplateToUse = Mfa::getTemplateFor($mfaOption['type']);
 
 $t = new SimpleSAML_XHTML_Template($globalConfig, $mfaTemplateToUse);
-$t->data['formTarget'] = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php');
-$t->data['formData'] = ['StateId' => $stateId, 'mfaId' => $mfaId];
 $t->data['errorMessage'] = $errorMessage ?? null;
 $t->data['mfaOption'] = $mfaOption;
 $t->data['mfaOptions'] = $mfaOptions;

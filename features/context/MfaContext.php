@@ -8,6 +8,7 @@ use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
+use Sil\PhpEnv\Env;
 use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
 
 /**
@@ -62,6 +63,18 @@ class MfaContext implements Context
     }
     
     /**
+     * Get the "continue" button.
+     *
+     * @param DocumentElement $page The page.
+     * @return NodeElement
+     */
+    protected function getContinueButton($page)
+    {
+        $continueButton = $page->find('css', '[name=continue]');
+        return $continueButton;
+    }
+    
+    /**
      * Get the login button from the given page.
      *
      * @param DocumentElement $page The page.
@@ -80,6 +93,19 @@ class MfaContext implements Context
         }
         Assert::assertNotNull($loginButton, 'Failed to find the login button');
         return $loginButton;
+    }
+    
+    /**
+     * Get the button for going to set up MFA.
+     *
+     * @param DocumentElement $page The page.
+     * @return NodeElement
+     */
+    protected function getSetUpMfaButton($page)
+    {
+        $setUpMfaButton = $page->find('css', '[name=setUpMfa]');
+        Assert::assertNotNull($setUpMfaButton, 'Failed to find the set-up-MFA button');
+        return $setUpMfaButton;
     }
     
     /**
@@ -140,8 +166,8 @@ class MfaContext implements Context
      */
     protected function submitMfaForm($page)
     {
-        $loginButton = $this->getSubmitMfaButton($page);
-        $loginButton->click();
+        $submitMfaButton = $this->getSubmitMfaButton($page);
+        $submitMfaButton->click();
         $this->submitSecondarySspFormIfPresent($page);
     }
     
@@ -320,7 +346,83 @@ class MfaContext implements Context
      */
     public function iProvideCredentialsThatHaveARateLimitedMfa()
     {
+        // See `development/idp-local/config/authsources.php` for options.
         $this->username = 'has_rate_limited_mfa';
         $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that will be nagged to set up MFA
+     */
+    public function iProvideCredentialsThatWillBeNaggedToSetUpMfa()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'nag_for_mfa';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Then I should see a message encouraging me to set up MFA
+     */
+    public function iShouldSeeAMessageEncouragingMeToSetUpMfa()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'increase the security of your account by enabling 2-',
+            $page->getHtml()
+        );
+    }
+
+    /**
+     * @Then there should be a way to continue to my intended destination
+     */
+    public function thereShouldBeAWayToContinueToMyIntendedDestination()
+    {
+        $page = $this->session->getPage();
+        $this->assertFormContains('name="continue"', $page);
+    }
+
+    /**
+     * @When I click the remind-me-later button
+     */
+    public function iClickTheRemindMeLaterButton()
+    {
+        $page = $this->session->getPage();
+        $continueButton = $this->getContinueButton($page);
+        Assert::assertNotNull($continueButton, 'Failed to find the continue button');
+        $continueButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+
+    /**
+     * @When I click the set-up-MFA button
+     */
+    public function iClickTheSetUpMfaButton()
+    {
+        $page = $this->session->getPage();
+        $setUpMfaButton = $this->getSetUpMfaButton($page);
+        $setUpMfaButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+
+    /**
+     * @Then I should end up at the mfa-setup URL
+     */
+    public function iShouldEndUpAtTheMfaSetupUrl()
+    {
+        $mfaSetupUrl = Env::get('MFA_SETUP_URL');
+        Assert::assertNotEmpty($mfaSetupUrl);
+        $currentUrl = $this->session->getCurrentUrl();
+        Assert::assertStringStartsWith($mfaSetupUrl, $currentUrl);
+    }
+
+    /**
+     * @Then there should NOT be a way to continue to my intended destination
+     */
+    public function thereShouldNotBeAWayToContinueToMyIntendedDestination()
+    {
+        $page = $this->session->getPage();
+        $continueButton = $this->getContinueButton($page);
+        Assert::assertNull($continueButton, 'Should not have found a continue button');
     }
 }

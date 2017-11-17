@@ -1,8 +1,6 @@
 <?php
-
-$this->data['header'] = '2-step verification';
+$this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
-
 ?>
 <script src="<?=SimpleSAML_Module::getModuleURL('mfa/u2f-api.js');?>"></script>
 <script type="application/javascript">
@@ -26,14 +24,7 @@ $this->includeAtTemplateBase('includes/header.php');
       });
     }
 </script>
-<form action="<?= htmlentities($this->data['formTarget']); ?>" method="POST" id="mfaForm">
-  
-    <?php foreach ($this->data['formData'] as $name => $value): ?>
-        <input type="hidden"
-               name="<?= htmlentities($name); ?>"
-               value="<?= htmlentities($value); ?>" />
-    <?php endforeach; ?>
-    
+<form method="post">
     <p id="mfaInstructions">Please insert your security key and press its button.</p>
     <p>
         <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
@@ -54,7 +45,9 @@ $this->includeAtTemplateBase('includes/header.php');
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
                 if ($mfaOpt['type'] != 'u2f'){
                     ?>
-                    <li><a href="<?=htmlentities($this->data['formTarget'])?>?StateId=<?=$this->data['stateId']?>&mfaId=<?=$mfaOpt['id']?>"><?=$mfaOpt['type']?></a></li>
+                    <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
+                       htmlentities($mfaOpt['type'])
+                    ?></a></li>
                     <?php
                 }
             }

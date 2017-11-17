@@ -495,8 +495,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         $id = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
         $url = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php');
+
+        $mfaOption = self::getMfaOptionToUse($mfaOptions);
         
-        SimpleSAML_Utilities::redirect($url, array('StateId' => $id));
+        SimpleSAML_Utilities::redirect($url, [
+            'mfaId' => $mfaOption['id'],
+            'StateId' => $id,
+        ]);
     }
 
     /**
