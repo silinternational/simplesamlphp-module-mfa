@@ -405,11 +405,14 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         if (self::shouldPromptForMfa($mfa)) {
             if (self::hasMfaOptions($mfa)) {
                 $this->redirectToMfaPrompt($state, $employeeId, $mfa['options']);
-            } else {
-                $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
+                return;
             }
+            
+            $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
+            return;
         } elseif (self::shouldNagToSetUpMfa($mfa)) {
             $this->redirectToMfaNag($state, $employeeId, $this->mfaSetupUrl);
+            return;
         }
     }
     
