@@ -6,6 +6,7 @@ use Behat\Behat\Context\Context;
 use Behat\Mink\Driver\GoutteDriver;
 use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
 use Sil\PhpEnv\Env;
@@ -16,6 +17,8 @@ use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
  */
 class MfaContext implements Context
 {
+    protected $nonPwManagerUrl = 'http://mfasp/module.php/core/authenticate.php?as=mfa-idp-no-port';
+    
     protected $username = null;
     protected $password = null;
     
@@ -126,13 +129,19 @@ class MfaContext implements Context
      */
     public function iLogin()
     {
-        $this->session->visit(
-            'http://mfasp/module.php/core/authenticate.php?as=mfa-idp-no-port'
-        );
+        $this->session->visit($this->nonPwManagerUrl);
         $page = $this->session->getPage();
-        $page->fillField('username', $this->username);
-        $page->fillField('password', $this->password);
-        $this->submitLoginForm($page);
+        try {
+            $page->fillField('username', $this->username);
+            $page->fillField('password', $this->password);
+            $this->submitLoginForm($page);
+        } catch (ElementNotFoundException $e) {
+            Assert::fail(sprintf(
+                "Did not find that element in the page.\nError: %s\nPage content: %s",
+                $e->getMessage(),
+                $page->getContent()
+            ));
+        }
     }
     
     /**
@@ -410,10 +419,14 @@ class MfaContext implements Context
      */
     public function iShouldEndUpAtTheMfaSetupUrl()
     {
-        $mfaSetupUrl = Env::get('MFA_SETUP_URL');
-        Assert::assertNotEmpty($mfaSetupUrl);
+        $mfaSetupUrl = Env::get('MFA_SETUP_URL_FOR_TESTS');
+        Assert::assertNotEmpty($mfaSetupUrl, 'No MFA_SETUP_URL_FOR_TESTS provided');
         $currentUrl = $this->session->getCurrentUrl();
-        Assert::assertStringStartsWith($mfaSetupUrl, $currentUrl);
+        Assert::assertStringStartsWith(
+            $mfaSetupUrl,
+            $currentUrl,
+            'Did NOT end up at the MFA-setup URL'
+        );
     }
 
     /**
@@ -424,5 +437,18 @@ class MfaContext implements Context
         $page = $this->session->getPage();
         $continueButton = $this->getContinueButton($page);
         Assert::assertNull($continueButton, 'Should not have found a continue button');
+    }
+
+    /**
+     * @Then I should NOT be able to get to my intended destination
+     */
+    public function iShouldNotBeAbleToGetToMyIntendedDestination()
+    {
+        $this->session->visit($this->nonPwManagerUrl);
+        Assert::assertStringStartsNotWith(
+            $this->nonPwManagerUrl,
+            $this->session->getCurrentUrl(),
+            'Failed to prevent me from getting to SPs other than the MFA setup URL'
+        );
     }
 }

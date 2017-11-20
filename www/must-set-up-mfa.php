@@ -11,19 +11,7 @@ $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_NEEDE
 
 // If the user has pressed the set-up-MFA button...
 if (filter_has_var(INPUT_POST, 'setUpMfa')) {
-    $mfaSetupUrl = $state['mfaSetupUrl'];
-    
-    // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
-    if (array_key_exists('saml:RelayState', $state)) {
-        $returnTo = sspmod_expirychecker_Utilities::getUrlFromRelayState(
-            $state['saml:RelayState']
-        );
-        if ( ! empty($returnTo)) {                                 
-            $mfaSetupUrl .= '?returnTo=' . $returnTo;
-        }
-    }
-    
-    SimpleSAML_Utilities::redirect($mfaSetupUrl);
+    Mfa::redirectToMfaSetup($state);
     return;
 }
 
