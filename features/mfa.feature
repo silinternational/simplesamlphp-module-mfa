@@ -36,6 +36,7 @@ Feature: Prompt for MFA credentials
       And I login
     When I click the set-up-MFA button
     Then I should end up at the mfa-setup URL
+      And I should NOT be able to get to my intended destination
 
   Scenario: Needs MFA, has backup code option available
     Given I provide credentials that need MFA and have backup codes available

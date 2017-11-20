@@ -17,6 +17,8 @@ use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
  */
 class MfaContext implements Context
 {
+    protected $nonPwManagerUrl = 'http://mfasp/module.php/core/authenticate.php?as=mfa-idp-no-port';
+    
     protected $username = null;
     protected $password = null;
     
@@ -127,9 +129,7 @@ class MfaContext implements Context
      */
     public function iLogin()
     {
-        $this->session->visit(
-            'http://mfasp/module.php/core/authenticate.php?as=mfa-idp-no-port'
-        );
+        $this->session->visit($this->nonPwManagerUrl);
         $page = $this->session->getPage();
         try {
             $page->fillField('username', $this->username);
@@ -437,5 +437,18 @@ class MfaContext implements Context
         $page = $this->session->getPage();
         $continueButton = $this->getContinueButton($page);
         Assert::assertNull($continueButton, 'Should not have found a continue button');
+    }
+
+    /**
+     * @Then I should NOT be able to get to my intended destination
+     */
+    public function iShouldNotBeAbleToGetToMyIntendedDestination()
+    {
+        $this->session->visit($this->nonPwManagerUrl);
+        Assert::assertStringStartsNotWith(
+            $this->nonPwManagerUrl,
+            $this->session->getCurrentUrl(),
+            'Failed to prevent me from getting to SPs other than the MFA setup URL'
+        );
     }
 }
