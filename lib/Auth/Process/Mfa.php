@@ -286,6 +286,17 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
     }
     
+    protected static function isHeadedToMfaSetupUrl($state, $mfaSetupUrl)
+    {
+        if (array_key_exists('saml:RelayState', $state)) {
+            $currentDestination = self::getRelayStateUrl($state);
+            if ( ! empty($currentDestination)) {
+                return (strpos($currentDestination, $mfaSetupUrl) === 0);
+            }
+        }
+        return false;
+    }
+    
     /**
      * Validate the given MFA submission. If successful, this function
      * will NOT return. If the submission does not pass validation, an error
@@ -400,6 +411,10 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         // Get the necessary info from the state data.
         $employeeId = $this->getAttribute($this->employeeIdAttr, $state);
         $mfa = $this->getAttributeAllValues('mfa', $state);
+        $isHeadedToMfaSetupUrl = self::isHeadedToMfaSetupUrl(
+            $state,
+            $this->mfaSetupUrl
+        );
 
         if (self::shouldPromptForMfa($mfa)) {
             if (self::hasMfaOptions($mfa)) {
@@ -407,9 +422,19 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 return;
             }
             
+            if ($isHeadedToMfaSetupUrl) {
+                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+                return;
+            }
+            
             $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
             return;
         } elseif (self::shouldNagToSetUpMfa($mfa)) {
+            if ($isHeadedToMfaSetupUrl) {
+                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+                return;
+            }
+            
             $this->redirectToMfaNag($state, $employeeId, $this->mfaSetupUrl);
             return;
         }
