@@ -6,6 +6,7 @@ use Behat\Behat\Context\Context;
 use Behat\Mink\Driver\GoutteDriver;
 use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
 use Sil\PhpEnv\Env;
@@ -130,9 +131,17 @@ class MfaContext implements Context
             'http://mfasp/module.php/core/authenticate.php?as=mfa-idp-no-port'
         );
         $page = $this->session->getPage();
-        $page->fillField('username', $this->username);
-        $page->fillField('password', $this->password);
-        $this->submitLoginForm($page);
+        try {
+            $page->fillField('username', $this->username);
+            $page->fillField('password', $this->password);
+            $this->submitLoginForm($page);
+        } catch (ElementNotFoundException $e) {
+            Assert::fail(sprintf(
+                "Did not find that element in the page.\nError: %s\nPage content: %s",
+                $e->getMessage(),
+                $page->getContent()
+            ));
+        }
     }
     
     /**
@@ -413,7 +422,11 @@ class MfaContext implements Context
         $mfaSetupUrl = Env::get('MFA_SETUP_URL_FOR_TESTS');
         Assert::assertNotEmpty($mfaSetupUrl, 'No MFA_SETUP_URL_FOR_TESTS provided');
         $currentUrl = $this->session->getCurrentUrl();
-        Assert::assertStringStartsWith($mfaSetupUrl, $currentUrl);
+        Assert::assertStringStartsWith(
+            $mfaSetupUrl,
+            $currentUrl,
+            'Did NOT end up at the MFA-setup URL'
+        );
     }
 
     /**
