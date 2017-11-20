@@ -237,6 +237,29 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         return $template;
     }
     
+    /**
+     * Return the saml:RelayState if it begins with "http" or "https". Otherwise
+     * return an empty string.
+     *
+     * @param array $state
+     * @returns string
+     */
+    protected static function getRelayStateUrl($state)
+    {
+        if (array_key_exists('saml:RelayState', $state)) {
+            $samlRelayState = $state['saml:RelayState'];
+            
+            if (strpos($samlRelayState, "http://") === 0) {
+                return $samlRelayState;
+            }
+
+            if (strpos($samlRelayState, "https://") === 0) {
+                return $samlRelayState;
+            }
+        }
+        return '';
+    }
+    
     protected static function hasMfaOptions($mfa)
     {
         return (count($mfa['options']) > 0);
@@ -344,49 +367,25 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * Redirect the user to set up MFA.
      *
      * @param array $state
-     * @param string $employeeId
-     * @param string $mfaSetupUrl
-     * @param string $mfaSetupSession
-     * @param int $expiryTimestamp The timestamp when the password will expire.
      */
-    public function redirectToMfaSetup(
-        &$state,
-        $employeeId,
-        $mfaSetupUrl
-    ) {
-        /* Save state and redirect. */
-        $state['employeeId'] = $employeeId;
+    public static function redirectToMfaSetup(&$state)
+    {
+        $mfaSetupUrl = $state['mfaSetupUrl'];
         
-        /* If state already has the MFA-setup URL, go straight there to avoid
-         * an eternal loop between that and the IdP. Otherwise add the original
-         * destination URL as a parameter.  */
-        if (array_key_exists('saml:RelayState', $state)) {
-            $relayState = $state['saml:RelayState'];
-            
-            /**
-             * @TODO Make sure this doesn't match when the MFA setup URL is
-             *       simply included as a query string parameter/value. In other
-             *       words, make sure the user is really just going to the MFA
-             *       setup website.
-             */
-            if (strpos($relayState, $mfaSetupUrl) !== false) {
-                //unset($state['Attributes']['mfa']);
-                // NOTE: This function call will never return.
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
-                return;
-            } else {
-                $returnTo = sspmod_mfa_Utilities::getUrlFromRelayState($relayState);
-                if ( ! empty($returnTo)) {                                 
-                    $mfaSetupUrl .= '?returnTo=' . $returnTo;
-                }
-            }
+        // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
+        $currentDestination = self::getRelayStateUrl($state);
+        if ( ! empty($currentDestination)) {
+            $mfaSetupUrl = SimpleSAML\Utils\HTTP::addURLParameters(
+                $mfaSetupUrl,
+                ['returnTo' => $currentDestination]
+            );
         }
         
-        $this->logger->warning(sprintf(
-            'mfa: Sending Employee ID %s to set up MFA at %s',
-            var_export($employeeId, true),
-            var_export($mfaSetupUrl, true)
-        ));
+        //$this->logger->warning(sprintf(
+        //    'mfa: Sending Employee ID %s to set up MFA at %s',
+        //    var_export($state['employeeId'] ?? null, true),
+        //    var_export($mfaSetupUrl, true)
+        //));
         
         SimpleSAML_Utilities::redirect($mfaSetupUrl);
     }
