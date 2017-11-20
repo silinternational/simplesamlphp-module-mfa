@@ -37,6 +37,7 @@ services:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
       - IDP_NAME=Local IdP
+      - MFA_SETUP_URL=http://mfa-pw-manager.local:8082/module.php/core/authenticate.php?as=mfa-idp
       - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
@@ -51,7 +52,7 @@ services:
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
 
       # Utilize custom configs
-      - ./development/sp-local/config/authsources.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
+      - ./development/sp-local/config/authsources-mfa-sp.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
 
       # Utilize custom metadata
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
@@ -62,6 +63,30 @@ services:
       - ADMIN_PASS=sp1
       - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
       - SECRET_SALT=NOT-a-secret-h57fjemb&dn^nsJFGNjweJz1
+      - SECURE_COOKIE=false
+      - SHOW_SAML_ERRORS=true
+      - SAML20_IDP_ENABLE=false
+      - ADMIN_PROTECT_INDEX_PAGE=false
+      - THEME_USE=default:default
+
+  mfapwmanager:
+    image: silintl/ssp-base:feature_mfa
+    volumes:
+      # Utilize custom certs
+      - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
+
+      # Utilize custom configs
+      - ./development/sp-local/config/authsources-mfa-pw-manager.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
+
+      # Utilize custom metadata
+      - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
+    ports:
+      - "8082:80"
+    environment:
+      - ADMIN_EMAIL=john_doe@there.com
+      - ADMIN_PASS=sp1
+      - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
+      - SECRET_SALT=NOT-a-secret-k49fjfkw73hjf9t87wjiw
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
       - SAML20_IDP_ENABLE=false
@@ -92,6 +117,7 @@ services:
       - ./common.env
       - ./local.env
     environment:
+      - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default:default
     working_dir: /data
     command: ["/data/run-tests.sh"]

@@ -38,4 +38,4 @@ test: composer web
 	make behat
 
 web:
-	docker-compose up -d mfaidp mfasp
+	docker-compose up -d mfaidp mfasp mfapwmanager
