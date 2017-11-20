@@ -33,7 +33,8 @@ services:
       - ADMIN_PASS=a
       - APPLICATION_ENV=test
       - IDP_NAME=Local IdP
-      - MFA_SETUP_URL=https://www.google.com/
+      - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
+      - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - ID_BROKER_ACCESS_TOKEN=dummy
       - ID_BROKER_ASSERT_VALID_IP=false
       - ID_BROKER_BASE_URI=dummy
@@ -52,7 +53,7 @@ services:
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
 
       # Utilize custom configs
-      - ./development/sp-local/config/authsources.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
+      - ./development/sp-local/config/authsources-mfa-sp.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
 
       # Utilize custom metadata
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
@@ -65,10 +66,35 @@ services:
       - ADMIN_PROTECT_INDEX_PAGE=false
       - THEME_USE=default:default
   
+  mfapwmanager:
+    image: silintl/ssp-base:feature_mfa
+    volumes:
+      # Utilize custom certs
+      - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
+
+      # Utilize custom configs
+      - ./development/sp-local/config/authsources-mfa-pw-manager.php:/data/vendor/simplesamlphp/simplesamlphp/config/authsources.php
+
+      # Utilize custom metadata
+      - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
+    ports:
+      - "8082:80"
+    environment:
+      - ADMIN_EMAIL=john_doe@there.com
+      - ADMIN_PASS=sp1
+      - IDP_NAME=THIS VARIABLE IS REQUIRED BUT PROBABLY NOT USED
+      - SECRET_SALT=NOT-a-secret-k49fjfkw73hjf9t87wjiw
+      - SECURE_COOKIE=false
+      - SHOW_SAML_ERRORS=true
+      - SAML20_IDP_ENABLE=false
+      - ADMIN_PROTECT_INDEX_PAGE=false
+      - THEME_USE=default:default
+  
   tests:
     image: silintl/ssp-base:feature_mfa
     links:
       - mfaidp
+      - mfapwmanager
       - mfasp
     volumes:
       - ./development/run-tests.sh:/data/run-tests.sh
@@ -78,7 +104,8 @@ services:
     env_file:
       - ./common.env
     environment:
-      - MFA_SETUP_URL=https://www.google.com
+      - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
+      - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default:default
     working_dir: /data
     command: /data/run-tests.sh
