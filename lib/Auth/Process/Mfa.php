@@ -237,6 +237,11 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         return $template;
     }
     
+    protected static function hasMfaOptions($mfa)
+    {
+        return (count($mfa['options']) > 0);
+    }
+    
     protected function initComposerAutoloader()
     {
         $path = __DIR__ . '/../../../vendor/autoload.php';
@@ -397,13 +402,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $employeeId = $this->getAttribute($this->employeeIdAttr, $state);
         $mfa = $this->getAttributeAllValues('mfa', $state);
 
-        if (strtolower($mfa['prompt']) !== 'no') {
-            if (count($mfa['options']) == 0) {
-                $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
-            } else {
+        if (self::shouldPromptForMfa($mfa)) {
+            if (self::hasMfaOptions($mfa)) {
                 $this->redirectToMfaPrompt($state, $employeeId, $mfa['options']);
+            } else {
+                $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
             }
-        } elseif (strtolower($mfa['nag']) == 'yes') {
+        } elseif (self::shouldNagToSetUpMfa($mfa)) {
             $this->redirectToMfaNag($state, $employeeId, $this->mfaSetupUrl);
         }
     }
@@ -571,5 +576,15 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $cookieHash = password_hash($cookieString, PASSWORD_DEFAULT);
         setcookie('c1', base64_encode($cookieHash), $expireDate, '/', null, $secureCookie, true);
         setcookie('c2', $expireDate, $expireDate, '/', null, $secureCookie, true);
+    }
+    
+    protected static function shouldNagToSetUpMfa($mfa)
+    {
+        return (strtolower($mfa['nag']) === 'yes');
+    }
+    
+    protected static function shouldPromptForMfa($mfa)
+    {
+        return (strtolower($mfa['prompt']) !== 'no');
     }
 }
