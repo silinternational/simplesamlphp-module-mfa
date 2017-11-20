@@ -410,8 +410,8 @@ class MfaContext implements Context
      */
     public function iShouldEndUpAtTheMfaSetupUrl()
     {
-        $mfaSetupUrl = Env::get('MFA_SETUP_URL');
-        Assert::assertNotEmpty($mfaSetupUrl);
+        $mfaSetupUrl = Env::get('MFA_SETUP_URL_FOR_TESTS');
+        Assert::assertNotEmpty($mfaSetupUrl, 'No MFA_SETUP_URL_FOR_TESTS provided');
         $currentUrl = $this->session->getCurrentUrl();
         Assert::assertStringStartsWith($mfaSetupUrl, $currentUrl);
     }

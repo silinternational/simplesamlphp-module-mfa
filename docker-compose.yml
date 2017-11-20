@@ -38,6 +38,7 @@ services:
       - ADMIN_PASS=a
       - IDP_NAME=Local IdP
       - MFA_SETUP_URL=http://mfa-pw-manager.local:8082/module.php/core/authenticate.php?as=mfa-idp
+      - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
@@ -117,7 +118,7 @@ services:
       - ./common.env
       - ./local.env
     environment:
-      - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
+      - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default:default
     working_dir: /data
     command: ["/data/run-tests.sh"]
