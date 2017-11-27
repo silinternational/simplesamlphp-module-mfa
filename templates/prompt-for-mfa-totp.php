@@ -1,6 +1,5 @@
 <?php
-
-$this->data['header'] = '2-step verification';
+$this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 
 if ( ! empty($this->data['errorMessage'])) {
@@ -13,18 +12,10 @@ if ( ! empty($this->data['errorMessage'])) {
 }
 
 ?>
-<form action="<?= htmlentities($this->data['formTarget']); ?>" method="POST">
-  
-    <?php foreach ($this->data['formData'] as $name => $value): ?>
-        <input type="hidden"
-               name="<?= htmlentities($name); ?>"
-               value="<?= htmlentities($value); ?>" />
-    <?php endforeach; ?>
-    
-    <p>Please enter the 6-digit number from your app: </p>
+<form method="post">
+    <p><b>Verification app</b></p>
     <p>
-
-        <input type="text" autofocus id="mfaSubmission" name="mfaSubmission" />
+        Enter 6-digit code: <input type="text" autofocus id="mfaSubmission" name="mfaSubmission" />
         <br />
         <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
         <label for="rememberMe">Remember this computer for 30 days</label>
@@ -42,7 +33,9 @@ if ( ! empty($this->data['errorMessage'])) {
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
                 if ($mfaOpt['type'] != 'totp'){
                     ?>
-                    <li><a href="<?=htmlentities($this->data['formTarget'])?>?StateId=<?=$this->data['stateId']?>&mfaId=<?=$mfaOpt['id']?>"><?=$mfaOpt['type']?></a></li>
+                    <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
+                       htmlentities($mfaOpt['type'])
+                    ?></a></li>
                     <?php
                 }
             }
@@ -54,5 +47,4 @@ if ( ! empty($this->data['errorMessage'])) {
     ?>
 </form>
 <?php
-
 $this->includeAtTemplateBase('includes/footer.php');

@@ -1,6 +1,5 @@
 <?php
-
-$this->data['header'] = '2-step verification';
+$this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 
 if ( ! empty($this->data['errorMessage'])) {
@@ -13,21 +12,14 @@ if ( ! empty($this->data['errorMessage'])) {
 }
 
 ?>
-<form action="<?= htmlentities($this->data['formTarget']); ?>" method="POST">
-  
-    <?php foreach ($this->data['formData'] as $name => $value): ?>
-        <input type="hidden"
-               name="<?= htmlentities($name); ?>"
-               value="<?= htmlentities($value); ?>" />
-    <?php endforeach; ?>
-    
+<form method="post">
+    <p><b>Backup code</b></p>
     <p>
-      Please enter one of your backup codes. Remember that each codes can
-      only be used once, so the code you enter this time will be used up and
-      will not be available for later use.
+      Each code can only be used once, so the code you enter this time will be
+      used up and will not be available again.
     </p>
     <p>
-        <input type="text" id="mfaSubmission" name="mfaSubmission" />
+        Enter code: <input type="text" id="mfaSubmission" name="mfaSubmission" />
         <br />
         <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
         <label for="rememberMe">Remember this computer for 30 days</label>
@@ -36,27 +28,27 @@ if ( ! empty($this->data['errorMessage'])) {
                 style="padding: 4px 8px;">Submit</button>
     </p>
     <?php
-        if (count($this->data['mfaOptions']) > 1) {
-            ?>
-            <p>
-                Don't have your backup codes handy? You may also use:
-                <ul>
+    if (count($this->data['mfaOptions']) > 1) {
+        ?>
+        <p>
+            Don't have your backup codes handy? You may also use:
+        <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
                 if ($mfaOpt['type'] != 'backupcode'){
                     ?>
-                    <li><a href="<?=htmlentities($this->data['formTarget'])?>?StateId=<?=$this->data['stateId']?>&mfaId=<?=$mfaOpt['id']?>"><?=$mfaOpt['type']?></a></li>
+                    <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
+                       htmlentities($mfaOpt['type'])
+                    ?></a></li>
                     <?php
                 }
             }
             ?>
-                </ul>
-            </p>
-            <?php
-        }
+        </ul>
+        </p>
+        <?php
+    }
     ?>
-
 </form>
 <?php
-
 $this->includeAtTemplateBase('includes/footer.php');

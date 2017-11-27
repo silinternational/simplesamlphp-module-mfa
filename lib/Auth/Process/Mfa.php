@@ -2,6 +2,7 @@
 
 use Psr\Log\LoggerInterface;
 use Sil\PhpEnv\Env;
+use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 
@@ -19,11 +20,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     const STAGE_SENT_TO_MFA_NAG = 'mfa:sent_to_mfa_nag';
 
     private $employeeIdAttr = null;
+    private $mfaLearnMoreUrl = null;
     private $mfaSetupUrl = null;
     
     private $idBrokerAccessToken = null;
     private $idBrokerAssertValidIp;
     private $idBrokerBaseUri = null;
+    private $idBrokerClientClass = null;
     private $idBrokerTrustedIpRanges = [];
     
     /** @var LoggerInterface */
@@ -49,11 +52,14 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             'idBrokerBaseUri',
         ]);
         
+        $this->mfaLearnMoreUrl = $config['mfaLearnMoreUrl'] ?? null;
+        
         $tempTrustedIpRanges = $config['idBrokerTrustedIpRanges'] ?? '';
         if ( ! empty($tempTrustedIpRanges)) {
             $this->idBrokerTrustedIpRanges = explode(',', $tempTrustedIpRanges);
         }
         $this->idBrokerAssertValidIp = (bool)($config['idBrokerAssertValidIp'] ?? true);
+        $this->idBrokerClientClass = $config['idBrokerClientClass'] ?? IdBrokerClient::class;
     }
     
     protected function loadValuesFromConfig($config, $attributes)
@@ -140,12 +146,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      */
     protected static function getIdBrokerClient($idBrokerConfig)
     {
+        $clientClass = $idBrokerConfig['clientClass'];
         $baseUri = $idBrokerConfig['baseUri'];
         $accessToken = $idBrokerConfig['accessToken'];
         $trustedIpRanges = $idBrokerConfig['trustedIpRanges'];
         $assertValidIp = $idBrokerConfig['assertValidIp'];
         
-        return new IdBrokerClient($baseUri, $accessToken, [
+        return new $clientClass($baseUri, $accessToken, [
             'http_client_options' => [
                 'timeout' => 10,
             ],
@@ -230,6 +237,34 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         return $template;
     }
     
+    /**
+     * Return the saml:RelayState if it begins with "http" or "https". Otherwise
+     * return an empty string.
+     *
+     * @param array $state
+     * @returns string
+     */
+    protected static function getRelayStateUrl($state)
+    {
+        if (array_key_exists('saml:RelayState', $state)) {
+            $samlRelayState = $state['saml:RelayState'];
+            
+            if (strpos($samlRelayState, "http://") === 0) {
+                return $samlRelayState;
+            }
+
+            if (strpos($samlRelayState, "https://") === 0) {
+                return $samlRelayState;
+            }
+        }
+        return '';
+    }
+    
+    protected static function hasMfaOptions($mfa)
+    {
+        return (count($mfa['options']) > 0);
+    }
+    
     protected function initComposerAutoloader()
     {
         $path = __DIR__ . '/../../../vendor/autoload.php';
@@ -251,6 +286,17 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
     }
     
+    protected static function isHeadedToMfaSetupUrl($state, $mfaSetupUrl)
+    {
+        if (array_key_exists('saml:RelayState', $state)) {
+            $currentDestination = self::getRelayStateUrl($state);
+            if ( ! empty($currentDestination)) {
+                return (strpos($currentDestination, $mfaSetupUrl) === 0);
+            }
+        }
+        return false;
+    }
+    
     /**
      * Validate the given MFA submission. If successful, this function
      * will NOT return. If the submission does not pass validation, an error
@@ -261,14 +307,19 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * @param string $mfaSubmission The value of the MFA submission.
      * @param array $state The array of state information.
      * @param bool $rememberMe Whether or not to set remember me cookies
-     * @return void|string An error message, if validation is unsuccessful.
+     * @param LoggerInterface $logger A PSR-3 compatible logger.
+     * @param string $mfaType The type of the MFA ('u2f', 'totp', 'backupcode').
+     * @return void|string If validation fails, an error message to show to the
+     *     end user will be returned.
      */
     public static function validateMfaSubmission(
         $mfaId,
         $employeeId,
         $mfaSubmission,
         $state,
-        $rememberMe
+        $rememberMe,
+        LoggerInterface $logger,
+        string $mfaType
     ) {
         if (empty($mfaId)) {
             return 'No MFA ID was provided.';
@@ -286,20 +337,40 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 $mfaSubmission
             );
             if ( ! $validMfa) {
+                if ($mfaType == 'backupcode') {
+                    return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
+                }
                 return 'Incorrect 2-step verification code.';
             }
         } catch (\Throwable $t) {
-            $logger = new Psr3SamlLogger();
+            
+            if ($t instanceof MfaRateLimitException) {
+                $logger->error(json_encode([
+                    'event' => 'MFA is rate-limited',
+                    'employeeId' => $employeeId,
+                    'mfaId' => $mfaId,
+                    'mfaType' => $mfaType,
+                ]));
+                return 'There have been too many wrong answers recently. '
+                     . 'Please wait a minute, then try again.';
+            }
+            
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
             return 'Something went wrong while we were trying to do the '
-                 . '2-step verification.' . $t->getMessage();
+                 . '2-step verification.';
         }
 
         // Set remember me cookies if requested
         if ($rememberMe) {
             self::setRememberMeCookies($state['employeeId'], $state['mfaOptions']);
         }
-
+        
+        $logger->warning(json_encode([
+            'event' => 'MFA validation result: success',
+            'employeeId' => $employeeId,
+            'mfaType' => $mfaType,
+        ]));
+        
         //unset($state['Attributes']['mfa']);
         // The following function call will never return.
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
@@ -310,49 +381,25 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * Redirect the user to set up MFA.
      *
      * @param array $state
-     * @param string $employeeId
-     * @param string $mfaSetupUrl
-     * @param string $mfaSetupSession
-     * @param int $expiryTimestamp The timestamp when the password will expire.
      */
-    public function redirectToMfaSetup(
-        &$state,
-        $employeeId,
-        $mfaSetupUrl
-    ) {
-        /* Save state and redirect. */
-        $state['employeeId'] = $employeeId;
+    public static function redirectToMfaSetup(&$state)
+    {
+        $mfaSetupUrl = $state['mfaSetupUrl'];
         
-        /* If state already has the MFA-setup URL, go straight there to avoid
-         * an eternal loop between that and the IdP. Otherwise add the original
-         * destination URL as a parameter.  */
-        if (array_key_exists('saml:RelayState', $state)) {
-            $relayState = $state['saml:RelayState'];
-            
-            /**
-             * @TODO Make sure this doesn't match when the MFA setup URL is
-             *       simply included as a query string parameter/value. In other
-             *       words, make sure the user is really just going to the MFA
-             *       setup website.
-             */
-            if (strpos($relayState, $mfaSetupUrl) !== false) {
-                //unset($state['Attributes']['mfa']);
-                // NOTE: This function call will never return.
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
-                return;
-            } else {
-                $returnTo = sspmod_mfa_Utilities::getUrlFromRelayState($relayState);
-                if ( ! empty($returnTo)) {                                 
-                    $mfaSetupUrl .= '?returnTo=' . $returnTo;
-                }
-            }
+        // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
+        $currentDestination = self::getRelayStateUrl($state);
+        if ( ! empty($currentDestination)) {
+            $mfaSetupUrl = SimpleSAML\Utils\HTTP::addURLParameters(
+                $mfaSetupUrl,
+                ['returnTo' => $currentDestination]
+            );
         }
         
-        $this->logger->warning(sprintf(
-            'mfa: Sending Employee ID %s to set up MFA at %s',
-            var_export($employeeId, true),
-            var_export($mfaSetupUrl, true)
-        ));
+        //$this->logger->warning(sprintf(
+        //    'mfa: Sending Employee ID %s to set up MFA at %s',
+        //    var_export($state['employeeId'] ?? null, true),
+        //    var_export($mfaSetupUrl, true)
+        //));
         
         SimpleSAML_Utilities::redirect($mfaSetupUrl);
     }
@@ -367,15 +414,32 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         // Get the necessary info from the state data.
         $employeeId = $this->getAttribute($this->employeeIdAttr, $state);
         $mfa = $this->getAttributeAllValues('mfa', $state);
+        $isHeadedToMfaSetupUrl = self::isHeadedToMfaSetupUrl(
+            $state,
+            $this->mfaSetupUrl
+        );
 
-        if (strtolower($mfa['prompt']) !== 'no') {
-            if (count($mfa['options']) == 0) {
-                $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
-            } else {
+        if (self::shouldPromptForMfa($mfa)) {
+            if (self::hasMfaOptions($mfa)) {
                 $this->redirectToMfaPrompt($state, $employeeId, $mfa['options']);
+                return;
             }
-        } elseif (strtolower($mfa['nag']) == 'yes') {
+            
+            if ($isHeadedToMfaSetupUrl) {
+                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+                return;
+            }
+            
+            $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
+            return;
+        } elseif (self::shouldNagToSetUpMfa($mfa)) {
+            if ($isHeadedToMfaSetupUrl) {
+                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+                return;
+            }
+            
             $this->redirectToMfaNag($state, $employeeId, $this->mfaSetupUrl);
+            return;
         }
     }
     
@@ -397,6 +461,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         /* Save state and redirect. */
         $state['employeeId'] = $employeeId;
+        $state['mfaLearnMoreUrl'] = $this->mfaLearnMoreUrl;
         $state['mfaSetupUrl'] = $mfaSetupUrl;
         
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
@@ -423,6 +488,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
 
         /* Save state and redirect. */
         $state['employeeId'] = $employeeId;
+        $state['mfaLearnMoreUrl'] = $this->mfaLearnMoreUrl;
         $state['mfaSetupUrl'] = $mfaSetupUrl;
 
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NAG);
@@ -442,12 +508,15 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     {
         assert('is_array($state)');
         
+        /** @todo Check for valid remember-me cookies here rather doing a redirect first. */
+        
         $logger = new Psr3SamlLogger();
         $state['mfaOptions'] = $mfaOptions;
         $state['idBrokerConfig'] = [
             'accessToken' => $this->idBrokerAccessToken,
             'assertValidIp' => $this->idBrokerAssertValidIp,
             'baseUri' => $this->idBrokerBaseUri,
+            'clientClass' => $this->idBrokerClientClass,
             'trustedIpRanges' => $this->idBrokerTrustedIpRanges,
         ];
         
@@ -461,8 +530,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         $id = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
         $url = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php');
+
+        $mfaOption = self::getMfaOptionToUse($mfaOptions);
         
-        SimpleSAML_Utilities::redirect($url, array('StateId' => $id));
+        SimpleSAML_Utilities::redirect($url, [
+            'mfaId' => $mfaOption['id'],
+            'StateId' => $id,
+        ]);
     }
 
     /**
@@ -532,5 +606,15 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $cookieHash = password_hash($cookieString, PASSWORD_DEFAULT);
         setcookie('c1', base64_encode($cookieHash), $expireDate, '/', null, $secureCookie, true);
         setcookie('c2', $expireDate, $expireDate, '/', null, $secureCookie, true);
+    }
+    
+    protected static function shouldNagToSetUpMfa($mfa)
+    {
+        return (strtolower($mfa['nag']) === 'yes');
+    }
+    
+    protected static function shouldPromptForMfa($mfa)
+    {
+        return (strtolower($mfa['prompt']) !== 'no');
     }
 }

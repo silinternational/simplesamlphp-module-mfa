@@ -21,6 +21,7 @@ them to the `'authproc'` array in your `metadata/saml20-idp-hosted.php` file.
 Example (for `metadata/saml20-idp-hosted.php`):
 
     use Sil\PhpEnv\Env;
+    use Sil\Psr3Adapters\Psr3SamlLogger;
     
     // ...
     
@@ -33,10 +34,11 @@ Example (for `metadata/saml20-idp-hosted.php`):
             'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
             'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
             'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
-            'mfaSetupUrl' => 'https://idm.example.com/mfa/',
+            'mfaLearnMoreUrl' => Env::get('MFA_LEARN_MORE_URL'),
+            'mfaSetupUrl' => Env::get('MFA_SETUP_URL'),
 
             // Optional:
-            'loggerClass' => '\\Sil\\Psr3Adapters\\Psr3SamlLogger',
+            'loggerClass' => Psr3SamlLogger::class,
         ],
         
         // ...

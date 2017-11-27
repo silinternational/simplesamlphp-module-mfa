@@ -6,14 +6,19 @@ use Behat\Behat\Context\Context;
 use Behat\Mink\Driver\GoutteDriver;
 use Behat\Mink\Element\DocumentElement;
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
+use Sil\PhpEnv\Env;
+use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
 
 /**
  * Defines application features from the specific context.
  */
 class MfaContext implements Context
 {
+    protected $nonPwManagerUrl = 'http://mfasp/module.php/core/authenticate.php?as=mfa-idp-no-port';
+    
     protected $username = null;
     protected $password = null;
     
@@ -61,25 +66,15 @@ class MfaContext implements Context
     }
     
     /**
-     * Assert that the given page does NOT have a form that contains the given
-     * text.
+     * Get the "continue" button.
      *
-     * @param string $text The text (or HTML) to search for.
-     * @param DocumentElement $page The page to search in.
-     * @return void
+     * @param DocumentElement $page The page.
+     * @return NodeElement
      */
-    protected function assertFormNotContains($text, $page)
+    protected function getContinueButton($page)
     {
-        $forms = $page->findAll('css', 'form');
-        foreach ($forms as $form) {
-            if (strpos($form->getHtml(), $text) !== false) {
-                Assert::fail(sprintf(
-                    "Found a form containing %s in this HTML:\n%s",
-                    var_export($text, true),
-                    $page->getHtml()
-                ));
-            }
-        }
+        $continueButton = $page->find('css', '[name=continue]');
+        return $continueButton;
     }
     
     /**
@@ -104,15 +99,49 @@ class MfaContext implements Context
     }
     
     /**
+     * Get the button for going to set up MFA.
+     *
+     * @param DocumentElement $page The page.
+     * @return NodeElement
+     */
+    protected function getSetUpMfaButton($page)
+    {
+        $setUpMfaButton = $page->find('css', '[name=setUpMfa]');
+        Assert::assertNotNull($setUpMfaButton, 'Failed to find the set-up-MFA button');
+        return $setUpMfaButton;
+    }
+    
+    /**
+     * Get the button for submitting the MFA form.
+     *
+     * @param DocumentElement $page The page.
+     * @return NodeElement
+     */
+    protected function getSubmitMfaButton($page)
+    {
+        $submitMfaButton = $page->find('css', '[name=submitMfa]');
+        Assert::assertNotNull($submitMfaButton, 'Failed to find the submit-MFA button');
+        return $submitMfaButton;
+    }
+    
+    /**
      * @When I login
      */
     public function iLogin()
     {
-        $this->session->visit('http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp');
+        $this->session->visit($this->nonPwManagerUrl);
         $page = $this->session->getPage();
-        $page->fillField('username', $this->username);
-        $page->fillField('password', $this->password);
-        $this->submitLoginForm($page);
+        try {
+            $page->fillField('username', $this->username);
+            $page->fillField('password', $this->password);
+            $this->submitLoginForm($page);
+        } catch (ElementNotFoundException $e) {
+            Assert::fail(sprintf(
+                "Did not find that element in the page.\nError: %s\nPage content: %s",
+                $e->getMessage(),
+                $page->getContent()
+            ));
+        }
     }
     
     /**
@@ -134,7 +163,32 @@ class MfaContext implements Context
     {
         $loginButton = $this->getLoginButton($page);
         $loginButton->click();
-        
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+    
+    
+    /**
+     * Submit the MFA form, including the secondary page's form (if
+     * simpleSAMLphp shows another page because JavaScript isn't supported).
+     *
+     * @param DocumentElement $page The page.
+     */
+    protected function submitMfaForm($page)
+    {
+        $submitMfaButton = $this->getSubmitMfaButton($page);
+        $submitMfaButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+    
+    
+    /**
+     * Submit the secondary page's form (if simpleSAMLphp shows another page
+     * because JavaScript isn't supported).
+     *
+     * @param DocumentElement $page The page.
+     */
+    protected function submitSecondarySspFormIfPresent($page)
+    {
         $body = $page->find('css', 'body');
         if ($body instanceof NodeElement) {
             $onload = $body->getAttribute('onload');
@@ -170,8 +224,7 @@ class MfaContext implements Context
     public function iShouldSeeAMessageThatIHaveToSetUpMfa()
     {
         $page = $this->session->getPage();
-        Assert::assertContains('need to', $page->getHtml());
-        Assert::assertContains('set up 2-step verification', $page->getHtml());
+        Assert::assertContains('must set up 2-', $page->getHtml());
     }
     
     /**
@@ -180,7 +233,7 @@ class MfaContext implements Context
     public function thereShouldBeAWayToGoSetUpMfaNow()
     {
         $page = $this->session->getPage();
-        $this->assertFormContains('id="setUpMfa"', $page);
+        $this->assertFormContains('name="setUpMfa"', $page);
     }
     
     /**
@@ -198,7 +251,10 @@ class MfaContext implements Context
      */
     public function iShouldSeeAPromptForABackupCode()
     {
-        throw new PendingException();
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Backup code', $pageHtml);
+        Assert::assertContains('Enter code', $pageHtml);
     }
     
     /**
@@ -216,6 +272,183 @@ class MfaContext implements Context
      */
     public function iShouldSeeAPromptForATotpCode()
     {
-        throw new PendingException();
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Verification app', $pageHtml);
+        Assert::assertContains('Enter 6-digit code', $pageHtml);
+    }
+
+    /**
+     * @Given I provide credentials that need MFA and have U2F available
+     */
+    public function iProvideCredentialsThatNeedMfaAndHaveUfAvailable()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_u2f';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Then I should see a prompt for a U2F security key
+     */
+    public function iShouldSeeAPromptForAUfSecurityKey()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains('insert your security key', $page->getHtml());
+    }
+
+    /**
+     * @Given I have logged in (again)
+     */
+    public function iHaveLoggedIn()
+    {
+        $this->iLogin();
+    }
+
+    protected function submitMfaValue($mfaValue)
+    {
+        $page = $this->session->getPage();
+        $page->fillField('mfaSubmission', $mfaValue);
+        $this->submitMfaForm($page);
+        return $page->getHtml();
+    }
+
+    /**
+     * @When I submit a correct backup code
+     */
+    public function iSubmitACorrectBackupCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::CORRECT_VALUE);
+    }
+
+    /**
+     * @When I submit an incorrect backup code
+     */
+    public function iSubmitAnIncorrectBackupCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::INCORRECT_VALUE);
+    }
+
+    /**
+     * @Then I should see a message that I have to wait before trying again
+     */
+    public function iShouldSeeAMessageThatIHaveToWaitBeforeTryingAgain()
+    {
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains(' wait ', $pageHtml);
+        Assert::assertContains('try again', $pageHtml);
+    }
+
+    /**
+     * @Then I should see a message that it was incorrect
+     */
+    public function iShouldSeeAMessageThatItWasIncorrect()
+    {
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('Incorrect 2-step verification code', $pageHtml);
+    }
+
+    /**
+     * @Given I provide credentials that have a rate-limited MFA
+     */
+    public function iProvideCredentialsThatHaveARateLimitedMfa()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_rate_limited_mfa';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that will be nagged to set up MFA
+     */
+    public function iProvideCredentialsThatWillBeNaggedToSetUpMfa()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'nag_for_mfa';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Then I should see a message encouraging me to set up MFA
+     */
+    public function iShouldSeeAMessageEncouragingMeToSetUpMfa()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'increase the security of your account by enabling 2-',
+            $page->getHtml()
+        );
+    }
+
+    /**
+     * @Then there should be a way to continue to my intended destination
+     */
+    public function thereShouldBeAWayToContinueToMyIntendedDestination()
+    {
+        $page = $this->session->getPage();
+        $this->assertFormContains('name="continue"', $page);
+    }
+
+    /**
+     * @When I click the remind-me-later button
+     */
+    public function iClickTheRemindMeLaterButton()
+    {
+        $page = $this->session->getPage();
+        $continueButton = $this->getContinueButton($page);
+        Assert::assertNotNull($continueButton, 'Failed to find the continue button');
+        $continueButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+
+    /**
+     * @When I click the set-up-MFA button
+     */
+    public function iClickTheSetUpMfaButton()
+    {
+        $page = $this->session->getPage();
+        $setUpMfaButton = $this->getSetUpMfaButton($page);
+        $setUpMfaButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
+    }
+
+    /**
+     * @Then I should end up at the mfa-setup URL
+     */
+    public function iShouldEndUpAtTheMfaSetupUrl()
+    {
+        $mfaSetupUrl = Env::get('MFA_SETUP_URL_FOR_TESTS');
+        Assert::assertNotEmpty($mfaSetupUrl, 'No MFA_SETUP_URL_FOR_TESTS provided');
+        $currentUrl = $this->session->getCurrentUrl();
+        Assert::assertStringStartsWith(
+            $mfaSetupUrl,
+            $currentUrl,
+            'Did NOT end up at the MFA-setup URL'
+        );
+    }
+
+    /**
+     * @Then there should NOT be a way to continue to my intended destination
+     */
+    public function thereShouldNotBeAWayToContinueToMyIntendedDestination()
+    {
+        $page = $this->session->getPage();
+        $continueButton = $this->getContinueButton($page);
+        Assert::assertNull($continueButton, 'Should not have found a continue button');
+    }
+
+    /**
+     * @Then I should NOT be able to get to my intended destination
+     */
+    public function iShouldNotBeAbleToGetToMyIntendedDestination()
+    {
+        $this->session->visit($this->nonPwManagerUrl);
+        Assert::assertStringStartsNotWith(
+            $this->nonPwManagerUrl,
+            $this->session->getCurrentUrl(),
+            'Failed to prevent me from getting to SPs other than the MFA setup URL'
+        );
     }
 }

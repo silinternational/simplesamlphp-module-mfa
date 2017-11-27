@@ -3,7 +3,7 @@
 start: web
 
 bash:
-	docker-compose run --rm idp bash
+	docker-compose run --rm mfaidp bash
 
 bashtests:
 	docker-compose run --rm tests bash
@@ -28,7 +28,7 @@ composerupdate:
 	docker-compose run --rm composer bash -c "composer update --no-scripts"
 
 enabledebug:
-	docker-compose exec idp bash -c "/data/enable-debug.sh"
+	docker-compose exec mfaidp bash -c "/data/enable-debug.sh"
 
 ps:
 	docker-compose ps
@@ -38,4 +38,4 @@ test: composer web
 	make behat
 
 web:
-	docker-compose up -d idp sp
+	docker-compose up -d mfaidp mfasp mfapwmanager
