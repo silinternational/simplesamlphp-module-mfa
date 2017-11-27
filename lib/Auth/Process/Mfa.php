@@ -337,6 +337,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 $mfaSubmission
             );
             if ( ! $validMfa) {
+                if ($mfaType == 'backupcode') {
+                    return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
+                }
                 return 'Incorrect 2-step verification code.';
             }
         } catch (\Throwable $t) {
