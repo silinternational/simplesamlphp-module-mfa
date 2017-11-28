@@ -3,7 +3,7 @@ version: "2"
 services:
 
   mfaidp:
-    image: silintl/ssp-base:feature_mfa
+    image: silintl/ssp-base:develop
     ports:
       - "8085:80"
       - "9000:9000"
@@ -47,7 +47,7 @@ services:
     command: ["/data/run-dev.sh"]
 
   mfasp:
-    image: silintl/ssp-base:feature_mfa
+    image: silintl/ssp-base:develop
     volumes:
       # Utilize custom certs
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
@@ -71,7 +71,7 @@ services:
       - THEME_USE=default:default
 
   mfapwmanager:
-    image: silintl/ssp-base:feature_mfa
+    image: silintl/ssp-base:develop
     volumes:
       # Utilize custom certs
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
@@ -95,7 +95,7 @@ services:
       - THEME_USE=default:default
 
   composer:
-    image: silintl/ssp-base:feature_mfa
+    image: silintl/ssp-base:develop
     volumes:
       - ./composer.json:/data/composer.json
       - ./composer.lock:/data/composer.lock
@@ -105,7 +105,7 @@ services:
     working_dir: /data
 
   tests:
-    image: silintl/ssp-base:feature_mfa
+    image: silintl/ssp-base:develop
     volumes_from:
       - mfaidp
     volumes:
