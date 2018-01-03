@@ -55,7 +55,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $this->mfaLearnMoreUrl = $config['mfaLearnMoreUrl'] ?? null;
         
         $tempTrustedIpRanges = $config['idBrokerTrustedIpRanges'] ?? '';
-        if ( ! empty($tempTrustedIpRanges)) {
+        if (! empty($tempTrustedIpRanges)) {
             $this->idBrokerTrustedIpRanges = explode(',', $tempTrustedIpRanges);
         }
         $this->idBrokerAssertValidIp = (bool)($config['idBrokerAssertValidIp'] ?? true);
@@ -277,7 +277,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     {
         $loggerClass = $config['loggerClass'] ?? Psr3SamlLogger::class;
         $this->logger = new $loggerClass();
-        if ( ! $this->logger instanceof LoggerInterface) {
+        if (! $this->logger instanceof LoggerInterface) {
             throw new Exception(sprintf(
                 'The specified loggerClass (%s) does not implement '
                 . '\\Psr\\Log\\LoggerInterface.',
@@ -290,7 +290,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     {
         if (array_key_exists('saml:RelayState', $state)) {
             $currentDestination = self::getRelayStateUrl($state);
-            if ( ! empty($currentDestination)) {
+            if (! empty($currentDestination)) {
                 return (strpos($currentDestination, $mfaSetupUrl) === 0);
             }
         }
@@ -336,14 +336,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 $employeeId,
                 $mfaSubmission
             );
-            if ( ! $validMfa) {
+            if (! $validMfa) {
                 if ($mfaType == 'backupcode') {
                     return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
                 }
                 return 'Incorrect 2-step verification code.';
             }
         } catch (\Throwable $t) {
-            
             if ($t instanceof MfaRateLimitException) {
                 $logger->error(json_encode([
                     'event' => 'MFA is rate-limited',
@@ -388,7 +387,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
         $currentDestination = self::getRelayStateUrl($state);
-        if ( ! empty($currentDestination)) {
+        if (! empty($currentDestination)) {
             $mfaSetupUrl = SimpleSAML\Utils\HTTP::addURLParameters(
                 $mfaSetupUrl,
                 ['returnTo' => $currentDestination]
