@@ -76,3 +76,27 @@ Feature: Prompt for MFA credentials
       And I have logged in
     When I submit a correct backup code
     Then I should see a message that I have to wait before trying again
+
+  Scenario: Warning when running low on backup codes
+    Given I provide credentials that need MFA and have 4 backup codes available
+      And I have logged in
+    When I submit a correct backup code
+    Then I should see a message that I am running low on backup codes
+      And there should be a way to go generate more backup codes now
+      And there should be a way to continue to my intended destination
+
+  Scenario: Requiring user to set up more backup codes when they run out and have no other MFA
+    Given I provide credentials that need MFA and have 1 backup code available and no other MFA
+      And I have logged in
+    When I submit a correct backup code
+    Then I should see a message that I have used up my backup codes
+      And there should be a way to go generate more backup codes now
+      And there should NOT be a way to continue to my intended destination
+
+  Scenario: Warning user when they run out of backup codes but have other MFA options
+    Given I provide credentials that need MFA and have 1 backup code available plus some other MFA
+      And I have logged in
+    When I submit a correct backup code
+    Then I should see a message that I have used up my backup codes
+      And there should be a way to go generate more backup codes now
+      And there should be a way to continue to my intended destination
