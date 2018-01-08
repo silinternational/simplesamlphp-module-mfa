@@ -25,7 +25,7 @@ class MfaContext implements Context
     /**
      * The browser session, used for interacting with the website.
      *
-     * @var Session 
+     * @var Session
      */
     protected $session;
     
