@@ -48,7 +48,9 @@ $config = [
                     [
                         'id' => '7',
                         'type' => 'backupcode',
-                        'data' => '',
+                        'data' => [
+                            'count' => 10,
+                        ],
                     ],
                 ],
             ],
@@ -122,7 +124,9 @@ $config = [
                     [
                         'id' => '1',
                         'type' => 'backupcode',
-                        'data' => '',
+                        'data' => [
+                            'count' => 8,
+                        ],
                     ],
                     [
                         'id' => '2',
@@ -152,7 +156,9 @@ $config = [
                     [
                         'id' => FakeIdBrokerClient::RATE_LIMITED_MFA_ID,
                         'type' => 'backupcode',
-                        'data' => '',
+                        'data' => [
+                            'count' => 5,
+                        ],
                     ],
                 ],
             ],
