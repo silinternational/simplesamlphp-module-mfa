@@ -163,5 +163,76 @@ $config = [
                 ],
             ],
         ],
+        'has_4_backupcodes:a' => [
+            'eduPersonPrincipalName' => ['HAS_4_BACKUPCODES@mfaidp'],
+            'eduPersonTargetID' => ['99999999-9999-9999-9999-999999999999'],
+            'sn' => ['Backupcodes'],
+            'givenName' => ['Has 4'],
+            'mail' => ['has_4_backupcodes@example.com'],
+            'employeeNumber' => ['99999'],
+            'cn' => ['HAS_4_BACKUPCODES'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '90',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 4,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'has_1_backupcode_only:a' => [
+            'eduPersonPrincipalName' => ['HAS_1_BACKUPCODE_ONLY@mfaidp'],
+            'eduPersonTargetID' => ['00000010-0010-0010-0010-000000000010'],
+            'sn' => ['Only, And No Other MFA'],
+            'givenName' => ['Has 1 Backupcode'],
+            'mail' => ['has_1_backupcode_only@example.com'],
+            'employeeNumber' => ['00010'],
+            'cn' => ['HAS_1_BACKUPCODE_ONLY'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '100',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 1,
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'has_1_backupcode_plus:a' => [
+            'eduPersonPrincipalName' => ['HAS_1_BACKUPCODE_PLUS@mfaidp'],
+            'eduPersonTargetID' => ['00000011-0011-0011-0011-000000000011'],
+            'sn' => ['Plus Other MFA'],
+            'givenName' => ['Has 1 Backupcode'],
+            'mail' => ['has_1_backupcode_plus@example.com'],
+            'employeeNumber' => ['00011'],
+            'cn' => ['HAS_1_BACKUPCODE_PLUS'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '110',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 1,
+                        ],
+                    ],
+                    [
+                        'id' => '112',
+                        'type' => 'totp',
+                        'data' => '',
+                    ],
+                ],
+            ],
+        ],
     ],
 ];
