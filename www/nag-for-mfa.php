@@ -1,5 +1,6 @@
 <?php
 
+use Sil\SspMfa\AuthProcLogger;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId') ?? null;
@@ -8,6 +9,7 @@ if (empty($stateId)) {
 }
 
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_NAG);
+$logger = AuthProcLogger::fromState($state);
 
 // If the user has pressed the set-up-MFA button...
 if (filter_has_var(INPUT_POST, 'setUpMfa')) {
@@ -25,7 +27,7 @@ $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:nag-for-mfa.php');
 $t->data['learnMoreUrl'] = $state['mfaLearnMoreUrl'];
 $t->show();
 
-Mfa::logInfo($state, sprintf(
+$logger->info(sprintf(
     'mfa: Encouraged Employee ID %s to set up MFA.',
     $state['employeeId']
 ));

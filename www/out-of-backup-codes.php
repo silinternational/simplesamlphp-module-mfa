@@ -1,5 +1,6 @@
 <?php
 
+use Sil\SspMfa\AuthProcLogger;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId') ?? null;
@@ -8,6 +9,7 @@ if (empty($stateId)) {
 }
 
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE);
+$logger = AuthProcLogger::fromState($state);
 $hasOtherMfaOptions = Mfa::hasMfaOptionsOtherThan('backupcode', $state);
 
 if (filter_has_var(INPUT_POST, 'setUpMfa')) {
@@ -25,7 +27,7 @@ $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:out-of-backup-codes.php')
 $t->data['hasOtherMfaOptions'] = $hasOtherMfaOptions;
 $t->show();
 
-Mfa::logInfo($state, sprintf(
+$logger->info(sprintf(
     'mfa: Told Employee ID %s they are out of backup codes%s.',
     $state['employeeId'],
     $hasOtherMfaOptions ? '' : ' and must set up more'
