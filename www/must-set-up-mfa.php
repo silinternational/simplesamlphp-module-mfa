@@ -1,6 +1,6 @@
 <?php
 
-use Sil\SspMfa\AuthProcLogger;
+use Sil\SspMfa\LoggerFactory;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId') ?? null;
@@ -9,7 +9,7 @@ if (empty($stateId)) {
 }
 
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
-$logger = AuthProcLogger::fromState($state);
+$logger = LoggerFactory::getAccordingToState($state);
 
 // If the user has pressed the set-up-MFA button...
 if (filter_has_var(INPUT_POST, 'setUpMfa')) {

@@ -5,7 +5,7 @@ use Sil\PhpEnv\Env;
 use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
-use Sil\SspMfa\AuthProcLogger;
+use Sil\SspMfa\LoggerFactory;
 use SimpleSAML\Utils\HTTP;
 
 /**
@@ -37,7 +37,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     protected $logger;
     
     /** @var string */
-    protected $configuredLoggerClass;
+    protected $loggerClass;
     
     /**
      * Initialize this filter.
@@ -51,8 +51,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $this->initComposerAutoloader();
         assert('is_array($config)');
         
-        $this->configuredLoggerClass = $config['loggerClass'] ?? Psr3SamlLogger::class;
-        $this->logger = new AuthProcLogger($this->configuredLoggerClass);
+        $this->loggerClass = $config['loggerClass'] ?? Psr3SamlLogger::class;
+        $this->logger = LoggerFactory::get($this->loggerClass);
         
         $this->loadValuesFromConfig($config, [
             'mfaSetupUrl',
@@ -448,7 +448,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             );
         }
         
-        $logger = AuthProcLogger::fromState($state);
+        $logger = LoggerFactory::getAccordingToState($state);
         $logger->warning(sprintf(
             'mfa: Sending Employee ID %s to set up MFA at %s',
             var_export($state['employeeId'] ?? null, true),
@@ -474,7 +474,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         );
         
         // Record to the state what logger class to use.
-        $state['loggerClass'] = $this->configuredLoggerClass;
+        $state['loggerClass'] = $this->loggerClass;
         
         // Add to the state any config data we may need for the low-on/out-of
         // backup codes pages.

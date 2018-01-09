@@ -7,7 +7,7 @@
  * - mfaId
  */
 
-use Sil\SspMfa\AuthProcLogger;
+use Sil\SspMfa\LoggerFactory;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId');
@@ -18,7 +18,7 @@ if (empty($stateId)) {
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_PROMPT);
 $mfaOptions = $state['mfaOptions'] ?? [];
 
-$logger = AuthProcLogger::fromState($state);
+$logger = LoggerFactory::getAccordingToState($state);
 
 /*
  * Check for "Remember me for 30 days" cookies and if valid bypass mfa prompt
