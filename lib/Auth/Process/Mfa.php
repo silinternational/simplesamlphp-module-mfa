@@ -37,7 +37,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     protected $logger;
     
     /** @var string */
-    protected $loggerClass;
+    protected $configuredLoggerClass;
     
     /**
      * Initialize this filter.
@@ -51,8 +51,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $this->initComposerAutoloader();
         assert('is_array($config)');
         
-        $this->loggerClass = $config['loggerClass'] ?? Psr3SamlLogger::class;
-        $this->logger = new AuthProcLogger($this->loggerClass);
+        $this->configuredLoggerClass = $config['loggerClass'] ?? Psr3SamlLogger::class;
+        $this->logger = new AuthProcLogger($this->configuredLoggerClass);
         
         $this->loadValuesFromConfig($config, [
             'mfaSetupUrl',
@@ -474,7 +474,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         );
         
         // Record to the state what logger class to use.
-        $state['loggerClass'] = $this->loggerClass;
+        $state['loggerClass'] = $this->configuredLoggerClass;
         
         // Add to the state any config data we may need for the low-on/out-of
         // backup codes pages.
