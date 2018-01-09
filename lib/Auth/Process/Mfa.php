@@ -455,12 +455,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             );
         }
         
-        //$this->logger->warning(sprintf(
-        //    'mfa: Sending Employee ID %s to set up MFA at %s',
-        //    var_export($state['employeeId'] ?? null, true),
-        //    var_export($mfaSetupUrl, true)
-        //));
-        
         SimpleSAML_Utilities::redirect($mfaSetupUrl);
     }
     
