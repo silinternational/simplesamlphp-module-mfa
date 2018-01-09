@@ -82,6 +82,7 @@ Feature: Prompt for MFA credentials
       And I have logged in
     When I submit a correct backup code
     Then I should see a message that I am running low on backup codes
+      And I should be told I only have 3 backup codes left
       And there should be a way to go generate more backup codes now
       And there should be a way to continue to my intended destination
 
@@ -100,3 +101,38 @@ Feature: Prompt for MFA credentials
     Then I should see a message that I have used up my backup codes
       And there should be a way to go generate more backup codes now
       And there should be a way to continue to my intended destination
+
+  Scenario: Obeying the nag to set up more backup codes when low
+    Given I provide credentials that need MFA and have 4 backup codes available
+      And I have logged in
+      And I submit a correct backup code
+    When I click the get-more-backup-codes button
+    Then I should end up at the mfa-setup URL
+
+  Scenario: Ignoring the nag to set up more backup codes when low
+    Given I provide credentials that need MFA and have 4 backup codes available
+      And I have logged in
+      And I submit a correct backup code
+    When I click the remind-me-later button
+    Then I should end up at my intended destination
+
+  Scenario: Obeying the requirement to set up more backup codes when out
+    Given I provide credentials that need MFA and have 1 backup code available and no other MFA
+      And I have logged in
+      And I submit a correct backup code
+    When I click the get-more-backup-codes button
+    Then I should end up at the mfa-setup URL
+
+  Scenario: Obeying the nag to set up more backup codes when out
+    Given I provide credentials that need MFA and have 1 backup code available plus some other MFA
+      And I have logged in
+      And I submit a correct backup code
+    When I click the get-more-backup-codes button
+    Then I should end up at the mfa-setup URL
+
+  Scenario: Ignoring the nag to set up more backup codes when out
+    Given I provide credentials that need MFA and have 1 backup code available plus some other MFA
+      And I have logged in
+      And I submit a correct backup code
+    When I click the remind-me-later button
+    Then I should end up at my intended destination

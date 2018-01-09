@@ -318,7 +318,27 @@ class MfaContext implements Context
      */
     public function iSubmitACorrectBackupCode()
     {
+        if (! $this->pageContainsElementWithText('h2', 'Printable Backup Code')) {
+            $this->clickLink('backupcode');
+        }
         $this->submitMfaValue(FakeIdBrokerClient::CORRECT_VALUE);
+    }
+    
+    protected function pageContainsElementWithText($cssSelector, $text)
+    {
+        $page = $this->session->getPage();
+        $elements = $page->findAll('css', $cssSelector);
+        foreach ($elements as $element) {
+            if (strpos($element->getText(), $text) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    protected function clickLink($text)
+    {
+        $this->session->getPage()->clickLink($text);
     }
 
     /**
@@ -449,6 +469,89 @@ class MfaContext implements Context
             $this->nonPwManagerUrl,
             $this->session->getCurrentUrl(),
             'Failed to prevent me from getting to SPs other than the MFA setup URL'
+        );
+    }
+
+    /**
+     * @Given I provide credentials that need MFA and have 4 backup codes available
+     */
+    public function iProvideCredentialsThatNeedMfaAndHave4BackupCodesAvailable()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_4_backupcodes';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Then I should see a message that I am running low on backup codes
+     */
+    public function iShouldSeeAMessageThatIAmRunningLowOnBackupCodes()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'You are almost out of Printable Backup Codes',
+            $page->getHtml()
+        );
+    }
+
+    /**
+     * @Then there should be a way to go generate more backup codes now
+     */
+    public function thereShouldBeAWayToGoGenerateMoreBackupCodesNow()
+    {
+        $page = $this->session->getPage();
+        $this->assertFormContains('name="setUpMfa"', $page);
+    }
+
+    /**
+     * @Given I provide credentials that need MFA and have 1 backup code available and no other MFA
+     */
+    public function iProvideCredentialsThatNeedMfaAndHave1BackupCodeAvailableAndNoOtherMfa()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_1_backupcode_only';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Then I should see a message that I have used up my backup codes
+     */
+    public function iShouldSeeAMessageThatIHaveUsedUpMyBackupCodes()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'You just used your last Printable Backup Code',
+            $page->getHtml()
+        );
+    }
+
+    /**
+     * @Given I provide credentials that need MFA and have 1 backup code available plus some other MFA
+     */
+    public function iProvideCredentialsThatNeedMfaAndHave1BackupCodeAvailablePlusSomeOtherMfa()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_1_backupcode_plus';
+        $this->password = 'a';
+    }
+
+    /**
+     * @When I click the get-more-backup-codes button
+     */
+    public function iClickTheGetMoreBackupCodesButton()
+    {
+        $this->iClickTheSetUpMfaButton();
+    }
+
+    /**
+     * @Then I should be told I only have :numRemaining backup codes left
+     */
+    public function iShouldBeToldIOnlyHaveBackupCodesLeft($numRemaining)
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'You only have ' . $numRemaining . ' remaining',
+            $page->getHtml()
         );
     }
 }
