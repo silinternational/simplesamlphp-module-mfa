@@ -21,7 +21,7 @@ $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:must-set-up-mfa.php');
 $t->data['learnMoreUrl'] = $state['mfaLearnMoreUrl'];
 $t->show();
 
-SimpleSAML_Logger::info(sprintf(
+Mfa::logInfo($state, sprintf(
     'mfa: Told Employee ID %s they they must set up MFA.',
     $state['employeeId']
 ));

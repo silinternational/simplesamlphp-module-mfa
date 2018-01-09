@@ -25,7 +25,7 @@ $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:out-of-backup-codes.php')
 $t->data['hasOtherMfaOptions'] = $hasOtherMfaOptions;
 $t->show();
 
-SimpleSAML_Logger::info(sprintf(
+Mfa::logInfo($state, sprintf(
     'mfa: Told Employee ID %s they are out of backup codes%s.',
     $state['employeeId'],
     $hasOtherMfaOptions ? '' : ' and must set up more'

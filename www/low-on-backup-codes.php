@@ -24,7 +24,7 @@ $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:low-on-backup-codes.php')
 $t->data['numBackupCodesRemaining'] = $state['numBackupCodesRemaining'];
 $t->show();
 
-SimpleSAML_Logger::info(sprintf(
+Mfa::logInfo($state, sprintf(
     'mfa: Told Employee ID %s they are low on backup codes.',
     $state['employeeId']
 ));

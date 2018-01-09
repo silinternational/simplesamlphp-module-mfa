@@ -25,7 +25,7 @@ $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:nag-for-mfa.php');
 $t->data['learnMoreUrl'] = $state['mfaLearnMoreUrl'];
 $t->show();
 
-SimpleSAML_Logger::info(sprintf(
+Mfa::logInfo($state, sprintf(
     'mfa: Encouraged Employee ID %s to set up MFA.',
     $state['employeeId']
 ));

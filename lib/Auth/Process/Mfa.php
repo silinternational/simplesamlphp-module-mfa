@@ -46,7 +46,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         parent::__construct($config, $reserved);
         $this->initComposerAutoloader();
         assert('is_array($config)');
-        $this->initLogger($config);
+        
+        $this->loggerClass = $config['loggerClass'] ?? Psr3SamlLogger::class;
+        $this->logger = self::getLogger($this->loggerClass);
         
         $this->loadValuesFromConfig($config, [
             'mfaSetupUrl',
@@ -314,17 +316,24 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
     }
     
-    protected function initLogger($config)
+    /**
+     * Get a logger of the specified class (ensuring it really is a logger).
+     *
+     * @param string $loggerClass
+     * @return LoggerInterface
+     * @throws Exception
+     */
+    public static function getLogger($loggerClass)
     {
-        $loggerClass = $config['loggerClass'] ?? Psr3SamlLogger::class;
-        $this->logger = new $loggerClass();
-        if (! $this->logger instanceof LoggerInterface) {
+        $logger = new $loggerClass();
+        if (! $logger instanceof LoggerInterface) {
             throw new Exception(sprintf(
                 'The specified loggerClass (%s) does not implement '
                 . '\\Psr\\Log\\LoggerInterface.',
                 var_export($loggerClass, true)
             ), 1507139915);
         }
+        return $logger;
     }
     
     protected static function isHeadedToMfaSetupUrl($state, $mfaSetupUrl)
@@ -336,6 +345,30 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             }
         }
         return false;
+    }
+    
+    /**
+     * Log a given INFO message using the logger specified in the state.
+     *
+     * @param array $state The current request state.
+     * @param string $message The message to log.
+     */
+    public static function logInfo($state, $message)
+    {
+        $logger = self::getLogger($state['loggerClass']);
+        $logger->info($message);
+    }
+    
+    /**
+     * Log a given WARNING message using the logger specified in the state.
+     *
+     * @param array $state The current request state.
+     * @param string $message The message to log.
+     */
+    public static function logWarning($state, $message)
+    {
+        $logger = self::getLogger($state['loggerClass']);
+        $logger->warning($message);
     }
     
     /**
@@ -455,6 +488,12 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             );
         }
         
+        self::logWarning($state, sprintf(
+            'mfa: Sending Employee ID %s to set up MFA at %s',
+            var_export($state['employeeId'] ?? null, true),
+            var_export($mfaSetupUrl, true)
+        ));
+        
         HTTP::redirectTrustedURL($mfaSetupUrl);
     }
     
@@ -472,6 +511,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             $state,
             $this->mfaSetupUrl
         );
+        
+        // Record to the state what logger class to use.
+        $state['loggerClass'] = $this->loggerClass;
         
         // Add to the state any config data we may need for the low-on/out-of
         // backup codes pages.
