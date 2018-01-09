@@ -455,7 +455,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             );
         }
         
-        SimpleSAML_Utilities::redirect($mfaSetupUrl);
+        HTTP::redirectTrustedURL($mfaSetupUrl);
     }
     
     /**
@@ -525,7 +525,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
         $url = SimpleSAML_Module::getModuleURL('mfa/must-set-up-mfa.php');
         
-        SimpleSAML_Utilities::redirect($url, array('StateId' => $stateId));
+        HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
 
     /**
@@ -552,7 +552,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NAG);
         $url = SimpleSAML_Module::getModuleURL('mfa/nag-for-mfa.php');
 
-        SimpleSAML_Utilities::redirect($url, array('StateId' => $stateId));
+        HTTP::redirectTrustedURL($url, array('StateId' => $stateId));
     }
     
     /**
@@ -590,7 +590,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
 
         $mfaOption = self::getMfaOptionToUse($mfaOptions);
         
-        SimpleSAML_Utilities::redirect($url, [
+        HTTP::redirectTrustedURL($url, [
             'mfaId' => $mfaOption['id'],
             'StateId' => $id,
         ]);
