@@ -5,6 +5,7 @@ use Sil\PhpEnv\Env;
 use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
+use SimpleSAML\Utils\HTTP;
 
 /**
  * Filter which prompts the user for MFA credentials.
@@ -14,10 +15,12 @@ use Sil\Psr3Adapters\Psr3SamlLogger;
 class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
 {
     const SESSION_TYPE = 'mfa';
+    const STAGE_SENT_TO_LOW_ON_BACKUP_CODES_NAG = 'mfa:sent_to_low_on_backup_codes_nag';
     const STAGE_SENT_TO_MFA_CHANGE_URL = 'mfa:sent_to_mfa_change_url';
     const STAGE_SENT_TO_MFA_NEEDED_MESSAGE = 'mfa:sent_to_mfa_needed_message';
     const STAGE_SENT_TO_MFA_PROMPT = 'mfa:sent_to_mfa_prompt';
     const STAGE_SENT_TO_MFA_NAG = 'mfa:sent_to_mfa_nag';
+    const STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE = 'mfa:sent_to_out_of_backup_codes_message';
 
     private $employeeIdAttr = null;
     private $mfaLearnMoreUrl = null;
@@ -212,6 +215,26 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
     
     /**
+     * Get the number of backup codes that the user had left PRIOR to this login.
+     *
+     * @param array $mfaOptions The list of MFA options.
+     * @return int The number of backup codes that the user HAD (prior to this
+     *     login).
+     */
+    public static function getNumBackupCodesUserHad(array $mfaOptions)
+    {
+        $numBackupCodes = 0;
+        foreach ($mfaOptions as $mfaOption) {
+            $mfaType = $mfaOption['type'] ?? null;
+            if ($mfaType === 'backupcode') {
+                $numBackupCodes += intval($mfaOption['data']['count'] ?? 0);
+            }
+        }
+        
+        return $numBackupCodes;
+    }
+    
+    /**
      * Get the template identifier (string) to use for the specified MFA type.
      *
      * @param string $mfaType The desired MFA type, such as 'u2f', 'totp', or
@@ -263,6 +286,24 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     protected static function hasMfaOptions($mfa)
     {
         return (count($mfa['options']) > 0);
+    }
+    
+    /**
+     * See if the user has any MFA options other than the specified type.
+     *
+     * @param string $excludedMfaType
+     * @param array $state
+     * @return bool
+     */
+    public static function hasMfaOptionsOtherThan($excludedMfaType, $state)
+    {
+        $mfaOptions = $state['mfaOptions'] ?? [];
+        foreach ($mfaOptions as $mfaOption) {
+            if (strval($mfaOption['type']) !== strval($excludedMfaType)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     protected function initComposerAutoloader()
@@ -370,6 +411,26 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             'mfaType' => $mfaType,
         ]));
         
+        // Handle situations where the user is running low on backup codes.
+        if ($mfaType === 'backupcode') {
+            $numBackupCodesUserHad = self::getNumBackupCodesUserHad(
+                $state['mfaOptions'] ?? []
+            );
+            $numBackupCodesRemaining = $numBackupCodesUserHad - 1;
+            
+            if ($numBackupCodesRemaining <= 0) {
+                self::redirectToOutOfBackupCodesMessage($state, $employeeId);
+                throw new \Exception('Failed to send user to out-of-backup-codes page.');
+            } elseif ($numBackupCodesRemaining < 4) {
+                self::redirectToLowOnBackupCodesNag(
+                    $state,
+                    $employeeId,
+                    $numBackupCodesRemaining
+                );
+                throw new \Exception('Failed to send user to low-on-backup-codes page.');
+            }
+        }
+        
         //unset($state['Attributes']['mfa']);
         // The following function call will never return.
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
@@ -417,6 +478,10 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             $state,
             $this->mfaSetupUrl
         );
+        
+        // Add to the state any config data we may need for the low-on/out-of
+        // backup codes pages.
+        $state['mfaSetupUrl'] = $this->mfaSetupUrl;
 
         if (self::shouldPromptForMfa($mfa)) {
             if (self::hasMfaOptions($mfa)) {
@@ -585,6 +650,50 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
 
         $string = $rememberSecret . $employeeId . $expireDate . $allMfaIds;
         return $string;
+    }
+    
+    /**
+     * Redirect the user to a page telling them they are running low on backup
+     * codes and encouraging them to create more now.
+     *
+     * NOTE: This function never returns.
+     *
+     * @param array $state The state data.
+     * @param string $employeeId The Employee ID of the user account.
+     * @param int $numBackupCodesRemaining The number of backup codes that the
+     *     user has left (now that they have used up one for this login).
+     */
+    protected static function redirectToLowOnBackupCodesNag(
+        array &$state,
+        $employeeId,
+        $numBackupCodesRemaining
+    ) {
+        $state['employeeId'] = $employeeId;
+        $state['numBackupCodesRemaining'] = $numBackupCodesRemaining;
+        
+        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_LOW_ON_BACKUP_CODES_NAG);
+        $url = SimpleSAML_Module::getModuleURL('mfa/low-on-backup-codes.php');
+        
+        HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
+    }
+    
+    /**
+     * Redirect the user to a page telling them they just used up their last
+     * backup code.
+     *
+     * NOTE: This function never returns.
+     *
+     * @param array $state The state data.
+     * @param string $employeeId The Employee ID of the user account.
+     */
+    protected static function redirectToOutOfBackupCodesMessage(array &$state, $employeeId)
+    {
+        $state['employeeId'] = $employeeId;
+        
+        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE);
+        $url = SimpleSAML_Module::getModuleURL('mfa/out-of-backup-codes.php');
+        
+        HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
 
     /**
