@@ -253,7 +253,7 @@ class MfaContext implements Context
     {
         $page = $this->session->getPage();
         $pageHtml = $page->getHtml();
-        Assert::assertContains('Backup code', $pageHtml);
+        Assert::assertContains('<h2>Printable Backup Code</h2>', $pageHtml);
         Assert::assertContains('Enter code', $pageHtml);
     }
     
@@ -274,7 +274,7 @@ class MfaContext implements Context
     {
         $page = $this->session->getPage();
         $pageHtml = $page->getHtml();
-        Assert::assertContains('Verification app', $pageHtml);
+        Assert::assertContains('<h2>Smartphone App</h2>', $pageHtml);
         Assert::assertContains('Enter 6-digit code', $pageHtml);
     }
 
