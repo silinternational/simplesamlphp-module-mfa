@@ -43,7 +43,7 @@ class AuthProcLogger extends AbstractLogger
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = []): void
+    public function log($level, $message, array $context = [])
     {
         $this->internalLogger->log($level, $message, $context);
     }
