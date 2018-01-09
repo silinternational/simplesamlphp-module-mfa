@@ -378,7 +378,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 $mfaSubmission
             );
             if (! $validMfa) {
-                if ($mfaType == 'backupcode') {
+                if ($mfaType === 'backupcode') {
                     return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
                 }
                 return 'Incorrect 2-step verification code.';
@@ -574,7 +574,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         /** @todo Check for valid remember-me cookies here rather doing a redirect first. */
         
-        $logger = new Psr3SamlLogger();
         $state['mfaOptions'] = $mfaOptions;
         $state['idBrokerConfig'] = [
             'accessToken' => $this->idBrokerAccessToken,
