@@ -5,7 +5,7 @@ use InvalidArgumentException;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Webmozart\Assert\Assert;
+use Sil\SspMfa\Assert;
 
 class AuthProcLogger extends AbstractLogger
 {
@@ -20,7 +20,7 @@ class AuthProcLogger extends AbstractLogger
      */
     public function __construct($loggerClass)
     {
-        Assert::classExists($loggerClass, 'The specified loggerClass (%s) does not exist.');
+        Assert::classExists($loggerClass);
         
         $this->internalLogger = new $loggerClass();
         
