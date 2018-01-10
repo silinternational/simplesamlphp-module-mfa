@@ -2,7 +2,7 @@
 $this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 
-if ( ! empty($this->data['errorMessage'])) {
+if (! empty($this->data['errorMessage'])) {
     ?>
     <p style="border: 3px solid red; padding: 5px;">
       <b>Oops!</b><br />
@@ -13,7 +13,7 @@ if ( ! empty($this->data['errorMessage'])) {
 
 ?>
 <form method="post">
-    <p><b>Verification app</b></p>
+    <h2>Smartphone App</h2>
     <p>
         Enter 6-digit code: <input type="text" autofocus id="mfaSubmission" name="mfaSubmission" />
         <br />
@@ -23,15 +23,14 @@ if ( ! empty($this->data['errorMessage'])) {
         <button type="submit" id="submitMfa" name="submitMfa"
                 style="padding: 4px 8px;">Submit</button>
     </p>
-    <?php
-    if (count($this->data['mfaOptions']) > 1) {
-        ?>
+    <?php if (count($this->data['mfaOptions']) > 1): ?>
         <p>
-            Don't have your app handy? You may also use:
+            Don't have your smartphone app handy? You may also use:
+        </p>
         <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
-                if ($mfaOpt['type'] != 'totp'){
+                if ($mfaOpt['type'] != 'totp') {
                     ?>
                     <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
                        htmlentities($mfaOpt['type'])
@@ -41,10 +40,7 @@ if ( ! empty($this->data['errorMessage'])) {
             }
             ?>
         </ul>
-        </p>
-        <?php
-    }
-    ?>
+    <?php endif; ?>
 </form>
 <?php
 $this->includeAtTemplateBase('includes/footer.php');

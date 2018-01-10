@@ -2,7 +2,7 @@
 $this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 
-if ( ! empty($this->data['errorMessage'])) {
+if (! empty($this->data['errorMessage'])) {
     ?>
     <p style="border: 3px solid red; padding: 5px;">
       <b>Oops!</b><br />
@@ -13,7 +13,7 @@ if ( ! empty($this->data['errorMessage'])) {
 
 ?>
 <form method="post">
-    <p><b>Backup code</b></p>
+    <h2>Printable Backup Code</h2>
     <p>
       Each code can only be used once, so the code you enter this time will be
       used up and will not be available again.
@@ -27,15 +27,14 @@ if ( ! empty($this->data['errorMessage'])) {
         <button type="submit" id="submitMfa" name="submitMfa"
                 style="padding: 4px 8px;">Submit</button>
     </p>
-    <?php
-    if (count($this->data['mfaOptions']) > 1) {
-        ?>
+    <?php if (count($this->data['mfaOptions']) > 1): ?>
         <p>
-            Don't have your backup codes handy? You may also use:
+            Don't have your printable backup codes handy? You may also use:
+        </p>
         <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
-                if ($mfaOpt['type'] != 'backupcode'){
+                if ($mfaOpt['type'] != 'backupcode') {
                     ?>
                     <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
                        htmlentities($mfaOpt['type'])
@@ -45,10 +44,7 @@ if ( ! empty($this->data['errorMessage'])) {
             }
             ?>
         </ul>
-        </p>
-        <?php
-    }
-    ?>
+    <?php endif; ?>
 </form>
 <?php
 $this->includeAtTemplateBase('includes/footer.php');

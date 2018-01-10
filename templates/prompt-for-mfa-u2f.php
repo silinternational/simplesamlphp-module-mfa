@@ -25,6 +25,7 @@ $this->includeAtTemplateBase('includes/header.php');
     }
 </script>
 <form method="post">
+    <h2>USB Security Key</h2>
     <p id="mfaInstructions">Please insert your security key and press its button.</p>
     <p>
         <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
@@ -35,15 +36,14 @@ $this->includeAtTemplateBase('includes/header.php');
 
     </p>
 
-    <?php
-    if (count($this->data['mfaOptions']) > 1) {
-        ?>
+    <?php if (count($this->data['mfaOptions']) > 1): ?>
         <p>
             Don't have your security key handy? You may also use:
+        </p>
         <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
-                if ($mfaOpt['type'] != 'u2f'){
+                if ($mfaOpt['type'] != 'u2f') {
                     ?>
                     <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
                        htmlentities($mfaOpt['type'])
@@ -53,11 +53,7 @@ $this->includeAtTemplateBase('includes/header.php');
             }
             ?>
         </ul>
-        </p>
-        <?php
-    }
-    ?>
+    <?php endif; ?>
 </form>
 <?php
-
 $this->includeAtTemplateBase('includes/footer.php');
