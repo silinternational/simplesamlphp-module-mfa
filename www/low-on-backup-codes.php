@@ -18,6 +18,7 @@ if (filter_has_var(INPUT_POST, 'setUpMfa')) {
 } elseif (filter_has_var(INPUT_POST, 'continue')) {
     // The user pressed the remind-me-later button.
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+    return;
 }
 
 $globalConfig = SimpleSAML_Configuration::getInstance();
