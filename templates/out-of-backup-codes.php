@@ -8,7 +8,13 @@ $hasOtherMfaOptions = $this->data['hasOtherMfaOptions'];
     You just used your last Printable Backup Code.
 </p>
 
-<?php if (! $hasOtherMfaOptions): ?>
+<?php if ($hasOtherMfaOptions): ?>
+    <p>
+      We recommend you get more now so that you will have some next time we ask
+      you for one. Otherwise, you will need to use a different option (such as a
+      Security Key or Smartphone App) the next time we ask you for 2-Step Verification.
+    </p>
+<?php else: ?>
     <p>
       Since you do not have any other 2-Step Verification options set up yet,
       you need to get more Printable Backup Codes now so that you will have some
