@@ -495,9 +495,9 @@ class MfaContext implements Context
     }
 
     /**
-     * @Then there should be a way to go generate more backup codes now
+     * @Then there should be a way to get more backup codes now
      */
-    public function thereShouldBeAWayToGoGenerateMoreBackupCodesNow()
+    public function thereShouldBeAWayToGetMoreBackupCodesNow()
     {
         $page = $this->session->getPage();
         $this->assertFormContains('name="setUpMfa"', $page);

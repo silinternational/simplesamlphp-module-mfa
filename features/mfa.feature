@@ -83,7 +83,7 @@ Feature: Prompt for MFA credentials
     When I submit a correct backup code
     Then I should see a message that I am running low on backup codes
       And I should be told I only have 3 backup codes left
-      And there should be a way to go generate more backup codes now
+      And there should be a way to get more backup codes now
       And there should be a way to continue to my intended destination
 
   Scenario: Requiring user to set up more backup codes when they run out and have no other MFA
@@ -91,7 +91,7 @@ Feature: Prompt for MFA credentials
       And I have logged in
     When I submit a correct backup code
     Then I should see a message that I have used up my backup codes
-      And there should be a way to go generate more backup codes now
+      And there should be a way to get more backup codes now
       And there should NOT be a way to continue to my intended destination
 
   Scenario: Warning user when they run out of backup codes but have other MFA options
@@ -99,7 +99,7 @@ Feature: Prompt for MFA credentials
       And I have logged in
     When I submit a correct backup code
     Then I should see a message that I have used up my backup codes
-      And there should be a way to go generate more backup codes now
+      And there should be a way to get more backup codes now
       And there should be a way to continue to my intended destination
 
   Scenario: Obeying the nag to set up more backup codes when low
