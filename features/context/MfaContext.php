@@ -500,7 +500,7 @@ class MfaContext implements Context
     public function thereShouldBeAWayToGetMoreBackupCodesNow()
     {
         $page = $this->session->getPage();
-        $this->assertFormContains('name="setUpMfa"', $page);
+        $this->assertFormContains('name="getMore"', $page);
     }
 
     /**
@@ -540,7 +540,10 @@ class MfaContext implements Context
      */
     public function iClickTheGetMoreBackupCodesButton()
     {
-        $this->iClickTheSetUpMfaButton();
+        $page = $this->session->getPage();
+        $getMoreButton = $page->find('css', '[name=getMore]');
+        Assert::assertNotNull($getMoreButton, 'Failed to find the "Get more" button');
+        $getMoreButton->click();
     }
 
     /**

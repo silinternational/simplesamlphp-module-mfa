@@ -11,7 +11,7 @@ if (empty($stateId)) {
 $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_LOW_ON_BACKUP_CODES_NAG);
 $logger = LoggerFactory::getAccordingToState($state);
 
-if (filter_has_var(INPUT_POST, 'setUpMfa')) {
+if (filter_has_var(INPUT_POST, 'getMore')) {
     // The user pressed the button to create more backup codes.
     Mfa::redirectToMfaSetup($state);
     return;
