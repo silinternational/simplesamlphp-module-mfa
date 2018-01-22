@@ -20,11 +20,11 @@ $mfaSetupUrl = $this->data['mfaSetupUrl'];
         Here are your new Printable Backup Codes. <b>Remember</b> to keep them
         secret (like a password) and store them somewhere safe.
     </p>
-    <ul>
-        <?php foreach ($newBackupCodes as $backupCode): ?>
-          <li><?= htmlentities($backupCode); ?></li>
-        <?php  endforeach; ?>
-    </ul>
+    <pre><?php
+        foreach ($newBackupCodes as $backupCode) {
+            echo htmlentities($backupCode) . "\n";
+        }
+    ?></pre><br />
     <p>
         Once you have stored them somewhere safe, you are welcome to click the
         button below to continue to where you were going.
