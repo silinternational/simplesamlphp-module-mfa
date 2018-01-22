@@ -13,7 +13,7 @@ $logger = LoggerFactory::getAccordingToState($state);
 
 if (filter_has_var(INPUT_POST, 'getMore')) {
     // The user pressed the button to create more backup codes.
-    Mfa::redirectToMfaSetup($state);
+    Mfa::giveUserNewBackupCodes($state, $logger);
     return;
 } elseif (filter_has_var(INPUT_POST, 'continue')) {
     // The user pressed the remind-me-later button.
