@@ -99,19 +99,6 @@ class MfaContext implements Context
     }
     
     /**
-     * Get the button for going to set up MFA.
-     *
-     * @param DocumentElement $page The page.
-     * @return NodeElement
-     */
-    protected function getSetUpMfaButton($page)
-    {
-        $setUpMfaButton = $page->find('css', '[name=setUpMfa]');
-        Assert::assertNotNull($setUpMfaButton, 'Failed to find the set-up-MFA button');
-        return $setUpMfaButton;
-    }
-    
-    /**
      * Get the button for submitting the MFA form.
      *
      * @param DocumentElement $page The page.
@@ -151,6 +138,26 @@ class MfaContext implements Context
     {
         $page = $this->session->getPage();
         Assert::assertContains('Your attributes', $page->getHtml());
+    }
+    
+    /**
+     * Submit the current form, including the secondary page's form (if
+     * simpleSAMLphp shows another page because JavaScript isn't supported) by
+     * clicking the specified button.
+     *
+     * @param string $buttonName The value of the desired button's `name`
+     *     attribute.
+     */
+    protected function submitFormByClickingButtonNamed($buttonName)
+    {
+        $page = $this->session->getPage();
+        $button = $page->find('css', sprintf(
+            '[name=%s]',
+            $buttonName
+        ));
+        Assert::assertNotNull($button, 'Failed to find button named ' . $buttonName);
+        $button->click();
+        $this->submitSecondarySspFormIfPresent($page);
     }
     
     /**
@@ -416,11 +423,7 @@ class MfaContext implements Context
      */
     public function iClickTheRemindMeLaterButton()
     {
-        $page = $this->session->getPage();
-        $continueButton = $this->getContinueButton($page);
-        Assert::assertNotNull($continueButton, 'Failed to find the continue button');
-        $continueButton->click();
-        $this->submitSecondarySspFormIfPresent($page);
+        $this->submitFormByClickingButtonNamed('continue');
     }
 
     /**
@@ -428,10 +431,7 @@ class MfaContext implements Context
      */
     public function iClickTheSetUpMfaButton()
     {
-        $page = $this->session->getPage();
-        $setUpMfaButton = $this->getSetUpMfaButton($page);
-        $setUpMfaButton->click();
-        $this->submitSecondarySspFormIfPresent($page);
+        $this->submitFormByClickingButtonNamed('setUpMfa');
     }
 
     /**
@@ -540,11 +540,7 @@ class MfaContext implements Context
      */
     public function iClickTheGetMoreBackupCodesButton()
     {
-        $page = $this->session->getPage();
-        $getMoreButton = $page->find('css', '[name=getMore]');
-        Assert::assertNotNull($getMoreButton, 'Failed to find the "Get more" button');
-        $getMoreButton->click();
-        $this->submitSecondarySspFormIfPresent($page);
+        $this->submitFormByClickingButtonNamed('getMore');
     }
 
     /**
