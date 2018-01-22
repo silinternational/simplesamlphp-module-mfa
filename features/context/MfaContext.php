@@ -544,6 +544,7 @@ class MfaContext implements Context
         $getMoreButton = $page->find('css', '[name=getMore]');
         Assert::assertNotNull($getMoreButton, 'Failed to find the "Get more" button');
         $getMoreButton->click();
+        $this->submitSecondarySspFormIfPresent($page);
     }
 
     /**
