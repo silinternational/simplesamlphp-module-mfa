@@ -554,4 +554,16 @@ class MfaContext implements Context
             $page->getHtml()
         );
     }
+
+    /**
+     * @Then I should be given more backup codes
+     */
+    public function iShouldBeGivenMoreBackupCodes()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains(
+            'Here are your new Printable Backup Codes',
+            $page->getContent()
+        );
+    }
 }

@@ -107,7 +107,8 @@ Feature: Prompt for MFA credentials
       And I have logged in
       And I submit a correct backup code
     When I click the get-more-backup-codes button
-    Then I should end up at the mfa-setup URL
+    Then I should be given more backup codes
+      And there should be a way to continue to my intended destination
 
   Scenario: Ignoring the nag to set up more backup codes when low
     Given I provide credentials that need MFA and have 4 backup codes available
@@ -121,14 +122,16 @@ Feature: Prompt for MFA credentials
       And I have logged in
       And I submit a correct backup code
     When I click the get-more-backup-codes button
-    Then I should end up at the mfa-setup URL
+    Then I should be given more backup codes
+      And there should be a way to continue to my intended destination
 
   Scenario: Obeying the nag to set up more backup codes when out
     Given I provide credentials that need MFA and have 1 backup code available plus some other MFA
       And I have logged in
       And I submit a correct backup code
     When I click the get-more-backup-codes button
-    Then I should end up at the mfa-setup URL
+    Then I should be given more backup codes
+      And there should be a way to continue to my intended destination
 
   Scenario: Ignoring the nag to set up more backup codes when out
     Given I provide credentials that need MFA and have 1 backup code available plus some other MFA
