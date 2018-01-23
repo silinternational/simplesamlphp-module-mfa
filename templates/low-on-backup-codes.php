@@ -9,7 +9,7 @@ $numBackupCodesRemaining = $this->data['numBackupCodesRemaining'];
   You only have <?= (int)$numBackupCodesRemaining ?> remaining.
 </p>
 <form method="post">
-    <button name="setUpMfa" style="padding: 4px 8px;">
+    <button name="getMore" style="padding: 4px 8px;">
         Get more
     </button>
     

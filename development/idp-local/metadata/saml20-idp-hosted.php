@@ -10,22 +10,22 @@ use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
  * See: https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-hosted
  */
 $metadata['http://mfa-idp.local:8085'] = [
-	/*
-	 * The hostname of the server (VHOST) that will use this SAML entity.
-	 *
-	 * Can be '__DEFAULT__', to use this entry by default.
-	 */
-	'host' => 'mfa-idp.local',
+    /*
+     * The hostname of the server (VHOST) that will use this SAML entity.
+     *
+     * Can be '__DEFAULT__', to use this entry by default.
+     */
+    'host' => 'mfa-idp.local',
 
-	// X.509 key and certificate. Relative to the cert directory.
-	'privatekey' => 'dummy.pem',
-	'certificate' => 'dummy.crt',
+    // X.509 key and certificate. Relative to the cert directory.
+    'privatekey' => 'dummy.pem',
+    'certificate' => 'dummy.crt',
 
-	/*
-	 * Authentication source to use. Must be one that is configured in
-	 * 'config/authsources.php'.
-	 */
-	'auth' => 'example-userpass',
+    /*
+     * Authentication source to use. Must be one that is configured in
+     * 'config/authsources.php'.
+     */
+    'auth' => 'example-userpass',
     
     'authproc' => [
         10 => [
@@ -45,22 +45,22 @@ $metadata['http://mfa-idp.local:8085'] = [
 
 // Copy the metadata to also work from another docker container.
 $metadata['http://mfaidp'] = [
-	/*
-	 * The hostname of the server (VHOST) that will use this SAML entity.
-	 *
-	 * Can be '__DEFAULT__', to use this entry by default.
-	 */
-	'host' => 'mfaidp', // *** DIFFERENT! ***
+    /*
+     * The hostname of the server (VHOST) that will use this SAML entity.
+     *
+     * Can be '__DEFAULT__', to use this entry by default.
+     */
+    'host' => 'mfaidp', // *** DIFFERENT! ***
 
-	// X.509 key and certificate. Relative to the cert directory.
-	'privatekey' => 'dummy.pem',
-	'certificate' => 'dummy.crt',
+    // X.509 key and certificate. Relative to the cert directory.
+    'privatekey' => 'dummy.pem',
+    'certificate' => 'dummy.crt',
 
-	/*
-	 * Authentication source to use. Must be one that is configured in
-	 * 'config/authsources.php'.
-	 */
-	'auth' => 'example-userpass',
+    /*
+     * Authentication source to use. Must be one that is configured in
+     * 'config/authsources.php'.
+     */
+    'auth' => 'example-userpass',
     
     'authproc' => [
         10 => [

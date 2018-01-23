@@ -21,6 +21,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     const STAGE_SENT_TO_MFA_NEEDED_MESSAGE = 'mfa:sent_to_mfa_needed_message';
     const STAGE_SENT_TO_MFA_PROMPT = 'mfa:sent_to_mfa_prompt';
     const STAGE_SENT_TO_MFA_NAG = 'mfa:sent_to_mfa_nag';
+    const STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE = 'mfa:sent_to_new_backup_codes_page';
     const STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE = 'mfa:sent_to_out_of_backup_codes_message';
 
     private $employeeIdAttr = null;
@@ -287,6 +288,44 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             }
         }
         return '';
+    }
+    
+    /**
+     * Get new Printable Backup Codes for the user, then redirect the user to a
+     * page showing the user their new codes.
+     *
+     * NOTE: This function never returns.
+     *
+     * @param array $state The state data.
+     * @param LoggerInterface $logger A PSR-3 compatible logger.
+     */
+    public static function giveUserNewBackupCodes(array &$state, $logger)
+    {
+        try {
+            $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
+            $newMfaRecord = $idBrokerClient->mfaCreate(
+                $state['employeeId'],
+                'backupcode'
+            );
+            $newBackupCodes = $newMfaRecord['data'];
+            
+            $logger->warning(json_encode([
+                'event' => 'New backup codes result: succeeded',
+                'employeeId' => $state['employeeId'],
+            ]));
+        } catch (\Throwable $t) {
+            $logger->error(json_encode([
+                'event' => 'New backup codes result: failed',
+                'employeeId' => $state['employeeId'],
+                'error' => $t->getCode() . ': ' . $t->getMessage(),
+            ]));
+        }
+        
+        $state['newBackupCodes'] = $newBackupCodes ?? null;
+        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE);
+        $url = SimpleSAML_Module::getModuleURL('mfa/new-backup-codes.php');
+        
+        HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
     
     protected static function hasMfaOptions($mfa)

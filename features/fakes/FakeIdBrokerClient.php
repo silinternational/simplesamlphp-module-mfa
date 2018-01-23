@@ -1,6 +1,7 @@
 <?php
 namespace Sil\SspMfa\Behat\fakes;
 
+use InvalidArgumentException;
 use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
 
 /**
@@ -41,5 +42,43 @@ class FakeIdBrokerClient
             throw new MfaRateLimitException('Too many recent failures for this MFA');
         }
         return ($value === self::CORRECT_VALUE);
+    }
+    
+    /**
+     * Create a new MFA configuration
+     * @param string $employee_id
+     * @param string $type
+     * @param string $label
+     * @return array|null
+     * @throws Exception
+     */
+    public function mfaCreate($employee_id, $type, $label = null)
+    {
+        if (empty($employee_id)) {
+            throw new InvalidArgumentException('employee_id is required');
+        }
+        
+        if ($type === 'backupcode') {
+            return [
+                "id" => 1234,
+                "data" => [
+                    "00000000",
+                    "11111111",
+                    "22222222",
+                    "33333333",
+                    "44444444",
+                    "55555555",
+                    "66666666",
+                    "77777777",
+                    "88888888",
+                    "99999999"
+                ],
+            ];
+        }
+        
+        throw new InvalidArgumentException(sprintf(
+            'This Fake ID Broker class does not support creating %s MFA records.',
+            $type
+        ));
     }
 }
