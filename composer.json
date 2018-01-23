@@ -2,7 +2,7 @@
   "name": "silinternational/simplesamlphp-module-mfa",
   "description": "A simpleSAMLphp module for prompting the user for MFA credentials (such as a TOTP code, etc.).",
   "type": "simplesamlphp-module",
-  "license": "LGPL-2.1",
+  "license": "LGPL-2.1-or-later",
   "authors": [
     {
       "name": "Matt Henderson",
