@@ -196,12 +196,9 @@ class MfaContext implements Context
      */
     protected function submitSecondarySspFormIfPresent($page)
     {
-        $body = $page->find('css', 'body');
-        if ($body instanceof NodeElement) {
-            $onload = $body->getAttribute('onload');
-            if ($onload === "document.getElementsByTagName('input')[0].click();") {
-                $body->pressButton('Submit');
-            }
+        $postLoginSubmitButton = $page->findButton('postLoginSubmitButton');
+        if ($postLoginSubmitButton instanceof NodeElement) {
+            $postLoginSubmitButton->click();
         }
     }
     
