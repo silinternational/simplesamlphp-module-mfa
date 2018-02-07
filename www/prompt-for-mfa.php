@@ -47,7 +47,7 @@ if (empty($mfaId)) {
     
     // Pick an MFA ID and do a redirect to put that into the URL.
     $mfaOption = Mfa::getMfaOptionToUse($mfaOptions);
-    $moduleUrl = SimpleSAML_Module::getModuleURL('mfa/prompt-for-mfa.php', [
+    $moduleUrl = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php', [
         'mfaId' => $mfaOption['id'],
         'StateId' => $stateId,
     ]);
