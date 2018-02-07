@@ -2,7 +2,7 @@
 $this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 ?>
-<script src="<?=SimpleSAML_Module::getModuleURL('mfa/u2f-api.js');?>"></script>
+<script src="<?=SimpleSAML\Module::getModuleURL('mfa/u2f-api.js');?>"></script>
 <script type="application/javascript">
     window.onload = function() {
 
