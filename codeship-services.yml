@@ -43,7 +43,7 @@ services:
       - SECURE_COOKIE=false
       - SHOW_SAML_ERRORS=true
       - REMEMBER_ME_SECRET=not-a-secret-570c5b18dacd45bd
-      - THEME_USE=default:default
+      - THEME_USE=default
     command: /data/run-dev.sh
   
   mfasp:
@@ -64,7 +64,7 @@ services:
       - SHOW_SAML_ERRORS=true
       - SAML20_IDP_ENABLE=false
       - ADMIN_PROTECT_INDEX_PAGE=false
-      - THEME_USE=default:default
+      - THEME_USE=default
   
   mfapwmanager:
     image: silintl/ssp-base:latest
@@ -88,7 +88,7 @@ services:
       - SHOW_SAML_ERRORS=true
       - SAML20_IDP_ENABLE=false
       - ADMIN_PROTECT_INDEX_PAGE=false
-      - THEME_USE=default:default
+      - THEME_USE=default
   
   tests:
     image: silintl/ssp-base:latest
@@ -106,6 +106,6 @@ services:
     environment:
       - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
-      - THEME_USE=default:default
+      - THEME_USE=default
     working_dir: /data
     command: /data/run-tests.sh
