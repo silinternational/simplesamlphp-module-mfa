@@ -528,7 +528,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             }
             
             if ($isHeadedToMfaSetupUrl) {
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             }
             
@@ -536,7 +535,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             return;
         } elseif (self::shouldNagToSetUpMfa($mfa)) {
             if ($isHeadedToMfaSetupUrl) {
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             }
             
