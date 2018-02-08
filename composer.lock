@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "eb549ae4c3985ea41c715b6b512727a1",
+    "content-hash": "25364829cf692d48adcbfdfe37b7df84",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -876,16 +876,16 @@
         },
         {
             "name": "silinternational/psr3-adapters",
-            "version": "1.1.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/psr3-adapters.git",
-                "reference": "bbaef684f34f94f64dcf018698028b786f67caaa"
+                "reference": "e095250f68267d749e67d3e9d8e02980a83a1042"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/psr3-adapters/zipball/bbaef684f34f94f64dcf018698028b786f67caaa",
-                "reference": "bbaef684f34f94f64dcf018698028b786f67caaa",
+                "url": "https://api.github.com/repos/silinternational/psr3-adapters/zipball/e095250f68267d749e67d3e9d8e02980a83a1042",
+                "reference": "e095250f68267d749e67d3e9d8e02980a83a1042",
                 "shasum": ""
             },
             "require": {
@@ -898,7 +898,7 @@
             },
             "suggest": {
                 "monolog/monolog": "^1.22",
-                "simplesamlphp/simplesamlphp": "^1.14.12",
+                "simplesamlphp/simplesamlphp": "^1.15.2",
                 "yiisoft/yii2": "^2.0"
             },
             "type": "library",
@@ -919,7 +919,7 @@
                 }
             ],
             "description": "Various PSR3-compatible logging adapters.",
-            "time": "2017-05-09T19:14:19+00:00"
+            "time": "2018-02-06T14:25:02+00:00"
         },
         {
             "name": "simplesamlphp/saml2",
