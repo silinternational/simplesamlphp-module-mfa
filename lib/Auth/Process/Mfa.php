@@ -498,7 +498,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
     
     /**
-     * Apply this AuthProc Filter.
+     * Apply this AuthProc Filter. It will either return (indicating that it
+     * has completed) or it will redirect the user, in which case it will
+     * later call `SimpleSAML_Auth_ProcessingChain::resumeProcessing($state)`.
      *
      * @param array &$state The current state.
      */
@@ -526,7 +528,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             }
             
             if ($isHeadedToMfaSetupUrl) {
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             }
             
@@ -534,7 +535,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             return;
         } elseif (self::shouldNagToSetUpMfa($mfa)) {
             if ($isHeadedToMfaSetupUrl) {
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             }
             
