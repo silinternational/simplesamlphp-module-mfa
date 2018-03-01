@@ -141,27 +141,27 @@ Feature: Prompt for MFA credentials
     Then I should end up at my intended destination
 
   Scenario Outline: Defaulting to another option when U2F is not supported
-    Given I provide credentials that have <certain MFA options>
+    Given I provide credentials that have <U2F?><TOTP?><backup codes?>
       And the user's browser <supports U2F or not>
     When I login
     Then I should see a prompt for a <default MFA type>
 
     Examples:
-      | certain MFA options            | supports U2F or not  | default MFA type |
-      | U2F                            | supports U2F         | U2F              |
-      | U2F and TOTP                   | supports U2F         | U2F              |
-      | U2F           and backup codes | supports U2F         | U2F              |
-      | U2F,    TOTP, and backup codes | supports U2F         | U2F              |
-      |         TOTP                   | supports U2F         |   TOTP           |
-      |         TOTP  and backup codes | supports U2F         |   TOTP           |
-      |                   backup codes | supports U2F         |      backup code |
-      | U2F                            | does not support U2F | U2F              |
-      | U2F and TOTP                   | does not support U2F |   TOTP           |
-      | U2F           and backup codes | does not support U2F |      backup code |
-      | U2F,    TOTP, and backup codes | does not support U2F |   TOTP           |
-      |         TOTP                   | does not support U2F |   TOTP           |
-      |         TOTP  and backup codes | does not support U2F |   TOTP           |
-      |                   backup codes | does not support U2F |      backup code |
+      | U2F? |  TOTP?   | backup codes?  | supports U2F or not  | default MFA type |
+      | U2F  |          |                | supports U2F         | U2F              |
+      | U2F  | , TOTP   |                | supports U2F         | U2F              |
+      | U2F  |          | , backup codes | supports U2F         | U2F              |
+      | U2F  | , TOTP   | , backup codes | supports U2F         | U2F              |
+      |      |   TOTP   |                | supports U2F         |   TOTP           |
+      |      |   TOTP   | , backup codes | supports U2F         |   TOTP           |
+      |      |          |   backup codes | supports U2F         |      backup code |
+      | U2F  |          |                | does not support U2F | U2F              |
+      | U2F  | , TOTP   |                | does not support U2F |   TOTP           |
+      | U2F  |          | , backup codes | does not support U2F |      backup code |
+      | U2F  | , TOTP   | , backup codes | does not support U2F |   TOTP           |
+      |      |   TOTP   |                | does not support U2F |   TOTP           |
+      |      |   TOTP   | , backup codes | does not support U2F |   TOTP           |
+      |      |          |   backup codes | does not support U2F |      backup code |
 
   Scenario Outline: When to show the U2F-not-supported error message
     Given I provide credentials that have U2F
