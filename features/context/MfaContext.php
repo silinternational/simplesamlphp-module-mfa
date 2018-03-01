@@ -671,4 +671,22 @@ class MfaContext implements Context
         
         $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithoutU2f);
     }
+
+    /**
+     * @Then I should not see an error message about U2F being unsupported
+     */
+    public function iShouldNotSeeAnErrorMessageAboutUfBeingUnsupported()
+    {
+        $page = $this->session->getPage();
+        Assert::assertNotContains('USB Security Keys are not supported', $page->getContent());
+    }
+
+    /**
+     * @Then I should see an error message about U2F being unsupported
+     */
+    public function iShouldSeeAnErrorMessageAboutUfBeingUnsupported()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains('USB Security Keys are not supported', $page->getContent());
+    }
 }
