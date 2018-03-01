@@ -11,6 +11,7 @@ use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
 use Sil\PhpEnv\Env;
 use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
+use Sil\SspMfa\LoginBrowser;
 
 /**
  * Defines application features from the specific context.
@@ -22,12 +23,22 @@ class MfaContext implements Context
     protected $username = null;
     protected $password = null;
     
+    const USER_AGENT_WITHOUT_U2F_SUPPORT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299';
+    const USER_AGENT_WITH_U2F_SUPPORT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36';
+    
     /**
      * The browser session, used for interacting with the website.
      *
      * @var Session
      */
     protected $session;
+    
+    /**
+     * The driver for our browser-based testing.
+     *
+     * @var GoutteDriver
+     */
+    protected $driver;
     
     /**
      * Initializes context.
@@ -38,8 +49,8 @@ class MfaContext implements Context
      */
     public function __construct()
     {
-        $driver = new GoutteDriver();
-        $this->session = new Session($driver);
+        $this->driver = new GoutteDriver();
+        $this->session = new Session($this->driver);
         $this->session->start();
     }
     
@@ -283,7 +294,7 @@ class MfaContext implements Context
     }
     
     /**
-     * @Then I should see a prompt for a TOTP code
+     * @Then I should see a prompt for a TOTP (code)
      */
     public function iShouldSeeAPromptForATotpCode()
     {
@@ -304,7 +315,7 @@ class MfaContext implements Context
     }
 
     /**
-     * @Then I should see a prompt for a U2F security key
+     * @Then I should see a prompt for a U2F (security key)
      */
     public function iShouldSeeAPromptForAUfSecurityKey()
     {
@@ -573,5 +584,91 @@ class MfaContext implements Context
             'Here are your new Printable Backup Codes',
             $page->getContent()
         );
+    }
+
+    /**
+     * @Given I provide credentials that have U2F
+     */
+    public function iProvideCredentialsThatHaveUf()
+    {
+        $this->iProvideCredentialsThatNeedMfaAndHaveUfAvailable();
+    }
+
+    /**
+     * @Given the user's browser supports U2F
+     */
+    public function theUsersBrowserSupportsUf()
+    {
+        $userAgentWithU2f = self::USER_AGENT_WITH_U2F_SUPPORT;
+        Assert::assertTrue(LoginBrowser::supportsU2f($userAgentWithU2f));
+        
+        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithU2f);
+    }
+
+    /**
+     * @Given I provide credentials that have U2F, TOTP
+     */
+    public function iProvideCredentialsThatHaveUfTotp()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_u2f_totp';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have U2F, backup codes
+     */
+    public function iProvideCredentialsThatHaveUfBackupCodes()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_u2f_backupcodes';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have U2F, TOTP, backup codes
+     */
+    public function iProvideCredentialsThatHaveUfTotpBackupCodes()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_u2f_totp_backupcodes';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have TOTP
+     */
+    public function iProvideCredentialsThatHaveTotp()
+    {
+        $this->iProvideCredentialsThatNeedMfaAndHaveTotpAvailable();
+    }
+
+    /**
+     * @Given I provide credentials that have TOTP, backup codes
+     */
+    public function iProvideCredentialsThatHaveTotpBackupCodes()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_totp_backupcodes';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have backup codes
+     */
+    public function iProvideCredentialsThatHaveBackupCodes()
+    {
+        $this->iProvideCredentialsThatNeedMfaAndHaveBackupCodesAvailable();
+    }
+
+    /**
+     * @Given the user's browser does not support U2F
+     */
+    public function theUsersBrowserDoesNotSupportUf()
+    {
+        $userAgentWithoutU2f = self::USER_AGENT_WITHOUT_U2F_SUPPORT;
+        Assert::assertFalse(LoginBrowser::supportsU2f($userAgentWithoutU2f));
+        
+        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithoutU2f);
     }
 }
