@@ -139,3 +139,37 @@ Feature: Prompt for MFA credentials
       And I submit a correct backup code
     When I click the remind-me-later button
     Then I should end up at my intended destination
+
+  Scenario Outline: Defaulting to another option when U2F is not supported
+    Given I provide credentials that have <certain MFA options>
+      And the user's browser <supports U2F or not>
+    When I login
+    Then I should see a prompt for a <default MFA type>
+
+    Examples:
+      | certain MFA options            | supports U2F or not  | default MFA type |
+      | U2F                            | supports U2F         | U2F              |
+      | U2F and TOTP                   | supports U2F         | U2F              |
+      | U2F           and backup codes | supports U2F         | U2F              |
+      | U2F,    TOTP, and backup codes | supports U2F         | U2F              |
+      |         TOTP                   | supports U2F         |   TOTP           |
+      |         TOTP  and backup codes | supports U2F         |   TOTP           |
+      |                   backup codes | supports U2F         |      backup code |
+      | U2F                            | does not support U2F | U2F              |
+      | U2F and TOTP                   | does not support U2F |   TOTP           |
+      | U2F           and backup codes | does not support U2F |      backup code |
+      | U2F,    TOTP, and backup codes | does not support U2F |   TOTP           |
+      |         TOTP                   | does not support U2F |   TOTP           |
+      |         TOTP  and backup codes | does not support U2F |   TOTP           |
+      |                   backup codes | does not support U2F |      backup code |
+
+  Scenario Outline: When to show the U2F-not-supported error message
+    Given I provide credentials that have U2F
+      And the user's browser <supports U2F or not>
+    When I login
+    Then I <should or not> see an error message about U2F being unsupported
+
+    Examples:
+      | supports U2F or not  | should or not |
+      | supports U2F         | should not    |
+      | does not support U2F | should        |
