@@ -320,7 +320,7 @@ class MfaContext implements Context
     public function iShouldSeeAPromptForAUfSecurityKey()
     {
         $page = $this->session->getPage();
-        Assert::assertContains('insert your security key', $page->getHtml());
+        Assert::assertContains('<h2>USB Security Key</h2>', $page->getHtml());
     }
 
     /**
