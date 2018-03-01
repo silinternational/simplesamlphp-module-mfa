@@ -8,6 +8,7 @@
  */
 
 use Sil\SspMfa\LoggerFactory;
+use Sil\SspMfa\LoginBrowser;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId');
@@ -46,7 +47,7 @@ if (empty($mfaId)) {
     ]));
     
     // Pick an MFA ID and do a redirect to put that into the URL.
-    $mfaOption = Mfa::getMfaOptionToUse($mfaOptions);
+    $mfaOption = Mfa::getMfaOptionToUse($mfaOptions, LoginBrowser::getUserAgent());
     $moduleUrl = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php', [
         'mfaId' => $mfaOption['id'],
         'StateId' => $stateId,
