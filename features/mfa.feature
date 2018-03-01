@@ -50,6 +50,7 @@ Feature: Prompt for MFA credentials
 
   Scenario: Needs MFA, has U2F option available
     Given I provide credentials that need MFA and have U2F available
+      And the user's browser supports U2F
     When I login
     Then I should see a prompt for a U2F security key
 
