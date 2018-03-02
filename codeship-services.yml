@@ -101,6 +101,7 @@ services:
       - ./composer.json:/data/composer.json
       - ./composer.lock:/data/composer.lock
       - ./features:/data/features
+      - ./src:/data/src
     env_file:
       - ./common.env
     environment:
