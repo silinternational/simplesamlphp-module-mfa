@@ -16,7 +16,8 @@
     "silinternational/php-env": "^2.1",
     "silinternational/psr3-adapters": "^1.1 || ^2.0",
     "simplesamlphp/simplesamlphp": "~1.15.2",
-    "silinternational/idp-id-broker-php-client": "^2.2"
+    "silinternational/idp-id-broker-php-client": "^2.2",
+    "sinergi/browser-detector": "^6.1"
   },
   "require-dev": {
     "behat/behat": "^3.3",

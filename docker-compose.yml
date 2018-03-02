@@ -113,6 +113,7 @@ services:
       - ./composer.lock:/data/composer.lock
       - ./development/run-tests.sh:/data/run-tests.sh
       - ./features:/data/features
+      - ./src:/data/src
       - ./vendor:/data/vendor
     env_file:
       - ./common.env
