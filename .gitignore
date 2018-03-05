@@ -1,3 +1,5 @@
+*.aes
+codeship.env
 local.*
 !local.*.dist
 /nbproject/
