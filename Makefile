@@ -28,7 +28,11 @@ ps:
 	docker-compose ps
 
 test: composer web
-	sleep 10
+	@echo -------------------------------------------------------------------
+	@echo Bringing up mfaidp takes a long time due to composer.
+	@echo After this, you can use \"make behat\" to run the tests more quickly.
+	@echo -------------------------------------------------------------------
+	sleep 200 # Give composer time to install any new dependencies of this project
 	make behat
 
 web:
