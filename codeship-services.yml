@@ -28,6 +28,7 @@ services:
     
     env_file:
       - ./common.env
+    encrypted_env_file: codeship.env.encrypted
     environment:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
