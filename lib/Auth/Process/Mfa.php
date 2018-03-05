@@ -6,6 +6,7 @@ use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 use Sil\SspMfa\LoggerFactory;
+use Sil\SspMfa\LoginBrowser;
 use SimpleSAML\Utils\HTTP;
 
 /**
@@ -200,16 +201,23 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      * Get the MFA type to use based on the available options.
      *
      * @param array[] $mfaOptions The available MFA options.
+     * @param string $userAgent The User-Agent sent by the user's browser, used
+     *     for detecting U2F support.
      * @return array The MFA option to use.
      * @throws \InvalidArgumentException
      */
-    public static function getMfaOptionToUse($mfaOptions)
+    public static function getMfaOptionToUse($mfaOptions, $userAgent)
     {
         if (empty($mfaOptions)) {
             throw new \Exception('No MFA options were provided.');
         }
         
-        $mfaTypePriority = ['u2f', 'totp', 'backupcode'];
+        if (LoginBrowser::supportsU2f($userAgent)) {
+            $mfaTypePriority = ['u2f', 'totp', 'backupcode'];
+        } else {
+            $mfaTypePriority = ['totp', 'backupcode', 'u2f'];
+        }
+        
         foreach ($mfaTypePriority as $mfaType) {
             foreach ($mfaOptions as $mfaOption) {
                 if ($mfaOption['type'] === $mfaType) {
@@ -498,7 +506,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
     
     /**
-     * Apply this AuthProc Filter.
+     * Apply this AuthProc Filter. It will either return (indicating that it
+     * has completed) or it will redirect the user, in which case it will
+     * later call `SimpleSAML_Auth_ProcessingChain::resumeProcessing($state)`.
      *
      * @param array &$state The current state.
      */
@@ -526,7 +536,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             }
             
             if ($isHeadedToMfaSetupUrl) {
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             }
             
@@ -534,7 +543,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             return;
         } elseif (self::shouldNagToSetUpMfa($mfa)) {
             if ($isHeadedToMfaSetupUrl) {
-                SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
                 return;
             }
             
@@ -630,7 +638,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $id = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
         $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
 
-        $mfaOption = self::getMfaOptionToUse($mfaOptions);
+        $mfaOption = self::getMfaOptionToUse($mfaOptions, LoginBrowser::getUserAgent());
         
         HTTP::redirectTrustedURL($url, [
             'mfaId' => $mfaOption['id'],
