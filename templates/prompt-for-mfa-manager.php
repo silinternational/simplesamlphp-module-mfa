@@ -13,10 +13,9 @@ if (! empty($this->data['errorMessage'])) {
 
 ?>
 <form method="post">
-    <h2>Printable Backup Code</h2>
+    <h2>Manager Rescue Code</h2>
     <p>
-      Each code can only be used once, so the code you enter this time will be
-      used up and will not be available again.
+      When you receive your code from your manager, enter it here.
     </p>
     <p>
         Enter code: <input type="text" id="mfaSubmission" name="mfaSubmission" />
@@ -29,7 +28,7 @@ if (! empty($this->data['errorMessage'])) {
     </p>
     <?php if (count($this->data['mfaOptions']) > 1): ?>
         <p>
-            Don't have your printable backup codes handy? You may also use:
+            You may also use:
         </p>
         <ul>
             <?php
@@ -46,9 +45,9 @@ if (! empty($this->data['errorMessage'])) {
         </ul>
     <?php endif; ?>
     <p>
-        Lost your codes and other MFA options?
+        Did not receive the code?
         <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>">
-            Send a code</a> to your manager.
+            Send again</a>
     </p>
 </form>
 <?php

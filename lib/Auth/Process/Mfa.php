@@ -263,6 +263,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             'backupcode' => 'mfa:prompt-for-mfa-backupcode.php',
             'totp' => 'mfa:prompt-for-mfa-totp.php',
             'u2f' => 'mfa:prompt-for-mfa-u2f.php',
+            'manager' => 'mfa:prompt-for-mfa-manager.php',
         ];
         $template = $mfaOptionTemplates[$mfaType] ?? null;
         
@@ -767,5 +768,40 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     protected static function shouldPromptForMfa($mfa)
     {
         return (strtolower($mfa['prompt']) !== 'no');
+    }
+
+    /**
+     * Send a rescue code to the manager, then redirect the user to a page where they
+     * can enter the code.
+     *
+     * NOTE: This function never returns.
+     *
+     * @param array $state The state data.
+     * @param LoggerInterface $logger A PSR-3 compatible logger.
+     */
+    public static function sendManagerCode(array &$state, $logger)
+    {
+        try {
+            $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
+            $mfaOption = $idBrokerClient->mfaCreate($state['employeeId'], 'manager');
+
+            $logger->warning(json_encode([
+                'event' => 'Manager rescue code sent',
+                'employeeId' => $state['employeeId'],
+            ]));
+        } catch (\Throwable $t) {
+            $logger->error(json_encode([
+                'event' => 'Manager rescue code: failed',
+                'employeeId' => $state['employeeId'],
+                'error' => $t->getCode() . ': ' . $t->getMessage(),
+            ]));
+        }
+
+        $mfaOptions[] = $mfaOption;
+        $state['mfaOptions'] = $mfaOptions;
+        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
+        $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
+
+        HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
     }
 }
