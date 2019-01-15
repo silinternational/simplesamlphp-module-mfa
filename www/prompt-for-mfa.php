@@ -96,6 +96,7 @@ $t->data['mfaOption'] = $mfaOption;
 $t->data['mfaOptions'] = $mfaOptions;
 $t->data['stateId'] = $stateId;
 $t->data['supportsU2f'] = LoginBrowser::supportsU2f($userAgent);
+$t->data['hasManagerEmail'] = Mfa::hasManagerEmail($state);
 $t->show();
 
 $logger->info(json_encode([

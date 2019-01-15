@@ -812,4 +812,19 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
 
         HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
     }
+
+    /**
+     * See if the user has a manager_email.
+     *
+     * @param array $state
+     * @return bool
+     */
+    public static function hasManagerEmail($state)
+    {
+        $managerEmail = $state['Attributes']['manager_email'] ?? '';
+        if (empty($managerEmail)) {
+            return false;
+        }
+        return true;
+    }
 }

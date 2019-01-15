@@ -64,11 +64,13 @@ $this->includeAtTemplateBase('includes/header.php');
             ?>
         </ul>
     <?php endif; ?>
-    <p>
-        Can't use any of your MFA options?
-        <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>">
-            Send a code</a> to your manager.
-    </p>
+    <?php if ($this->data['hasManagerEmail']): ?>
+        <p>
+            Can't use any of your MFA options?
+            <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>">
+                Send a code</a> to your manager.
+        </p>
+    <?php endif; ?>
 </form>
 <?php
 $this->includeAtTemplateBase('includes/footer.php');
