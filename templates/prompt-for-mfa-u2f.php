@@ -66,7 +66,7 @@ $this->includeAtTemplateBase('includes/header.php');
     <?php endif; ?>
     <?php if ($this->data['hasManagerEmail']): ?>
         <p>
-            Can't use any of your MFA options?
+            Can't use any of your 2-Step Verification options?
             <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>">
                 Send a code</a> to your manager.
         </p>
