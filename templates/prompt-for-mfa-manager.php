@@ -33,7 +33,7 @@ if (! empty($this->data['errorMessage'])) {
         <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
-                if ($mfaOpt['type'] != 'backupcode') {
+                if ($mfaOpt['type'] != 'manager') {
                     ?>
                     <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
                        htmlentities($mfaOpt['type'])
