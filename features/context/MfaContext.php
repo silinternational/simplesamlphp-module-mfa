@@ -751,4 +751,12 @@ class MfaContext implements Context
     {
         $this->submitMfaValue(FakeIdBrokerClient::CORRECT_VALUE);
     }
+
+    /**
+     * @When I submit an incorrect manager code
+     */
+    public function iSubmitAnIncorrectManagerCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::INCORRECT_VALUE);
+    }
 }

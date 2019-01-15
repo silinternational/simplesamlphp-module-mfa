@@ -212,3 +212,11 @@ Feature: Prompt for MFA credentials
       And I click the Send a code link
     When I submit the correct manager code
     Then I should end up at my intended destination
+
+  Scenario: Submit a correct manager code
+    Given I provide credentials that have backup codes
+    And the user has a manager email
+    And I login
+    And I click the Send a code link
+    When I submit an incorrect manager code
+    Then I should see a message that it was incorrect
