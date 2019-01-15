@@ -1,7 +1,6 @@
 <?php
 namespace Sil\SspMfa\Behat\context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Mink\Driver\GoutteDriver;
 use Behat\Mink\Element\DocumentElement;
@@ -688,5 +687,68 @@ class MfaContext implements Context
     {
         $page = $this->session->getPage();
         Assert::assertContains('USB Security Keys are not supported', $page->getContent());
+    }
+
+    /**
+     * @Given the user has a manager email
+     */
+    public function theUserHasAManagerEmail()
+    {
+        $this->username .= '_and_mgr';
+    }
+
+    /**
+     * @Then I should see a link to send a code to the user's manager
+     */
+    public function iShouldSeeALinkToSendACodeToTheUsersManager()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains('Send a code</a> to your manager', $page->getContent());
+    }
+
+    /**
+     * @Given the user does not have a manager email
+     */
+    public function theUserDoesntHaveAManagerEmail()
+    {
+        /*
+         * No change to username needed.
+         */
+    }
+
+    /**
+     * @Then I should not see a link to send a code to the user's manager
+     */
+    public function iShouldNotSeeALinkToSendACodeToTheUsersManager()
+    {
+        $page = $this->session->getPage();
+        Assert::assertNotContains('Send a code</a> to your manager', $page->getContent());
+    }
+
+    /**
+     * @When I click the Send a code link
+     */
+    public function iClickTheSendACodeLink()
+    {
+        $this->clickLink('Send a code');
+    }
+
+    /**
+     * @Then I should see a prompt for a manager rescue code
+     */
+    public function iShouldSeeAPromptForAManagerRescueCode()
+    {
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('<h2>Manager Rescue Code</h2>', $pageHtml);
+        Assert::assertContains('Enter code', $pageHtml);
+    }
+
+    /**
+     * @When I submit the correct manager code
+     */
+    public function iSubmitTheCorrectManagerCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::CORRECT_VALUE);
     }
 }
