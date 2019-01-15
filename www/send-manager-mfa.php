@@ -19,6 +19,4 @@ $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_PROMP
 
 $logger = LoggerFactory::getAccordingToState($state);
 
-$userAgent = LoginBrowser::getUserAgent();
-
 Mfa::sendManagerCode($state, $logger);
