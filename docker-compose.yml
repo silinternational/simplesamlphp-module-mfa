@@ -6,7 +6,7 @@ services:
     image: silintl/ssp-base:develop
     ports:
       - "8085:80"
-      - "9000:9000"
+#      - "9000:9000"
     volumes:
       - ./:/mfa
       - ./development/enable-debug.sh:/data/enable-debug.sh
@@ -15,6 +15,7 @@ services:
       - ./development/symlink.sh:/data/symlink.sh
       - ./development/idp-local/UserPass.php:/data/vendor/simplesamlphp/simplesamlphp/modules/exampleauth/lib/Auth/Source/UserPass.php
       - ./features:/data/features
+      - ${COMPOSER_CACHE_DIR}:/composer
 
       # Revert to standard SSOService.php instead of using sildisco'saml20-idp-hosted
       - ./development/idp-local/www_saml2_idp_SSOService.php:/data/vendor/simplesamlphp/simplesamlphp/www/saml2/idp/SSOService.php
@@ -44,6 +45,8 @@ services:
       - SHOW_SAML_ERRORS=true
       - REMEMBER_ME_SECRET=not-a-secret-570c5b18dacd45bd
       - THEME_USE=default
+      - COMPOSER_CACHE_DIR=/composer
+    user: "${DOCKER_UIDGID}"
     command: ["/data/run-dev.sh"]
 
   mfasp:
@@ -100,8 +103,12 @@ services:
       - ./composer.json:/data/composer.json
       - ./composer.lock:/data/composer.lock
       - ./vendor:/data/vendor
+      - ${COMPOSER_CACHE_DIR}:/composer
     env_file:
       - ./local.env
+    environment:
+      - COMPOSER_CACHE_DIR=/composer
+    user: "${DOCKER_UIDGID}"
     working_dir: /data
 
   tests:
@@ -115,11 +122,14 @@ services:
       - ./features:/data/features
       - ./src:/data/src
       - ./vendor:/data/vendor
+      - ${COMPOSER_CACHE_DIR}:/composer
     env_file:
       - ./common.env
       - ./local.env
     environment:
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default
+      - COMPOSER_CACHE_DIR=/composer
+    user: "${DOCKER_UIDGID}"
     working_dir: /data
     command: ["/data/run-tests.sh"]
