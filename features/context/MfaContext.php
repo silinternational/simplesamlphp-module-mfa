@@ -703,7 +703,7 @@ class MfaContext implements Context
     public function iShouldSeeALinkToSendACodeToTheUsersManager()
     {
         $page = $this->session->getPage();
-        Assert::assertContains('Send a code</a> to your manager', $page->getContent());
+        Assert::assertContains('<a>Send a code</a> to your manager', $page->getContent());
     }
 
     /**
@@ -722,7 +722,7 @@ class MfaContext implements Context
     public function iShouldNotSeeALinkToSendACodeToTheUsersManager()
     {
         $page = $this->session->getPage();
-        Assert::assertNotContains('Send a code</a> to your manager', $page->getContent());
+        Assert::assertNotContains('<a>Send a code</a> to your manager', $page->getContent());
     }
 
     /**
