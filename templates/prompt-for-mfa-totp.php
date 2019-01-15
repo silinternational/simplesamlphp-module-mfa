@@ -41,6 +41,11 @@ if (! empty($this->data['errorMessage'])) {
             ?>
         </ul>
     <?php endif; ?>
+    <p>
+        Can't use any of your MFA options?
+        <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>">
+            Send a code</a> to your manager.
+    </p>
 </form>
 <?php
 $this->includeAtTemplateBase('includes/footer.php');

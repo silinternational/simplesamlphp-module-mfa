@@ -46,7 +46,7 @@ if (! empty($this->data['errorMessage'])) {
         </ul>
     <?php endif; ?>
     <p>
-        Lost your codes and other MFA options?
+        Can't use any of your MFA options?
         <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>">
             Send a code</a> to your manager.
     </p>
