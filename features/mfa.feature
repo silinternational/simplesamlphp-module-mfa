@@ -174,3 +174,49 @@ Feature: Prompt for MFA credentials
       | supports U2F or not  | should or not |
       | supports U2F         | should not    |
       | does not support U2F | should        |
+
+  Scenario Outline: When to show the link to send a manager rescue code
+    Given I provide credentials that have <U2F?><TOTP?><backup codes?>
+    And the user <has or does not have> a manager email
+    When I login
+    Then I <should or should not> see a link to send a code to the user's manager
+
+    Examples:
+      | U2F? |  TOTP?   | backup codes?  | has or does not have | should or should not |
+      | U2F  |          |                | has                  | should               |
+      | U2F  | , TOTP   |                | has                  | should               |
+      | U2F  |          | , backup codes | has                  | should               |
+      | U2F  | , TOTP   | , backup codes | has                  | should               |
+      |      |   TOTP   |                | has                  | should               |
+      |      |   TOTP   | , backup codes | has                  | should               |
+      |      |          |   backup codes | has                  | should               |
+      | U2F  |          |                | does not have        | should not           |
+      | U2F  | , TOTP   |                | does not have        | should not           |
+      | U2F  |          | , backup codes | does not have        | should not           |
+      | U2F  | , TOTP   | , backup codes | does not have        | should not           |
+      |      |   TOTP   |                | does not have        | should not           |
+      |      |   TOTP   | , backup codes | does not have        | should not           |
+      |      |          |   backup codes | does not have        | should not           |
+
+  Scenario: Ask for a code to be sent to my manager
+    Given I provide credentials that have backup codes
+      And the user has a manager email
+      And I login
+    When I click the Send a code link
+    Then I should see a prompt for a manager rescue code
+
+  Scenario: Submit a correct manager code
+    Given I provide credentials that have backup codes
+      And the user has a manager email
+      And I login
+      And I click the Send a code link
+    When I submit the correct manager code
+    Then I should end up at my intended destination
+
+  Scenario: Submit a correct manager code
+    Given I provide credentials that have backup codes
+    And the user has a manager email
+    And I login
+    And I click the Send a code link
+    When I submit an incorrect manager code
+    Then I should see a message that it was incorrect

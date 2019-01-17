@@ -75,7 +75,14 @@ class FakeIdBrokerClient
                 ],
             ];
         }
-        
+
+        if ($type === 'manager') {
+            return [
+                "id" => 5678,
+                "data" => [],
+            ];
+        }
+
         throw new InvalidArgumentException(sprintf(
             'This Fake ID Broker class does not support creating %s MFA records.',
             $type

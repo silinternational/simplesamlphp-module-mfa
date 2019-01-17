@@ -55,6 +55,29 @@ $config = [
                 ],
             ],
         ],
+        'has_backupcode_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['HAS_BACKUPCODE@mfaidp'],
+            'eduPersonTargetID' => ['33333333-3333-3333-3333-333333333333'],
+            'sn' => ['Backupcode'],
+            'givenName' => ['Has'],
+            'mail' => ['has_backupcode@example.com'],
+            'employeeNumber' => ['33333'],
+            'cn' => ['HAS_BACKUPCODE'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '7',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 10,
+                        ],
+                    ],
+                ],
+            ],
+            'manager_email' => 'manager@example.com',
+        ],
         'has_totp:a' => [
             'eduPersonPrincipalName' => ['HAS_TOTP@mfaidp'],
             'eduPersonTargetID' => ['44444444-4444-4444-4444-444444444444'],
@@ -75,6 +98,27 @@ $config = [
                 ],
             ],
         ],
+        'has_totp_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['HAS_TOTP@mfaidp'],
+            'eduPersonTargetID' => ['44444444-4444-4444-4444-444444444444'],
+            'sn' => ['TOTP'],
+            'givenName' => ['Has'],
+            'mail' => ['has_totp@example.com'],
+            'employeeNumber' => ['44444'],
+            'cn' => ['HAS_TOTP'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '2',
+                        'type' => 'totp',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'manager_email' => 'manager@example.com',
+        ],
         'has_u2f:a' => [
             'eduPersonPrincipalName' => ['HAS_U2F@mfaidp'],
             'eduPersonTargetID' => ['55555555-5555-5555-5555-555555555555'],
@@ -94,6 +138,27 @@ $config = [
                     ],
                 ]
             ],
+        ],
+        'has_u2f_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['HAS_U2F@mfaidp'],
+            'eduPersonTargetID' => ['55555555-5555-5555-5555-555555555555'],
+            'sn' => ['U2F'],
+            'givenName' => ['Has'],
+            'mail' => ['has_u2f@example.com'],
+            'employeeNumber' => ['55555'],
+            'cn' => ['HAS_U2F'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '3',
+                        'type' => 'u2f',
+                        'data' => '',
+                    ],
+                ]
+            ],
+            'manager_email' => 'manager@example.com',
         ],
         'nag_for_mfa:a' => [
             'eduPersonPrincipalName' => ['NAG_FOR_MFA@mfaidp'],
@@ -140,6 +205,7 @@ $config = [
                     ],
                 ],
             ],
+            'manager_email' => 'manager@example.com',
         ],
         'has_rate_limited_mfa:a' => [
             'eduPersonPrincipalName' => ['HAS_RATE_LIMITED_MFA@mfaidp'],
@@ -259,6 +325,32 @@ $config = [
                 ],
             ],
         ],
+        'has_u2f_totp_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_u2f_totp@mfaidp'],
+            'eduPersonTargetID' => ['00000012-0012-0012-0012-000000000012'],
+            'sn' => ['U2F And TOTP'],
+            'givenName' => ['Has'],
+            'mail' => ['has_u2f_totp@example.com'],
+            'employeeNumber' => ['00012'],
+            'cn' => ['HAS_U2F_TOTP'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '120',
+                        'type' => 'totp',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '121',
+                        'type' => 'u2f',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'manager_email' => 'manager@example.com',
+        ],
         'has_u2f_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_u2f_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000013-0013-0013-0013-000000000013'],
@@ -285,6 +377,34 @@ $config = [
                     ],
                 ],
             ],
+        ],
+        'has_u2f_backupcodes_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_u2f_backupcodes@mfaidp'],
+            'eduPersonTargetID' => ['00000013-0013-0013-0013-000000000013'],
+            'sn' => ['U2F And Backup Codes'],
+            'givenName' => ['Has'],
+            'mail' => ['has_u2f_backupcodes@example.com'],
+            'employeeNumber' => ['00013'],
+            'cn' => ['HAS_U2F_BACKUPCODES'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '130',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 10,
+                        ],
+                    ],
+                    [
+                        'id' => '131',
+                        'type' => 'u2f',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'manager_email' => 'manager@example.com',
         ],
         'has_u2f_totp_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_u2f_totp_backupcodes@mfaidp'],
@@ -318,6 +438,39 @@ $config = [
                 ],
             ],
         ],
+        'has_u2f_totp_backupcodes_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_u2f_totp_backupcodes@mfaidp'],
+            'eduPersonTargetID' => ['00000014-0014-0014-0014-000000000014'],
+            'sn' => ['U2F, TOTP, And Backup Codes'],
+            'givenName' => ['Has'],
+            'mail' => ['has_u2f_totp_backupcodes@example.com'],
+            'employeeNumber' => ['00014'],
+            'cn' => ['HAS_U2F_TOTP_BACKUPCODES'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '140',
+                        'type' => 'totp',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '141',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 10,
+                        ],
+                    ],
+                    [
+                        'id' => '142',
+                        'type' => 'u2f',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'manager_email' => 'manager@example.com',
+        ],
         'has_totp_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_totp_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000015-0015-0015-0015-000000000015'],
@@ -344,6 +497,34 @@ $config = [
                     ],
                 ],
             ],
+        ],
+        'has_totp_backupcodes_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_totp_backupcodes@mfaidp'],
+            'eduPersonTargetID' => ['00000015-0015-0015-0015-000000000015'],
+            'sn' => ['TOTP And Backup Codes'],
+            'givenName' => ['Has'],
+            'mail' => ['has_totp_backupcodes@example.com'],
+            'employeeNumber' => ['00015'],
+            'cn' => ['HAS_TOTP_BACKUPCODES'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'nag' => 'no',
+                'options' => [
+                    [
+                        'id' => '150',
+                        'type' => 'totp',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '151',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 10,
+                        ],
+                    ],
+                ],
+            ],
+            'manager_email' => 'manager@example.com',
         ],
     ],
 ];
