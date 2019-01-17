@@ -76,7 +76,7 @@ $config = [
                     ],
                 ],
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
         'has_totp:a' => [
             'eduPersonPrincipalName' => ['HAS_TOTP@mfaidp'],
@@ -117,7 +117,7 @@ $config = [
                     ],
                 ],
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
         'has_u2f:a' => [
             'eduPersonPrincipalName' => ['HAS_U2F@mfaidp'],
@@ -158,7 +158,7 @@ $config = [
                     ],
                 ]
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
         'nag_for_mfa:a' => [
             'eduPersonPrincipalName' => ['NAG_FOR_MFA@mfaidp'],
@@ -205,7 +205,7 @@ $config = [
                     ],
                 ],
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
         'has_rate_limited_mfa:a' => [
             'eduPersonPrincipalName' => ['HAS_RATE_LIMITED_MFA@mfaidp'],
@@ -349,7 +349,7 @@ $config = [
                     ],
                 ],
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
         'has_u2f_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_u2f_backupcodes@mfaidp'],
@@ -404,7 +404,7 @@ $config = [
                     ],
                 ],
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
         'has_u2f_totp_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_u2f_totp_backupcodes@mfaidp'],
@@ -469,7 +469,7 @@ $config = [
                     ],
                 ],
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
         'has_totp_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_totp_backupcodes@mfaidp'],
@@ -524,7 +524,7 @@ $config = [
                     ],
                 ],
             ],
-            'manager_email' => 'manager@example.com',
+            'manager_email' => ['manager@example.com'],
         ],
     ],
 ];

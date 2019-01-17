@@ -46,7 +46,7 @@ services:
       - REMEMBER_ME_SECRET=not-a-secret-570c5b18dacd45bd
       - THEME_USE=default
       - COMPOSER_CACHE_DIR=/composer
-    user: "${DOCKER_UIDGID}"
+#    user: "${DOCKER_UIDGID}"
     command: ["/data/run-dev.sh"]
 
   mfasp:

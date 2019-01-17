@@ -821,8 +821,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
      */
     public static function hasManagerEmail($state)
     {
-        $managerEmail = $state['Attributes']['manager_email'] ?? '';
-        if (empty($managerEmail)) {
+        $managerEmail = $state['Attributes']['manager_email'] ?? [''];
+        if (empty($managerEmail[0])) {
             return false;
         }
         return true;
