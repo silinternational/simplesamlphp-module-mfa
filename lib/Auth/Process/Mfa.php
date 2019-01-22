@@ -21,7 +21,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     const STAGE_SENT_TO_MFA_CHANGE_URL = 'mfa:sent_to_mfa_change_url';
     const STAGE_SENT_TO_MFA_NEEDED_MESSAGE = 'mfa:sent_to_mfa_needed_message';
     const STAGE_SENT_TO_MFA_PROMPT = 'mfa:sent_to_mfa_prompt';
-    const STAGE_SENT_TO_MFA_NAG = 'mfa:sent_to_mfa_nag';
     const STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE = 'mfa:sent_to_new_backup_codes_page';
     const STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE = 'mfa:sent_to_out_of_backup_codes_message';
 
@@ -542,13 +541,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             
             $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
             return;
-        } elseif (self::shouldNagToSetUpMfa($mfa)) {
-            if ($isHeadedToMfaSetupUrl) {
-                return;
-            }
-            
-            $this->redirectToMfaNag($state, $employeeId, $this->mfaSetupUrl);
-            return;
         }
     }
     
@@ -579,33 +571,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
 
-    /**
-     * Redirect user to nag page encouraging them to setup MFA
-     *
-     * @param array $state The state data.
-     * @param string $employeeId The Employee ID of the user account.
-     * @param string $mfaSetupUrl URL to MFA setup process
-     */
-    protected function redirectToMfaNag(&$state, $employeeId, $mfaSetupUrl)
-    {
-        assert('is_array($state)');
-
-        $this->logger->info(sprintf(
-            'mfa: Redirecting Employee ID %s to MFA nag message.',
-            var_export($employeeId, true)
-        ));
-
-        /* Save state and redirect. */
-        $state['employeeId'] = $employeeId;
-        $state['mfaLearnMoreUrl'] = $this->mfaLearnMoreUrl;
-        $state['mfaSetupUrl'] = $mfaSetupUrl;
-
-        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NAG);
-        $url = SimpleSAML\Module::getModuleURL('mfa/nag-for-mfa.php');
-
-        HTTP::redirectTrustedURL($url, array('StateId' => $stateId));
-    }
-    
     /**
      * Redirect the user to the appropriate MFA-prompt page.
      *
@@ -758,11 +723,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $cookieHash = password_hash($cookieString, PASSWORD_DEFAULT);
         setcookie('c1', base64_encode($cookieHash), $expireDate, '/', null, $secureCookie, true);
         setcookie('c2', $expireDate, $expireDate, '/', null, $secureCookie, true);
-    }
-    
-    protected static function shouldNagToSetUpMfa($mfa)
-    {
-        return (strtolower($mfa['nag']) === 'yes');
     }
     
     protected static function shouldPromptForMfa($mfa)

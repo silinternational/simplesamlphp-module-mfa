@@ -406,16 +406,6 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that will be nagged to set up MFA
-     */
-    public function iProvideCredentialsThatWillBeNaggedToSetUpMfa()
-    {
-        // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'nag_for_mfa';
-        $this->password = 'a';
-    }
-
-    /**
      * @Then I should see a message encouraging me to set up MFA
      */
     public function iShouldSeeAMessageEncouragingMeToSetUpMfa()
