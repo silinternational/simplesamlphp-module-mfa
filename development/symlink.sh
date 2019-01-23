@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-rm -rf /data/vendor/simplesamlphp/simplesamlphp/modules/mfa
+if [ -d "/data/vendor/simplesamlphp/simplesamlphp/modules/mfa" ]; then
+  mv /data/vendor/simplesamlphp/simplesamlphp/modules/mfa /data/vendor/simplesamlphp/simplesamlphp/modules/mfa#
+  rm /data/vendor/simplesamlphp/simplesamlphp/modules/mfa#/default-enable
+fi
+
 ln -s /mfa /data/vendor/simplesamlphp/simplesamlphp/modules/
 
 #ln -s /mfa/development/ssp/authsources.php /data/vendor/simplesamlphp/simplesamlphp/config/authsources.php

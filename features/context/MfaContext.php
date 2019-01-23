@@ -406,28 +406,6 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that will be nagged to set up MFA
-     */
-    public function iProvideCredentialsThatWillBeNaggedToSetUpMfa()
-    {
-        // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'nag_for_mfa';
-        $this->password = 'a';
-    }
-
-    /**
-     * @Then I should see a message encouraging me to set up MFA
-     */
-    public function iShouldSeeAMessageEncouragingMeToSetUpMfa()
-    {
-        $page = $this->session->getPage();
-        Assert::assertContains(
-            'increase the security of your account by enabling 2-',
-            $page->getHtml()
-        );
-    }
-
-    /**
      * @Then there should be a way to continue to my intended destination
      */
     public function thereShouldBeAWayToContinueToMyIntendedDestination()
