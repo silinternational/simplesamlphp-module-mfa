@@ -20,6 +20,8 @@ $logger = LoggerFactory::getAccordingToState($state);
 
 // If the user pressed the continue button...
 if (filter_has_var(INPUT_POST, 'continue')) {
+    unset($state['Attributes']['manager_email']);
+
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
     return;
 }

@@ -31,8 +31,9 @@ if (Mfa::isRememberMeCookieValid(base64_decode($cookieHash), $expireDate, $mfaOp
         'event' => 'MFA skipped due to valid remember-me cookie',
         'employeeId' => $state['employeeId'],
     ]));
-    
-    //unset($state['Attributes']['mfa']);
+
+    unset($state['Attributes']['manager_email']);
+
     // This condition should never return
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
     throw new \Exception('Failed to resume processing auth proc chain.');

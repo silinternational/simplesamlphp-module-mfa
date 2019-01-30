@@ -470,8 +470,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 throw new \Exception('Failed to send user to low-on-backup-codes page.');
             }
         }
-        
-        //unset($state['Attributes']['mfa']);
+
+        unset($state['Attributes']['manager_email']);
+
         // The following function call will never return.
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
         throw new \Exception('Failed to resume processing auth proc chain.');
@@ -535,13 +536,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 return;
             }
             
-            if ($isHeadedToMfaSetupUrl) {
+            if (! $isHeadedToMfaSetupUrl) {
+                $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
                 return;
             }
-            
-            $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
-            return;
         }
+
+        unset($state['Attributes']['manager_email']);
     }
     
     /**

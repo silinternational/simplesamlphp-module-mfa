@@ -17,6 +17,8 @@ if (filter_has_var(INPUT_POST, 'getMore')) {
     Mfa::giveUserNewBackupCodes($state, $logger);
     return;
 } elseif (filter_has_var(INPUT_POST, 'continue') && $hasOtherMfaOptions) {
+    unset($state['Attributes']['manager_email']);
+
     // The user pressed the remind-me-later button.
     SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
     return;
