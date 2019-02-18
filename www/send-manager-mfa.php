@@ -7,7 +7,6 @@
  */
 
 use Sil\SspMfa\LoggerFactory;
-use Sil\SspMfa\LoginBrowser;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId');

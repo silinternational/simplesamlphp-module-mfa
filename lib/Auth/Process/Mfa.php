@@ -769,7 +769,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $state['mfaOptions'] = $mfaOptions;
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
 
-        $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
+        $url = SimpleSAML\Module::getModuleURL('mfa/mfa-recovery.php');
 
         HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
     }
@@ -787,5 +787,23 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             return false;
         }
         return true;
+    }
+
+    /**
+     * Get the manager MFA, if it exists. Otherwise, return null.
+     *
+     * @param array[] $mfaOptions The available MFA options.
+     * @return array The manager MFA.
+     * @throws \InvalidArgumentException
+     */
+    public static function getManagerMfa($mfaOptions)
+    {
+        foreach ($mfaOptions as $mfaOption) {
+            if ($mfaOption['type'] === 'manager') {
+                return $mfaOption;
+            }
+        }
+
+        return null;
     }
 }
