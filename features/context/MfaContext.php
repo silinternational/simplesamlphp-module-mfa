@@ -681,7 +681,7 @@ class MfaContext implements Context
     public function iShouldSeeALinkToSendACodeToTheUsersManager()
     {
         $page = $this->session->getPage();
-        Assert::assertContains('Send a code</a> to your manager', $page->getContent());
+        Assert::assertContains('Can\'t use any of your 2-Step Verification options', $page->getContent());
     }
 
     /**
@@ -704,11 +704,19 @@ class MfaContext implements Context
     }
 
     /**
-     * @When I click the Send a code link
+     * @When I click the Request Assistance link
      */
-    public function iClickTheSendACodeLink()
+    public function iClickTheRequestAssistanceLink()
     {
-        $this->clickLink('Send a code');
+        $this->clickLink('Click here');
+    }
+
+    /**
+     * @When I click the Request a code link
+     */
+    public function iClickTheRequestACodeLink()
+    {
+        $this->clickLink('Request a code');
     }
 
     /**
@@ -736,5 +744,15 @@ class MfaContext implements Context
     public function iSubmitAnIncorrectManagerCode()
     {
         $this->submitMfaValue(FakeIdBrokerClient::INCORRECT_VALUE);
+    }
+
+    /**
+     * @Given I provide credentials that have a manager code
+     */
+    public function iProvideCredentialsThatHaveAManagerCode()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_mgr_code';
+        $this->password = 'a';
     }
 }

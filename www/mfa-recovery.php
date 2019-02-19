@@ -54,6 +54,7 @@ $globalConfig = SimpleSAML_Configuration::getInstance();
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:prompt-for-mfa-manager.php');
 $t->data['stateId'] = $stateId;
 $t->data['mfaOptions'] = $mfaOptions;
+$t->data['errorMessage'] = $errorMessage ?? null;
 $t->show();
 
 $logger->info(json_encode([
