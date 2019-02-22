@@ -638,5 +638,39 @@ $config = [
             ],
             'manager_email' => ['manager@example.com'],
         ],
+        'has_mgr_code:a' => [
+            'eduPersonPrincipalName' => ['has_mgr_code@mfaidp'],
+            'eduPersonTargetID' => ['00000015-0015-0015-0015-000000000015'],
+            'sn' => ['Manager Code'],
+            'givenName' => ['Has'],
+            'mail' => ['has_mgr_code@example.com'],
+            'employeeNumber' => ['00015'],
+            'cn' => ['HAS_MGR_CODE'],
+            'mfa' => [
+                'prompt' => 'yes',
+                'add' => 'no',
+                'review' => 'no',
+                'options' => [
+                    [
+                        'id' => '151',
+                        'type' => 'backupcode',
+                        'data' => [
+                            'count' => 10,
+                        ],
+                    ],
+                    [
+                        'id' => '151',
+                        'type' => 'manager',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'method' => [
+                'add' => 'no',
+                'review' => 'no',
+                'options' => [],
+            ],
+            'manager_email' => ['manager@example.com'],
+        ],
     ],
 ];

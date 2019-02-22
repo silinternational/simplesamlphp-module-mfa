@@ -183,21 +183,30 @@ Feature: Prompt for MFA credentials
     Given I provide credentials that have backup codes
       And the user has a manager email
       And I login
-    When I click the Send a code link
+    When I click the Request Assistance link
     Then I should see a prompt for a manager rescue code
 
-  Scenario: Submit a correct manager code
-    Given I provide credentials that have backup codes
-      And the user has a manager email
+  Scenario: Submit a code sent to my manager at an earlier time
+    Given I provide credentials that have a manager code
       And I login
-      And I click the Send a code link
+      And I click the Request Assistance link
     When I submit the correct manager code
     Then I should end up at my intended destination
 
   Scenario: Submit a correct manager code
     Given I provide credentials that have backup codes
-    And the user has a manager email
-    And I login
-    And I click the Send a code link
+      And the user has a manager email
+      And I login
+      And I click the Request Assistance link
+      And I click the Request a code link
+    When I submit the correct manager code
+    Then I should end up at my intended destination
+
+  Scenario: Submit an incorrect manager code
+    Given I provide credentials that have backup codes
+      And the user has a manager email
+      And I login
+      And I click the Request Assistance link
+      And I click the Request a code link
     When I submit an incorrect manager code
     Then I should see a message that it was incorrect

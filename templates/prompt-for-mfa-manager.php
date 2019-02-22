@@ -15,13 +15,14 @@ if (! empty($this->data['errorMessage'])) {
 <form method="post">
     <h2>Manager Rescue Code</h2>
     <p>
+        We can send a code to your manager.
+        <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>">Request a code</a>.
+    </p>
+    <p>
       When you receive your code from your manager, enter it here.
     </p>
     <p>
         Enter code: <input type="text" id="mfaSubmission" name="mfaSubmission" />
-        <br />
-        <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
-        <label for="rememberMe">Remember this computer for 30 days</label>
         <br />
         <button type="submit" id="submitMfa" name="submitMfa"
                 style="padding: 4px 8px;">Submit</button>
@@ -44,11 +45,6 @@ if (! empty($this->data['errorMessage'])) {
             ?>
         </ul>
     <?php endif; ?>
-    <p>
-        Did not receive the code?
-        <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>">
-            Send again</a>
-    </p>
 </form>
 <?php
 $this->includeAtTemplateBase('includes/footer.php');
