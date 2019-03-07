@@ -18,4 +18,22 @@ $state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_PROMP
 
 $logger = LoggerFactory::getAccordingToState($state);
 
-Mfa::sendManagerCode($state, $logger);
+if (filter_has_var(INPUT_POST, 'send')) {
+    Mfa::sendManagerCode($state, $logger);
+}
+
+$globalConfig = SimpleSAML_Configuration::getInstance();
+
+$t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:send-manager-mfa.php');
+$t->data['errorMessage'] = $errorMessage ?? null;
+$t->data['mfaOption'] = $mfaOption;
+$t->data['mfaOptions'] = $mfaOptions;
+$t->data['stateId'] = $stateId;
+$t->data['managerEmail'] = $state['managerEmail'];
+$t->show();
+
+$logger->info(json_encode([
+    'event' => 'Send manager code',
+    'employeeId' => $state['employeeId'],
+    'mfaType' => $mfaOption['type'],
+]));

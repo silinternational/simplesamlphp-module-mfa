@@ -48,7 +48,7 @@ if (! empty($this->data['errorMessage'])) {
     <?php if ($this->data['hasManagerEmail']): ?>
         <p>
             Can't use any of your 2-Step Verification options?
-            <a href="mfa-recovery.php?StateId=<?= htmlentities($this->data['stateId']) ?>">
+            <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>">
                 Click here</a> for assistance.
         </p>
     <?php endif; ?>

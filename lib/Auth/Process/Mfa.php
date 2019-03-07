@@ -212,9 +212,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
         
         if (LoginBrowser::supportsU2f($userAgent)) {
-            $mfaTypePriority = ['u2f', 'totp', 'backupcode'];
+            $mfaTypePriority = ['manager', 'u2f', 'totp', 'backupcode'];
         } else {
-            $mfaTypePriority = ['totp', 'backupcode', 'u2f'];
+            $mfaTypePriority = ['manager', 'totp', 'backupcode', 'u2f'];
         }
         
         foreach ($mfaTypePriority as $mfaType) {
@@ -770,7 +770,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $state['mfaOptions'] = $mfaOptions;
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
 
-        $url = SimpleSAML\Module::getModuleURL('mfa/mfa-recovery.php');
+        $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
 
         HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
     }

@@ -15,10 +15,6 @@ if (! empty($this->data['errorMessage'])) {
 <form method="post">
     <h2>Manager Rescue Code</h2>
     <p>
-        We can send a code to your manager.
-        <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>">Request a code</a>.
-    </p>
-    <p>
       When you receive your code from your manager, enter it here.
     </p>
     <p>
