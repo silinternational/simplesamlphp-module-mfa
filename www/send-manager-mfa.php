@@ -25,15 +25,11 @@ if (filter_has_var(INPUT_POST, 'send')) {
 $globalConfig = SimpleSAML_Configuration::getInstance();
 
 $t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:send-manager-mfa.php');
-$t->data['errorMessage'] = $errorMessage ?? null;
-$t->data['mfaOption'] = $mfaOption;
-$t->data['mfaOptions'] = $mfaOptions;
 $t->data['stateId'] = $stateId;
 $t->data['managerEmail'] = $state['managerEmail'];
 $t->show();
 
 $logger->info(json_encode([
-    'event' => 'Send manager code',
+    'event' => 'offer to send manager code',
     'employeeId' => $state['employeeId'],
-    'mfaType' => $mfaOption['type'],
 ]));
