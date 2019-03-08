@@ -34,7 +34,7 @@ if (! empty($this->data['errorMessage'])) {
         <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
-                if ($mfaOpt['type'] != 'backupcode' && $mfaOpt['type'] != 'manager') {
+                if ($mfaOpt['type'] != 'backupcode') {
                     ?>
                     <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
                        htmlentities($mfaOpt['type'])
@@ -48,7 +48,7 @@ if (! empty($this->data['errorMessage'])) {
     <?php if ($this->data['hasManagerEmail']): ?>
         <p>
             Can't use any of your 2-Step Verification options?
-            <a href="mfa-recovery.php?StateId=<?= htmlentities($this->data['stateId']) ?>">
+            <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>">
                 Click here</a> for assistance.
         </p>
     <?php endif; ?>

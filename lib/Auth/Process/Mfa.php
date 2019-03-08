@@ -212,9 +212,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
         
         if (LoginBrowser::supportsU2f($userAgent)) {
-            $mfaTypePriority = ['u2f', 'totp', 'backupcode'];
+            $mfaTypePriority = ['manager', 'u2f', 'totp', 'backupcode'];
         } else {
-            $mfaTypePriority = ['totp', 'backupcode', 'u2f'];
+            $mfaTypePriority = ['manager', 'totp', 'backupcode', 'u2f'];
         }
         
         foreach ($mfaTypePriority as $mfaType) {
@@ -586,6 +586,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         /** @todo Check for valid remember-me cookies here rather doing a redirect first. */
         
         $state['mfaOptions'] = $mfaOptions;
+        $state['managerEmail'] = self::getManagerEmail($state);
         $state['idBrokerConfig'] = [
             'accessToken' => $this->idBrokerAccessToken,
             'assertValidIp' => $this->idBrokerAssertValidIp,
@@ -769,7 +770,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $state['mfaOptions'] = $mfaOptions;
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
 
-        $url = SimpleSAML\Module::getModuleURL('mfa/mfa-recovery.php');
+        $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
 
         HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
     }
@@ -790,6 +791,21 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
 
     /**
+     * Get masked copy of manager_email, or null if it isn't available.
+     *
+     * @param array $state
+     * @return string|null
+     */
+    public static function getManagerEmail($state)
+    {
+        $managerEmail = $state['Attributes']['manager_email'] ?? [''];
+        if (empty($managerEmail[0])) {
+            return null;
+        }
+        return self::maskEmail($managerEmail[0]);
+    }
+
+    /**
      * Get the manager MFA, if it exists. Otherwise, return null.
      *
      * @param array[] $mfaOptions The available MFA options.
@@ -805,5 +821,52 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
 
         return null;
+    }
+
+    /**
+     * @param string $email an email address
+     * @return string with most letters changed to asterisks
+     */
+    public static function maskEmail($email)
+    {
+        list($part1, $domain) = explode('@', $email);
+        $newEmail = '';
+        $useRealChar = true;
+
+        /*
+         * Replace all characters with '*', except
+         * the first one, the last one, underscores and each
+         * character that follows and underscore.
+         */
+        foreach (str_split($part1) as $nextChar) {
+            if ($useRealChar) {
+                $newEmail .= $nextChar;
+                $useRealChar = false;
+            } else if ($nextChar === '_') {
+                $newEmail .= $nextChar;
+                $useRealChar = true;
+            } else {
+                $newEmail .= '*';
+            }
+        }
+
+        // replace the last * with the last real character
+        $newEmail = substr($newEmail, 0, -1);
+        $newEmail .= substr($part1, -1);
+        $newEmail .= '@';
+
+        /*
+         * Add an '*' for each of the characters of the domain, except
+         * for the first character of each part and the .
+         */
+        list($domainA, $domainB) = explode('.', $domain);
+
+        $newEmail .= substr($domainA, 0, 1);
+        $newEmail .= str_repeat('*', strlen($domainA) - 1);
+        $newEmail .= '.';
+
+        $newEmail .= substr($domainB, 0, 1);
+        $newEmail .= str_repeat('*', strlen($domainB) - 1);
+        return $newEmail;
     }
 }

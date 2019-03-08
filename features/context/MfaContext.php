@@ -712,11 +712,11 @@ class MfaContext implements Context
     }
 
     /**
-     * @When I click the Request a code link
+     * @When I click the Send a code link
      */
     public function iClickTheRequestACodeLink()
     {
-        $this->clickLink('Request a code');
+        $this->submitFormByClickingButtonNamed('send');
     }
 
     /**
@@ -754,5 +754,14 @@ class MfaContext implements Context
         // See `development/idp-local/config/authsources.php` for options.
         $this->username = 'has_mgr_code';
         $this->password = 'a';
+    }
+
+    /**
+     * @Then there should be a way to request a manager code
+     */
+    public function thereShouldBeAWayToRequestAManagerCode()
+    {
+        $page = $this->session->getPage();
+        $this->assertFormContains('name="send"', $page);
     }
 }
