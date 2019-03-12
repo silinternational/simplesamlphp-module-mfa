@@ -764,4 +764,12 @@ class MfaContext implements Context
         $page = $this->session->getPage();
         $this->assertFormContains('name="send"', $page);
     }
+
+    /**
+     * @When I click the Cancel button
+     */
+    public function iClickTheCancelButton()
+    {
+        $this->submitFormByClickingButtonNamed('cancel');
+    }
 }

@@ -20,6 +20,11 @@ $logger = LoggerFactory::getAccordingToState($state);
 
 if (filter_has_var(INPUT_POST, 'send')) {
     Mfa::sendManagerCode($state, $logger);
+} elseif (filter_has_var(INPUT_POST, 'cancel')) {
+    $moduleUrl = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php', [
+        'StateId' => $stateId,
+    ]);
+    SimpleSAML_Utilities::redirect($moduleUrl);
 }
 
 $globalConfig = SimpleSAML_Configuration::getInstance();

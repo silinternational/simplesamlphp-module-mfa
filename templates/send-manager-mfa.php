@@ -9,6 +9,9 @@ $this->includeAtTemplateBase('includes/header.php');
   The email address on file (masked for privacy) is <?= $this->data['managerEmail'] ?>
 </p>
 <form method="post">
+    <button name="cancel" style="padding: 4px 8px;">
+        Cancel
+    </button>
     <button name="send" style="padding: 4px 8px;">
         Send
     </button>

@@ -209,3 +209,11 @@ Feature: Prompt for MFA credentials
       And I click the Send a code link
     When I submit an incorrect manager code
     Then I should see a message that it was incorrect
+
+  Scenario: Ask for assistance, but change my mind
+    Given I provide credentials that have backup codes
+    And the user has a manager email
+    And I login
+    And I click the Request Assistance link
+    When I click the Cancel button
+    Then I should see a prompt for a backup code
