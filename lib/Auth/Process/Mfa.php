@@ -768,26 +768,12 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
          */
         $mfaOptions['manager'] = $mfaOption;
         $state['mfaOptions'] = $mfaOptions;
+        $state['managerEmail'] = self::getManagerEmail($state);
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
 
         $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
 
         HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
-    }
-
-    /**
-     * See if the user has a manager_email.
-     *
-     * @param array $state
-     * @return bool
-     */
-    public static function hasManagerEmail($state)
-    {
-        $managerEmail = $state['Attributes']['manager_email'] ?? [''];
-        if (empty($managerEmail[0])) {
-            return false;
-        }
-        return true;
     }
 
     /**
