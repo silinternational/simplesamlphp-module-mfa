@@ -16,7 +16,7 @@
     "silinternational/php-env": "^2.1",
     "silinternational/psr3-adapters": "^1.1 || ^2.0",
     "simplesamlphp/simplesamlphp": "~1.16.1",
-    "silinternational/idp-id-broker-php-client": "dev-develop",
+    "silinternational/idp-id-broker-php-client": "^3.0",
     "sinergi/browser-detector": "^6.1"
   },
   "require-dev": {

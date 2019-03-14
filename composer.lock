@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c454353ff604eadf6758f6e7f75eb69",
+    "content-hash": "d671c97b8859b22a787ec14d6eb2d3ac",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -885,16 +885,16 @@
         },
         {
             "name": "silinternational/idp-id-broker-php-client",
-            "version": "dev-develop",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/idp-id-broker-php-client.git",
-                "reference": "7bb4ce11c8adb1cfe8d4dc322e4e3329f5bb9d6e"
+                "reference": "e21bfe80f58b0e30c488f4ce7e201b3330ea48d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/idp-id-broker-php-client/zipball/7bb4ce11c8adb1cfe8d4dc322e4e3329f5bb9d6e",
-                "reference": "7bb4ce11c8adb1cfe8d4dc322e4e3329f5bb9d6e",
+                "url": "https://api.github.com/repos/silinternational/idp-id-broker-php-client/zipball/e21bfe80f58b0e30c488f4ce7e201b3330ea48d8",
+                "reference": "e21bfe80f58b0e30c488f4ce7e201b3330ea48d8",
                 "shasum": ""
             },
             "require": {
@@ -936,7 +936,7 @@
                 "idp",
                 "php client"
             ],
-            "time": "2019-03-06T19:06:42+00:00"
+            "time": "2019-03-14T18:21:27+00:00"
         },
         {
             "name": "silinternational/php-env",
@@ -4159,8 +4159,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "roave/security-advisories": 20,
-        "silinternational/idp-id-broker-php-client": 20
+        "roave/security-advisories": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
