@@ -471,6 +471,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             }
         }
 
+        /*
+         * If the user had to use a manager code, show the profile review page.
+         */
+        if ($mfaType === 'manager' && isset($state['Attributes']['profile_review'])) {
+            $state['Attributes']['profile_review'] = 'yes';
+        }
+
         unset($state['Attributes']['manager_email']);
 
         // The following function call will never return.
