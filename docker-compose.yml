@@ -5,7 +5,7 @@ services:
   mfaidp:
     image: silintl/ssp-base:develop
     ports:
-      - "8085:80"
+      - "52020:80"
 #      - "9000:9000"
     volumes:
       - ./:/mfa
@@ -38,7 +38,7 @@ services:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
       - IDP_NAME=Local IdP
-      - MFA_SETUP_URL=http://mfa-pw-manager.local:8082/module.php/core/authenticate.php?as=mfa-idp
+      - MFA_SETUP_URL=http://mfa-pw-manager.local:52022/module.php/core/authenticate.php?as=mfa-idp
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - SECRET_SALT=NOT-a-SECRET-1362102e525237994020fb7ff18753c8
       - SECURE_COOKIE=false
@@ -61,7 +61,7 @@ services:
       # Utilize custom metadata
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
     ports:
-      - "8081:80"
+      - "52021:80"
     environment:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=sp1
@@ -85,7 +85,7 @@ services:
       # Utilize custom metadata
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
     ports:
-      - "8082:80"
+      - "52022:80"
     environment:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=sp1
