@@ -3,7 +3,7 @@ version: '2'
 services:
   
   mfaidp:
-    image: silintl/ssp-base:latest
+    image: silintl/ssp-base:develop-5.0
     volumes:
       - ./:/mfa
       - ./development/enable-debug.sh:/data/enable-debug.sh
@@ -48,7 +48,7 @@ services:
     command: /data/run-dev.sh
   
   mfasp:
-    image: silintl/ssp-base:latest
+    image: silintl/ssp-base:develop-5.0
     volumes:
       # Utilize custom certs
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
@@ -68,7 +68,7 @@ services:
       - THEME_USE=default
   
   mfapwmanager:
-    image: silintl/ssp-base:latest
+    image: silintl/ssp-base:develop-5.0
     volumes:
       # Utilize custom certs
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
@@ -78,8 +78,6 @@ services:
 
       # Utilize custom metadata
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
-    ports:
-      - "8082:80"
     environment:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=sp1
