@@ -412,14 +412,22 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         try {
             $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
-            $validMfa = $idBrokerClient->mfaVerify(
+            $mfaDataFromBroker = $idBrokerClient->mfaVerify(
                 $mfaId,
                 $employeeId,
                 $mfaSubmission
             );
         } catch (\Throwable $t) {
+            $message = 'Something went wrong while we were trying to do the '
+                . '2-step verification.';
             if ($t instanceof ServiceException) {
-                if ($t->httpStatusCode === 429) {
+                if ($t->httpStatusCode === 400) {
+                    if ($mfaType === 'backupcode') {
+                        return 'Incorrect 2-step verification code. Printable backup '
+                            . 'codes can only be used once, please try a different code.';
+                    }
+                    return 'Incorrect 2-step verification code.';
+                } elseif ($t->httpStatusCode === 429){
                     $logger->error(json_encode([
                         'event' => 'MFA is rate-limited',
                         'employeeId' => $employeeId,
