@@ -2,7 +2,7 @@
 namespace Sil\SspMfa\Behat\fakes;
 
 use InvalidArgumentException;
-use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
+use Sil\Idp\IdBroker\Client\ServiceException;
 
 /**
  * FAKE IdP ID Broker API client, used for testing.
@@ -34,14 +34,26 @@ class FakeIdBrokerClient
      * Verify an MFA value
      * @param int $id
      * @param string $value
-     * @return bool
+     * @return array
+     * @throws ServiceException
      */
     public function mfaVerify($id, $employeeId, $value)
     {
         if ($id === self::RATE_LIMITED_MFA_ID) {
-            throw new MfaRateLimitException('Too many recent failures for this MFA');
+            throw new ServiceException('Too many recent failures for this MFA', 0, 429);
         }
-        return ($value === self::CORRECT_VALUE);
+
+        if ($value !== self::CORRECT_VALUE) {
+            throw new ServiceException('Incorrect code', 0, 400);
+        }
+
+        return [
+            'id' => $id,
+            'type' => 'backupcode',
+            'data' => [
+                'count' => 4,
+            ],
+        ];
     }
     
     /**
