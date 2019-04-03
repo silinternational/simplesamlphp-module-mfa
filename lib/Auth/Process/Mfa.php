@@ -428,17 +428,14 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                     ]));
                     return 'There have been too many wrong answers recently. '
                         . 'Please wait a minute, then try again.';
-                } elseif ($t->httpStatusCode === 400) {
-                    if ($mfaType === 'backupcode') {
-                        return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
-                    }
-                    return 'Incorrect 2-step verification code.';
+                } else {
+                    $message .= ' (code ' . $t->httpStatusCode . ')';
+                    return $message;
                 }
             }
             
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
-            return 'Something went wrong while we were trying to do the '
-                 . '2-step verification.';
+            return $message;
         }
 
         // Set remember me cookies if requested
