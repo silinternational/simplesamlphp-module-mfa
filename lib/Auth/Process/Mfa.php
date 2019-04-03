@@ -328,7 +328,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 'error' => $t->getCode() . ': ' . $t->getMessage(),
             ]));
         }
-        
+
+        self::updateStateWithNewMfaData($state, $logger);
+
         $state['newBackupCodes'] = $newBackupCodes ?? null;
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE);
         $url = SimpleSAML\Module::getModuleURL('mfa/new-backup-codes.php');
@@ -445,6 +447,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
             return $message;
         }
+
+        self::updateStateWithNewMfaData($state, $logger);
 
         // Set remember me cookies if requested
         if ($rememberMe) {
@@ -867,5 +871,38 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $newEmail .= substr($domainB, 0, 1);
         $newEmail .= str_repeat('*', strlen($domainB) - 1);
         return $newEmail;
+    }
+
+    /**
+     * @param $state array
+     * @param LoggerInterface $logger
+     */
+    protected static function updateStateWithNewMfaData(&$state, $logger)
+    {
+        $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
+
+        $log = [
+            'event' => 'Update state with new mfa data',
+        ];
+
+        try {
+            $newMfaOptions = $idBrokerClient->mfaList($state['employeeId']);
+        } catch (\Exception $e) {
+            $log['status'] = 'failed: id-broker exception';
+            $logger->error(json_encode($log));
+            return;
+        }
+
+        if (empty($newMfaOptions)) {
+            $log['status'] = 'failed: no data provided';
+            $logger->warning(json_encode($log));
+            return;
+        }
+
+        $state['Attributes']['mfa']['options'] = $newMfaOptions;
+
+        $log['data'] = $newMfaOptions;
+        $log['status'] = 'updated';
+        $logger->warning(json_encode($log));
     }
 }
