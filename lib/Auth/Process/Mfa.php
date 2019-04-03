@@ -417,22 +417,23 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 $employeeId,
                 $mfaSubmission
             );
-            if (! $validMfa) {
-                if ($mfaType === 'backupcode') {
-                    return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
-                }
-                return 'Incorrect 2-step verification code.';
-            }
         } catch (\Throwable $t) {
-            if ($t instanceof MfaRateLimitException) {
-                $logger->error(json_encode([
-                    'event' => 'MFA is rate-limited',
-                    'employeeId' => $employeeId,
-                    'mfaId' => $mfaId,
-                    'mfaType' => $mfaType,
-                ]));
-                return 'There have been too many wrong answers recently. '
-                     . 'Please wait a minute, then try again.';
+            if ($t instanceof ServiceException) {
+                if ($t->httpStatusCode === 429) {
+                    $logger->error(json_encode([
+                        'event' => 'MFA is rate-limited',
+                        'employeeId' => $employeeId,
+                        'mfaId' => $mfaId,
+                        'mfaType' => $mfaType,
+                    ]));
+                    return 'There have been too many wrong answers recently. '
+                        . 'Please wait a minute, then try again.';
+                } elseif ($t->httpStatusCode === 400) {
+                    if ($mfaType === 'backupcode') {
+                        return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
+                    }
+                    return 'Incorrect 2-step verification code.';
+                }
             }
             
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
