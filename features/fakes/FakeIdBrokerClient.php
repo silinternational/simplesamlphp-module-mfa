@@ -50,6 +50,8 @@ class FakeIdBrokerClient
         return [
             'id' => $id,
             'type' => 'backupcode',
+            'label' => 'Printable Codes',
+            'created_utc' => '2019-01-02T03:04:05Z',
             'data' => [
                 'count' => 4,
             ],
@@ -99,5 +101,36 @@ class FakeIdBrokerClient
             'This Fake ID Broker class does not support creating %s MFA records.',
             $type
         ));
+    }
+
+    /**
+     * Get a list of MFA configurations for given user
+     * @param string $employee_id
+     * @return array
+     * @throws ServiceException
+     */
+    public function mfaList($employee_id)
+    {
+        return [
+            [
+                'id' => 1,
+                'type' => 'backupcode',
+                'label' => 'Printable Codes',
+                'created_utc' => '2019-04-02T16:02:14Z',
+                'last_used_utc' => '2019-04-01T00:00:00Z',
+                'data' => [
+                    'count' => 10
+                ],
+            ],
+            [
+                'id' => 2,
+                'type' => 'totp',
+                'label' => 'Smartphone App',
+                'created_utc' => '2019-04-02T16:02:14Z',
+                'last_used_utc' => '2019-04-01T00:00:00Z',
+                'data' => [
+                ],
+            ],
+        ];
     }
 }
