@@ -2,7 +2,7 @@
 
 use Psr\Log\LoggerInterface;
 use Sil\PhpEnv\Env;
-use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
+use Sil\Idp\IdBroker\Client\ServiceException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 use Sil\SspMfa\LoggerFactory;
@@ -412,32 +412,38 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         try {
             $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
-            $validMfa = $idBrokerClient->mfaVerify(
+            $mfaDataFromBroker = $idBrokerClient->mfaVerify(
                 $mfaId,
                 $employeeId,
                 $mfaSubmission
             );
-            if (! $validMfa) {
-                if ($mfaType === 'backupcode') {
-                    return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
-                }
-                return 'Incorrect 2-step verification code.';
-            }
         } catch (\Throwable $t) {
-            if ($t instanceof MfaRateLimitException) {
-                $logger->error(json_encode([
-                    'event' => 'MFA is rate-limited',
-                    'employeeId' => $employeeId,
-                    'mfaId' => $mfaId,
-                    'mfaType' => $mfaType,
-                ]));
-                return 'There have been too many wrong answers recently. '
-                     . 'Please wait a minute, then try again.';
+            $message = 'Something went wrong while we were trying to do the '
+                . '2-step verification.';
+            if ($t instanceof ServiceException) {
+                if ($t->httpStatusCode === 400) {
+                    if ($mfaType === 'backupcode') {
+                        return 'Incorrect 2-step verification code. Printable backup '
+                            . 'codes can only be used once, please try a different code.';
+                    }
+                    return 'Incorrect 2-step verification code.';
+                } elseif ($t->httpStatusCode === 429){
+                    $logger->error(json_encode([
+                        'event' => 'MFA is rate-limited',
+                        'employeeId' => $employeeId,
+                        'mfaId' => $mfaId,
+                        'mfaType' => $mfaType,
+                    ]));
+                    return 'There have been too many wrong answers recently. '
+                        . 'Please wait a minute, then try again.';
+                } else {
+                    $message .= ' (code ' . $t->httpStatusCode . ')';
+                    return $message;
+                }
             }
             
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
-            return 'Something went wrong while we were trying to do the '
-                 . '2-step verification.';
+            return $message;
         }
 
         // Set remember me cookies if requested
