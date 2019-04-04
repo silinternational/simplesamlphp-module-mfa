@@ -874,7 +874,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
 
     /**
-     * @param $state array
+     * @param array $state
      * @param LoggerInterface $logger
      */
     protected static function updateStateWithNewMfaData(&$state, $logger)
