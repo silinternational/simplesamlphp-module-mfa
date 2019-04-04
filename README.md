@@ -65,11 +65,11 @@ the Vagrantfile if you are running docker within the Vagrant VM).
 Run `make test`.
 
 ### Manual Testing ###
-Go to <http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp> in
+Go to <http://mfa-sp.local:52021/module.php/core/authenticate.php?as=mfa-idp> in
 your browser and sign in with one of the users defined in
 `development/idp-local/config/authsources.php`.
 
-Go to <http://mfa-sp.local:8081/module.php/core/as_logout.php?ReturnTo=/&AuthId=mfa-idp>
+Go to <http://mfa-sp.local:52021/module.php/core/as_logout.php?ReturnTo=/&AuthId=mfa-idp>
 to logout.
 
 ## Why use an AuthProc for MFA?
