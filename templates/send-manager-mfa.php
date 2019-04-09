@@ -5,7 +5,7 @@ $this->includeAtTemplateBase('includes/header.php');
 ?>
 <p>
   You can send a backup code to your manager to serve as an
-  additional 2-Factor Authentication option.
+  additional 2-Step Verification option.
   The email address on file (masked for privacy) is <?= $this->data['managerEmail'] ?>
 </p>
 <form method="post">
