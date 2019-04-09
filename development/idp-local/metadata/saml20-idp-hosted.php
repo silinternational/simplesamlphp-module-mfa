@@ -9,7 +9,7 @@ use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
  *
  * See: https://simplesamlphp.org/docs/stable/simplesamlphp-reference-idp-hosted
  */
-$metadata['http://mfa-idp.local:8085'] = [
+$metadata['http://mfa-idp.local:52020'] = [
     /*
      * The hostname of the server (VHOST) that will use this SAML entity.
      *

@@ -5,25 +5,6 @@ Feature: Prompt for MFA credentials
     When I login
     Then I should end up at my intended destination
 
-  Scenario: Nag to set up MFA
-    Given I provide credentials that will be nagged to set up MFA
-    When I login
-    Then I should see a message encouraging me to set up MFA
-      And there should be a way to go set up MFA now
-      And there should be a way to continue to my intended destination
-
-  Scenario: Obeying the nag to set up MFA
-    Given I provide credentials that will be nagged to set up MFA
-      And I login
-    When I click the set-up-MFA button
-    Then I should end up at the mfa-setup URL
-
-  Scenario: Ignoring the nag to set up MFA
-    Given I provide credentials that will be nagged to set up MFA
-      And I login
-    When I click the remind-me-later button
-    Then I should end up at my intended destination
-
   Scenario: Needs MFA, but no MFA options are available
     Given I provide credentials that need MFA but have no MFA options available
     When I login
@@ -174,3 +155,65 @@ Feature: Prompt for MFA credentials
       | supports U2F or not  | should or not |
       | supports U2F         | should not    |
       | does not support U2F | should        |
+
+  Scenario Outline: When to show the link to send a manager rescue code
+    Given I provide credentials that have <U2F?><TOTP?><backup codes?>
+    And the user <has or does not have> a manager email
+    When I login
+    Then I <should or should not> see a link to send a code to the user's manager
+
+    Examples:
+      | U2F? |  TOTP?   | backup codes?  | has or does not have | should or should not |
+      | U2F  |          |                | has                  | should               |
+      | U2F  | , TOTP   |                | has                  | should               |
+      | U2F  |          | , backup codes | has                  | should               |
+      | U2F  | , TOTP   | , backup codes | has                  | should               |
+      |      |   TOTP   |                | has                  | should               |
+      |      |   TOTP   | , backup codes | has                  | should               |
+      |      |          |   backup codes | has                  | should               |
+      | U2F  |          |                | does not have        | should not           |
+      | U2F  | , TOTP   |                | does not have        | should not           |
+      | U2F  |          | , backup codes | does not have        | should not           |
+      | U2F  | , TOTP   | , backup codes | does not have        | should not           |
+      |      |   TOTP   |                | does not have        | should not           |
+      |      |   TOTP   | , backup codes | does not have        | should not           |
+      |      |          |   backup codes | does not have        | should not           |
+
+  Scenario: Ask for a code to be sent to my manager
+    Given I provide credentials that have backup codes
+      And the user has a manager email
+      And I login
+    When I click the Request Assistance link
+    Then there should be a way to request a manager code
+
+  Scenario: Submit a code sent to my manager at an earlier time
+    Given I provide credentials that have a manager code
+      And I login
+    When I submit the correct manager code
+    Then I should end up at my intended destination
+
+  Scenario: Submit a correct manager code
+    Given I provide credentials that have backup codes
+      And the user has a manager email
+      And I login
+      And I click the Request Assistance link
+      And I click the Send a code link
+    When I submit the correct manager code
+    Then I should end up at my intended destination
+
+  Scenario: Submit an incorrect manager code
+    Given I provide credentials that have backup codes
+      And the user has a manager email
+      And I login
+      And I click the Request Assistance link
+      And I click the Send a code link
+    When I submit an incorrect manager code
+    Then I should see a message that it was incorrect
+
+  Scenario: Ask for assistance, but change my mind
+    Given I provide credentials that have backup codes
+    And the user has a manager email
+    And I login
+    And I click the Request Assistance link
+    When I click the Cancel button
+    Then I should see a prompt for a backup code

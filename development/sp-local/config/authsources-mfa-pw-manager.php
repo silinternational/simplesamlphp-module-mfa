@@ -12,8 +12,8 @@ $config = [
 
     'mfa-idp' => [
         'saml:SP',
-        'entityID' => 'http://mfa-pw-manager.local:8082',
-        'idp' => 'http://mfa-idp.local:8085',
+        'entityID' => 'http://mfa-pw-manager.local:52022',
+        'idp' => 'http://mfa-idp.local:52020',
         'discoURL' => null,
         'NameIDPolicy' => "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
     ],

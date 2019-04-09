@@ -1,7 +1,6 @@
 <?php
 namespace Sil\SspMfa\Behat\context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Mink\Driver\GoutteDriver;
 use Behat\Mink\Element\DocumentElement;
@@ -407,28 +406,6 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that will be nagged to set up MFA
-     */
-    public function iProvideCredentialsThatWillBeNaggedToSetUpMfa()
-    {
-        // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'nag_for_mfa';
-        $this->password = 'a';
-    }
-
-    /**
-     * @Then I should see a message encouraging me to set up MFA
-     */
-    public function iShouldSeeAMessageEncouragingMeToSetUpMfa()
-    {
-        $page = $this->session->getPage();
-        Assert::assertContains(
-            'increase the security of your account by enabling 2-',
-            $page->getHtml()
-        );
-    }
-
-    /**
      * @Then there should be a way to continue to my intended destination
      */
     public function thereShouldBeAWayToContinueToMyIntendedDestination()
@@ -688,5 +665,111 @@ class MfaContext implements Context
     {
         $page = $this->session->getPage();
         Assert::assertContains('USB Security Keys are not supported', $page->getContent());
+    }
+
+    /**
+     * @Given the user has a manager email
+     */
+    public function theUserHasAManagerEmail()
+    {
+        $this->username .= '_and_mgr';
+    }
+
+    /**
+     * @Then I should see a link to send a code to the user's manager
+     */
+    public function iShouldSeeALinkToSendACodeToTheUsersManager()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains('Can\'t use any of your 2-Step Verification options', $page->getContent());
+    }
+
+    /**
+     * @Given the user does not have a manager email
+     */
+    public function theUserDoesntHaveAManagerEmail()
+    {
+        /*
+         * No change to username needed.
+         */
+    }
+
+    /**
+     * @Then I should not see a link to send a code to the user's manager
+     */
+    public function iShouldNotSeeALinkToSendACodeToTheUsersManager()
+    {
+        $page = $this->session->getPage();
+        Assert::assertNotContains('Send a code</a> to your manager', $page->getContent());
+    }
+
+    /**
+     * @When I click the Request Assistance link
+     */
+    public function iClickTheRequestAssistanceLink()
+    {
+        $this->clickLink('Click here');
+    }
+
+    /**
+     * @When I click the Send a code link
+     */
+    public function iClickTheRequestACodeLink()
+    {
+        $this->submitFormByClickingButtonNamed('send');
+    }
+
+    /**
+     * @Then I should see a prompt for a manager rescue code
+     */
+    public function iShouldSeeAPromptForAManagerRescueCode()
+    {
+        $page = $this->session->getPage();
+        $pageHtml = $page->getHtml();
+        Assert::assertContains('<h2>Manager Rescue Code</h2>', $pageHtml);
+        Assert::assertContains('Enter code', $pageHtml);
+    }
+
+    /**
+     * @When I submit the correct manager code
+     */
+    public function iSubmitTheCorrectManagerCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::CORRECT_VALUE);
+    }
+
+    /**
+     * @When I submit an incorrect manager code
+     */
+    public function iSubmitAnIncorrectManagerCode()
+    {
+        $this->submitMfaValue(FakeIdBrokerClient::INCORRECT_VALUE);
+    }
+
+    /**
+     * @Given I provide credentials that have a manager code
+     */
+    public function iProvideCredentialsThatHaveAManagerCode()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_mgr_code';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Then there should be a way to request a manager code
+     */
+    public function thereShouldBeAWayToRequestAManagerCode()
+    {
+        $page = $this->session->getPage();
+        $this->assertFormContains('name="send"', $page);
+    }
+
+    /**
+     * @When I click the Cancel button
+     */
+    public function iClickTheCancelButton()
+    {
+        $this->submitFormByClickingButtonNamed('cancel');
     }
 }

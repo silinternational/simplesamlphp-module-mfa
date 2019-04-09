@@ -64,6 +64,13 @@ $this->includeAtTemplateBase('includes/header.php');
             ?>
         </ul>
     <?php endif; ?>
+    <?php if ( ! empty($this->data['managerEmail'])): ?>
+        <p>
+            Can't use any of your 2-Step Verification options?
+            <a href="send-manager-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>">
+                Click here</a> for assistance.
+        </p>
+    <?php endif; ?>
 </form>
 <?php
 $this->includeAtTemplateBase('includes/footer.php');

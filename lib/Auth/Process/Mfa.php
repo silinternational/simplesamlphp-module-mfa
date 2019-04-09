@@ -2,7 +2,7 @@
 
 use Psr\Log\LoggerInterface;
 use Sil\PhpEnv\Env;
-use Sil\Idp\IdBroker\Client\exceptions\MfaRateLimitException;
+use Sil\Idp\IdBroker\Client\ServiceException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 use Sil\SspMfa\LoggerFactory;
@@ -21,7 +21,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     const STAGE_SENT_TO_MFA_CHANGE_URL = 'mfa:sent_to_mfa_change_url';
     const STAGE_SENT_TO_MFA_NEEDED_MESSAGE = 'mfa:sent_to_mfa_needed_message';
     const STAGE_SENT_TO_MFA_PROMPT = 'mfa:sent_to_mfa_prompt';
-    const STAGE_SENT_TO_MFA_NAG = 'mfa:sent_to_mfa_nag';
     const STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE = 'mfa:sent_to_new_backup_codes_page';
     const STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE = 'mfa:sent_to_out_of_backup_codes_message';
 
@@ -213,9 +212,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         }
         
         if (LoginBrowser::supportsU2f($userAgent)) {
-            $mfaTypePriority = ['u2f', 'totp', 'backupcode'];
+            $mfaTypePriority = ['manager', 'u2f', 'totp', 'backupcode'];
         } else {
-            $mfaTypePriority = ['totp', 'backupcode', 'u2f'];
+            $mfaTypePriority = ['manager', 'totp', 'backupcode', 'u2f'];
         }
         
         foreach ($mfaTypePriority as $mfaType) {
@@ -263,6 +262,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             'backupcode' => 'mfa:prompt-for-mfa-backupcode.php',
             'totp' => 'mfa:prompt-for-mfa-totp.php',
             'u2f' => 'mfa:prompt-for-mfa-u2f.php',
+            'manager' => 'mfa:prompt-for-mfa-manager.php',
         ];
         $template = $mfaOptionTemplates[$mfaType] ?? null;
         
@@ -328,7 +328,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 'error' => $t->getCode() . ': ' . $t->getMessage(),
             ]));
         }
-        
+
+        self::updateStateWithNewMfaData($state, $logger);
+
         $state['newBackupCodes'] = $newBackupCodes ?? null;
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE);
         $url = SimpleSAML\Module::getModuleURL('mfa/new-backup-codes.php');
@@ -412,33 +414,41 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         try {
             $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
-            $validMfa = $idBrokerClient->mfaVerify(
+            $mfaDataFromBroker = $idBrokerClient->mfaVerify(
                 $mfaId,
                 $employeeId,
                 $mfaSubmission
             );
-            if (! $validMfa) {
-                if ($mfaType === 'backupcode') {
-                    return 'Incorrect 2-step verification code. Printable backup codes can only be used once, please try a different code.';
-                }
-                return 'Incorrect 2-step verification code.';
-            }
         } catch (\Throwable $t) {
-            if ($t instanceof MfaRateLimitException) {
-                $logger->error(json_encode([
-                    'event' => 'MFA is rate-limited',
-                    'employeeId' => $employeeId,
-                    'mfaId' => $mfaId,
-                    'mfaType' => $mfaType,
-                ]));
-                return 'There have been too many wrong answers recently. '
-                     . 'Please wait a minute, then try again.';
+            $message = 'Something went wrong while we were trying to do the '
+                . '2-step verification.';
+            if ($t instanceof ServiceException) {
+                if ($t->httpStatusCode === 400) {
+                    if ($mfaType === 'backupcode') {
+                        return 'Incorrect 2-step verification code. Printable backup '
+                            . 'codes can only be used once, please try a different code.';
+                    }
+                    return 'Incorrect 2-step verification code.';
+                } elseif ($t->httpStatusCode === 429){
+                    $logger->error(json_encode([
+                        'event' => 'MFA is rate-limited',
+                        'employeeId' => $employeeId,
+                        'mfaId' => $mfaId,
+                        'mfaType' => $mfaType,
+                    ]));
+                    return 'There have been too many wrong answers recently. '
+                        . 'Please wait a minute, then try again.';
+                } else {
+                    $message .= ' (code ' . $t->httpStatusCode . ')';
+                    return $message;
+                }
             }
             
             $logger->critical($t->getCode() . ': ' . $t->getMessage());
-            return 'Something went wrong while we were trying to do the '
-                 . '2-step verification.';
+            return $message;
         }
+
+        self::updateStateWithNewMfaData($state, $logger);
 
         // Set remember me cookies if requested
         if ($rememberMe) {
@@ -470,8 +480,16 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 throw new \Exception('Failed to send user to low-on-backup-codes page.');
             }
         }
-        
-        //unset($state['Attributes']['mfa']);
+
+        /*
+         * If the user had to use a manager code, show the profile review page.
+         */
+        if ($mfaType === 'manager' && isset($state['Attributes']['profile_review'])) {
+            $state['Attributes']['profile_review'] = 'yes';
+        }
+
+        unset($state['Attributes']['manager_email']);
+
         // The following function call will never return.
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
         throw new \Exception('Failed to resume processing auth proc chain.');
@@ -535,20 +553,13 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
                 return;
             }
             
-            if ($isHeadedToMfaSetupUrl) {
+            if (! $isHeadedToMfaSetupUrl) {
+                $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
                 return;
             }
-            
-            $this->redirectToMfaNeededMessage($state, $employeeId, $this->mfaSetupUrl);
-            return;
-        } elseif (self::shouldNagToSetUpMfa($mfa)) {
-            if ($isHeadedToMfaSetupUrl) {
-                return;
-            }
-            
-            $this->redirectToMfaNag($state, $employeeId, $this->mfaSetupUrl);
-            return;
         }
+
+        unset($state['Attributes']['manager_email']);
     }
     
     /**
@@ -579,33 +590,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     }
 
     /**
-     * Redirect user to nag page encouraging them to setup MFA
-     *
-     * @param array $state The state data.
-     * @param string $employeeId The Employee ID of the user account.
-     * @param string $mfaSetupUrl URL to MFA setup process
-     */
-    protected function redirectToMfaNag(&$state, $employeeId, $mfaSetupUrl)
-    {
-        assert('is_array($state)');
-
-        $this->logger->info(sprintf(
-            'mfa: Redirecting Employee ID %s to MFA nag message.',
-            var_export($employeeId, true)
-        ));
-
-        /* Save state and redirect. */
-        $state['employeeId'] = $employeeId;
-        $state['mfaLearnMoreUrl'] = $this->mfaLearnMoreUrl;
-        $state['mfaSetupUrl'] = $mfaSetupUrl;
-
-        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NAG);
-        $url = SimpleSAML\Module::getModuleURL('mfa/nag-for-mfa.php');
-
-        HTTP::redirectTrustedURL($url, array('StateId' => $stateId));
-    }
-    
-    /**
      * Redirect the user to the appropriate MFA-prompt page.
      *
      * @param array $state The state data.
@@ -619,6 +603,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         /** @todo Check for valid remember-me cookies here rather doing a redirect first. */
         
         $state['mfaOptions'] = $mfaOptions;
+        $state['managerEmail'] = self::getManagerEmail($state);
         $state['idBrokerConfig'] = [
             'accessToken' => $this->idBrokerAccessToken,
             'assertValidIp' => $this->idBrokerAssertValidIp,
@@ -759,13 +744,165 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         setcookie('c2', $expireDate, $expireDate, '/', null, $secureCookie, true);
     }
     
-    protected static function shouldNagToSetUpMfa($mfa)
-    {
-        return (strtolower($mfa['nag']) === 'yes');
-    }
-    
     protected static function shouldPromptForMfa($mfa)
     {
         return (strtolower($mfa['prompt']) !== 'no');
+    }
+
+    /**
+     * Send a rescue code to the manager, then redirect the user to a page where they
+     * can enter the code.
+     *
+     * NOTE: This function never returns.
+     *
+     * @param array $state The state data.
+     * @param LoggerInterface $logger A PSR-3 compatible logger.
+     */
+    public static function sendManagerCode(array &$state, $logger)
+    {
+        try {
+            $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
+            $mfaOption = $idBrokerClient->mfaCreate($state['employeeId'], 'manager');
+            $mfaOption['type'] = 'manager';
+
+            $logger->warning(json_encode([
+                'event' => 'Manager rescue code sent',
+                'employeeId' => $state['employeeId'],
+            ]));
+        } catch (\Throwable $t) {
+            $logger->error(json_encode([
+                'event' => 'Manager rescue code: failed',
+                'employeeId' => $state['employeeId'],
+                'error' => $t->getCode() . ': ' . $t->getMessage(),
+            ]));
+        }
+
+        $mfaOptions = $state['mfaOptions'];
+
+        /*
+         * Add this option into the list, giving it a key so `mfaOptions` doesn't get multiple entries
+         * if the user tries multiple times.
+         */
+        $mfaOptions['manager'] = $mfaOption;
+        $state['mfaOptions'] = $mfaOptions;
+        $state['managerEmail'] = self::getManagerEmail($state);
+        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
+
+        $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
+
+        HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
+    }
+
+    /**
+     * Get masked copy of manager_email, or null if it isn't available.
+     *
+     * @param array $state
+     * @return string|null
+     */
+    public static function getManagerEmail($state)
+    {
+        $managerEmail = $state['Attributes']['manager_email'] ?? [''];
+        if (empty($managerEmail[0])) {
+            return null;
+        }
+        return self::maskEmail($managerEmail[0]);
+    }
+
+    /**
+     * Get the manager MFA, if it exists. Otherwise, return null.
+     *
+     * @param array[] $mfaOptions The available MFA options.
+     * @return array The manager MFA.
+     * @throws \InvalidArgumentException
+     */
+    public static function getManagerMfa($mfaOptions)
+    {
+        foreach ($mfaOptions as $mfaOption) {
+            if ($mfaOption['type'] === 'manager') {
+                return $mfaOption;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $email an email address
+     * @return string with most letters changed to asterisks
+     */
+    public static function maskEmail($email)
+    {
+        list($part1, $domain) = explode('@', $email);
+        $newEmail = '';
+        $useRealChar = true;
+
+        /*
+         * Replace all characters with '*', except
+         * the first one, the last one, underscores and each
+         * character that follows and underscore.
+         */
+        foreach (str_split($part1) as $nextChar) {
+            if ($useRealChar) {
+                $newEmail .= $nextChar;
+                $useRealChar = false;
+            } else if ($nextChar === '_') {
+                $newEmail .= $nextChar;
+                $useRealChar = true;
+            } else {
+                $newEmail .= '*';
+            }
+        }
+
+        // replace the last * with the last real character
+        $newEmail = substr($newEmail, 0, -1);
+        $newEmail .= substr($part1, -1);
+        $newEmail .= '@';
+
+        /*
+         * Add an '*' for each of the characters of the domain, except
+         * for the first character of each part and the .
+         */
+        list($domainA, $domainB) = explode('.', $domain);
+
+        $newEmail .= substr($domainA, 0, 1);
+        $newEmail .= str_repeat('*', strlen($domainA) - 1);
+        $newEmail .= '.';
+
+        $newEmail .= substr($domainB, 0, 1);
+        $newEmail .= str_repeat('*', strlen($domainB) - 1);
+        return $newEmail;
+    }
+
+    /**
+     * @param array $state
+     * @param LoggerInterface $logger
+     */
+    protected static function updateStateWithNewMfaData(&$state, $logger)
+    {
+        $idBrokerClient = self::getIdBrokerClient($state['idBrokerConfig']);
+
+        $log = [
+            'event' => 'Update state with new mfa data',
+        ];
+
+        try {
+            $newMfaOptions = $idBrokerClient->mfaList($state['employeeId']);
+        } catch (\Exception $e) {
+            $log['status'] = 'failed: id-broker exception';
+            $logger->error(json_encode($log));
+            return;
+        }
+
+        if (empty($newMfaOptions)) {
+            $log['status'] = 'failed: no data provided';
+            $logger->warning(json_encode($log));
+            return;
+        }
+
+        $state['Attributes']['mfa']['options'] = $newMfaOptions;
+
+        $log['data'] = $newMfaOptions;
+        $log['status'] = 'updated';
+        $logger->warning(json_encode($log));
     }
 }

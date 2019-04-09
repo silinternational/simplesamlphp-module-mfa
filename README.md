@@ -65,9 +65,27 @@ the Vagrantfile if you are running docker within the Vagrant VM).
 Run `make test`.
 
 ### Manual Testing ###
-Go to <http://mfa-sp.local:8081/module.php/core/authenticate.php?as=mfa-idp> in
+Go to <http://mfa-sp.local:52021/module.php/core/authenticate.php?as=mfa-idp> in
 your browser and sign in with one of the users defined in
 `development/idp-local/config/authsources.php`.
+
+Go to <http://mfa-sp.local:52021/module.php/core/as_logout.php?ReturnTo=/&AuthId=mfa-idp>
+to logout.
+
+## Why use an AuthProc for MFA?
+Based on...
+
+- the existence of multiple other simpleSAMLphp modules used for MFA and
+  implemented as AuthProcs,
+- implementing my solution as an AuthProc and having a number of tests that all
+  confirm that it is working as desired, and
+- a discussion in the SimpleSAMLphp mailing list about this:  
+  https://groups.google.com/d/msg/simplesamlphp/ocQols0NCZ8/RL_WAcryBwAJ
+
+... it seems sufficiently safe to implement MFA using a simpleSAMLphp AuthProc.
+
+For more of the details, please see this Stack Overflow Q&A:  
+https://stackoverflow.com/q/46566014/3813891
 
 ## Contributing ##
 To contribute, please submit issues or pull requests at 
