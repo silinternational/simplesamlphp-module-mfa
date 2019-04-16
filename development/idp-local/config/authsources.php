@@ -13,15 +13,14 @@ $config = [
             'mail' => ['no_mfa_needed@example.com'],
             'employeeNumber' => ['11111'],
             'cn' => ['NO_MFA_NEEDED'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'no',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -33,15 +32,14 @@ $config = [
             'mail' => ['must_set_up_mfa@example.com'],
             'employeeNumber' => ['22222'],
             'cn' => ['MUST_SET_UP_MFA'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -53,10 +51,10 @@ $config = [
             'mail' => ['has_backupcode@example.com'],
             'employeeNumber' => ['33333'],
             'cn' => ['HAS_BACKUPCODE'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '7',
@@ -69,7 +67,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -81,10 +78,10 @@ $config = [
             'mail' => ['has_backupcode@example.com'],
             'employeeNumber' => ['33333'],
             'cn' => ['HAS_BACKUPCODE'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '7',
@@ -97,7 +94,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -110,10 +106,10 @@ $config = [
             'mail' => ['has_totp@example.com'],
             'employeeNumber' => ['44444'],
             'cn' => ['HAS_TOTP'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '2',
@@ -124,7 +120,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -136,10 +131,10 @@ $config = [
             'mail' => ['has_totp@example.com'],
             'employeeNumber' => ['44444'],
             'cn' => ['HAS_TOTP'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '2',
@@ -150,7 +145,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -163,10 +157,10 @@ $config = [
             'mail' => ['has_u2f@example.com'],
             'employeeNumber' => ['55555'],
             'cn' => ['HAS_U2F'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '3',
@@ -177,7 +171,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -189,10 +182,10 @@ $config = [
             'mail' => ['has_u2f@example.com'],
             'employeeNumber' => ['55555'],
             'cn' => ['HAS_U2F'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '3',
@@ -203,7 +196,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -216,10 +208,10 @@ $config = [
             'mail' => ['has_all@example.com'],
             'employeeNumber' => ['777777'],
             'cn' => ['HAS_ALL'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '1',
@@ -242,7 +234,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -255,10 +246,10 @@ $config = [
             'mail' => ['has_rate_limited_mfa@example.com'],
             'employeeNumber' => ['88888'],
             'cn' => ['HAS_RATE_LIMITED_MFA'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => FakeIdBrokerClient::RATE_LIMITED_MFA_ID,
@@ -271,7 +262,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -283,10 +273,10 @@ $config = [
             'mail' => ['has_4_backupcodes@example.com'],
             'employeeNumber' => ['99999'],
             'cn' => ['HAS_4_BACKUPCODES'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '90',
@@ -299,7 +289,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -311,10 +300,10 @@ $config = [
             'mail' => ['has_1_backupcode_only@example.com'],
             'employeeNumber' => ['00010'],
             'cn' => ['HAS_1_BACKUPCODE_ONLY'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '100',
@@ -327,7 +316,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -339,10 +327,10 @@ $config = [
             'mail' => ['has_1_backupcode_plus@example.com'],
             'employeeNumber' => ['00011'],
             'cn' => ['HAS_1_BACKUPCODE_PLUS'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '110',
@@ -360,7 +348,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -372,10 +359,10 @@ $config = [
             'mail' => ['has_u2f_totp@example.com'],
             'employeeNumber' => ['00012'],
             'cn' => ['HAS_U2F_TOTP'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '120',
@@ -391,7 +378,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -403,10 +389,10 @@ $config = [
             'mail' => ['has_u2f_totp@example.com'],
             'employeeNumber' => ['00012'],
             'cn' => ['HAS_U2F_TOTP'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '120',
@@ -422,7 +408,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -435,10 +420,10 @@ $config = [
             'mail' => ['has_u2f_backupcodes@example.com'],
             'employeeNumber' => ['00013'],
             'cn' => ['HAS_U2F_BACKUPCODES'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '130',
@@ -456,7 +441,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -468,10 +452,10 @@ $config = [
             'mail' => ['has_u2f_backupcodes@example.com'],
             'employeeNumber' => ['00013'],
             'cn' => ['HAS_U2F_BACKUPCODES'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '130',
@@ -489,7 +473,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -502,10 +485,10 @@ $config = [
             'mail' => ['has_u2f_totp_backupcodes@example.com'],
             'employeeNumber' => ['00014'],
             'cn' => ['HAS_U2F_TOTP_BACKUPCODES'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '140',
@@ -528,7 +511,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -540,10 +522,10 @@ $config = [
             'mail' => ['has_u2f_totp_backupcodes@example.com'],
             'employeeNumber' => ['00014'],
             'cn' => ['HAS_U2F_TOTP_BACKUPCODES'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '140',
@@ -566,7 +548,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -579,10 +560,10 @@ $config = [
             'mail' => ['has_totp_backupcodes@example.com'],
             'employeeNumber' => ['00015'],
             'cn' => ['HAS_TOTP_BACKUPCODES'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '150',
@@ -600,7 +581,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
         ],
@@ -612,10 +592,10 @@ $config = [
             'mail' => ['has_totp_backupcodes@example.com'],
             'employeeNumber' => ['00015'],
             'cn' => ['HAS_TOTP_BACKUPCODES'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '150',
@@ -633,7 +613,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
@@ -646,10 +625,10 @@ $config = [
             'mail' => ['has_mgr_code@example.com'],
             'employeeNumber' => ['00015'],
             'cn' => ['HAS_MGR_CODE'],
+            'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [
                     [
                         'id' => '151',
@@ -667,7 +646,6 @@ $config = [
             ],
             'method' => [
                 'add' => 'no',
-                'review' => 'no',
                 'options' => [],
             ],
             'manager_email' => ['manager@example.com'],
