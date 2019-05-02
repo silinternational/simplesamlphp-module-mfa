@@ -669,7 +669,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     ): string {
         $allMfaIds = '';
         foreach ($mfaOptions as $opt) {
-            $allMfaIds .= $opt['id'];
+            if ($opt['type'] !== 'manager') {
+                $allMfaIds .= $opt['id'];
+            }
         }
 
         $string = $rememberSecret . $employeeId . $expireDate . $allMfaIds;
