@@ -25,7 +25,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     const STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE = 'mfa:sent_to_out_of_backup_codes_message';
 
     private $employeeIdAttr = null;
-    private $mfaLearnMoreUrl = null;
     private $mfaSetupUrl = null;
     
     private $idBrokerAccessToken = null;
@@ -61,8 +60,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
             'idBrokerAccessToken',
             'idBrokerBaseUri',
         ]);
-        
-        $this->mfaLearnMoreUrl = $config['mfaLearnMoreUrl'] ?? null;
         
         $tempTrustedIpRanges = $config['idBrokerTrustedIpRanges'] ?? '';
         if (! empty($tempTrustedIpRanges)) {
@@ -580,7 +577,6 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         
         /* Save state and redirect. */
         $state['employeeId'] = $employeeId;
-        $state['mfaLearnMoreUrl'] = $this->mfaLearnMoreUrl;
         $state['mfaSetupUrl'] = $mfaSetupUrl;
         
         $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
@@ -673,7 +669,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     ): string {
         $allMfaIds = '';
         foreach ($mfaOptions as $opt) {
-            $allMfaIds .= $opt['id'];
+            if ($opt['type'] !== 'manager') {
+                $allMfaIds .= $opt['id'];
+            }
         }
 
         $string = $rememberSecret . $employeeId . $expireDate . $allMfaIds;

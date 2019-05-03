@@ -3,7 +3,7 @@ version: '2'
 services:
   
   mfaidp:
-    image: silintl/ssp-base:develop-5.0
+    image: silintl/ssp-base:develop
     volumes:
       - ./:/mfa
       - ./development/enable-debug.sh:/data/enable-debug.sh
@@ -48,7 +48,7 @@ services:
     command: /data/run-dev.sh
   
   mfasp:
-    image: silintl/ssp-base:develop-5.0
+    image: silintl/ssp-base:develop
     volumes:
       # Utilize custom certs
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
@@ -68,7 +68,7 @@ services:
       - THEME_USE=default
   
   mfapwmanager:
-    image: silintl/ssp-base:develop-5.0
+    image: silintl/ssp-base:develop
     volumes:
       # Utilize custom certs
       - ./development/sp-local/cert:/data/vendor/simplesamlphp/simplesamlphp/cert
