@@ -9,14 +9,20 @@
 
 use Sil\SspMfa\LoggerFactory;
 use Sil\SspMfa\LoginBrowser;
+use SimpleSAML\Auth\ProcessingChain;
+use SimpleSAML\Auth\State;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error\BadRequest;
+use SimpleSAML\Utils\HTTP;
+use SimpleSAML\XHTML\Template;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId');
 if (empty($stateId)) {
-    throw new SimpleSAML_Error_BadRequest('Missing required StateId query parameter.');
+    throw new BadRequest('Missing required StateId query parameter.');
 }
 
-$state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_PROMPT);
+$state = State::loadState($stateId, Mfa::STAGE_SENT_TO_MFA_PROMPT);
 $mfaOptions = $state['mfaOptions'] ?? [];
 
 $logger = LoggerFactory::getAccordingToState($state);
@@ -35,7 +41,7 @@ if (Mfa::isRememberMeCookieValid(base64_decode($cookieHash), $expireDate, $mfaOp
     unset($state['Attributes']['manager_email']);
 
     // This condition should never return
-    SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+    ProcessingChain::resumeProcessing($state);
     throw new \Exception('Failed to resume processing auth proc chain.');
 }
 
@@ -54,7 +60,7 @@ if (empty($mfaId)) {
         'mfaId' => $mfaOption['id'],
         'StateId' => $stateId,
     ]);
-    SimpleSAML_Utilities::redirect($moduleUrl);
+    HTTP::redirectTrustedURL($moduleUrl);
     return;
 }
 $mfaOption = Mfa::getMfaOptionById($mfaOptions, $mfaId);
@@ -87,11 +93,11 @@ if (filter_has_var(INPUT_POST, 'submitMfa')) {
     ]));
 }
 
-$globalConfig = SimpleSAML_Configuration::getInstance();
+$globalConfig = Configuration::getInstance();
 
 $mfaTemplateToUse = Mfa::getTemplateFor($mfaOption['type']);
 
-$t = new SimpleSAML_XHTML_Template($globalConfig, $mfaTemplateToUse);
+$t = new Template($globalConfig, $mfaTemplateToUse);
 $t->data['errorMessage'] = $errorMessage ?? null;
 $t->data['mfaOption'] = $mfaOption;
 $t->data['mfaOptions'] = $mfaOptions;

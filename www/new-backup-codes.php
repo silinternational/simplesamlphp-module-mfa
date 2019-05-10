@@ -8,27 +8,32 @@
  */
 
 use Sil\SspMfa\LoggerFactory;
+use SimpleSAML\Auth\ProcessingChain;
+use SimpleSAML\Auth\State;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error\BadRequest;
+use SimpleSAML\XHTML\Template;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId') ?? null;
 if (empty($stateId)) {
-    throw new SimpleSAML_Error_BadRequest('Missing required StateId query parameter.');
+    throw new BadRequest('Missing required StateId query parameter.');
 }
 
-$state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE);
+$state = State::loadState($stateId, Mfa::STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE);
 $logger = LoggerFactory::getAccordingToState($state);
 
 // If the user pressed the continue button...
 if (filter_has_var(INPUT_POST, 'continue')) {
     unset($state['Attributes']['manager_email']);
 
-    SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+    ProcessingChain::resumeProcessing($state);
     return;
 }
 
-$globalConfig = SimpleSAML_Configuration::getInstance();
+$globalConfig = Configuration::getInstance();
 
-$t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:new-backup-codes.php');
+$t = new Template($globalConfig, 'mfa:new-backup-codes.php');
 $t->data['mfaSetupUrl'] = $state['mfaSetupUrl'];
 $t->data['newBackupCodes'] = $state['newBackupCodes'] ?? [];
 $t->show();

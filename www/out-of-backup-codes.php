@@ -1,14 +1,19 @@
 <?php
 
 use Sil\SspMfa\LoggerFactory;
+use SimpleSAML\Auth\ProcessingChain;
+use SimpleSAML\Auth\State;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error\BadRequest;
+use SimpleSAML\XHTML\Template;
 use sspmod_mfa_Auth_Process_Mfa as Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId') ?? null;
 if (empty($stateId)) {
-    throw new SimpleSAML_Error_BadRequest('Missing required StateId query parameter.');
+    throw new BadRequest('Missing required StateId query parameter.');
 }
 
-$state = SimpleSAML_Auth_State::loadState($stateId, Mfa::STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE);
+$state = State::loadState($stateId, Mfa::STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE);
 $logger = LoggerFactory::getAccordingToState($state);
 $hasOtherMfaOptions = Mfa::hasMfaOptionsOtherThan('backupcode', $state);
 
@@ -20,13 +25,13 @@ if (filter_has_var(INPUT_POST, 'getMore')) {
     unset($state['Attributes']['manager_email']);
 
     // The user pressed the remind-me-later button.
-    SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+    ProcessingChain::resumeProcessing($state);
     return;
 }
 
-$globalConfig = SimpleSAML_Configuration::getInstance();
+$globalConfig = Configuration::getInstance();
 
-$t = new SimpleSAML_XHTML_Template($globalConfig, 'mfa:out-of-backup-codes.php');
+$t = new Template($globalConfig, 'mfa:out-of-backup-codes.php');
 $t->data['hasOtherMfaOptions'] = $hasOtherMfaOptions;
 $t->show();
 

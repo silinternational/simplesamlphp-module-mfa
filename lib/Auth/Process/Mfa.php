@@ -7,6 +7,10 @@ use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 use Sil\SspMfa\LoggerFactory;
 use Sil\SspMfa\LoginBrowser;
+use SimpleSAML\Auth\ProcessingChain;
+use SimpleSAML\Auth\ProcessingFilter;
+use SimpleSAML\Auth\State;
+use SimpleSAML\Module;
 use SimpleSAML\Utils\HTTP;
 
 /**
@@ -14,7 +18,7 @@ use SimpleSAML\Utils\HTTP;
  *
  * See README.md for sample (and explanation of) expected configuration.
  */
-class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
+class sspmod_mfa_Auth_Process_Mfa extends ProcessingFilter
 {
     const SESSION_TYPE = 'mfa';
     const STAGE_SENT_TO_LOW_ON_BACKUP_CODES_NAG = 'mfa:sent_to_low_on_backup_codes_nag';
@@ -329,8 +333,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         self::updateStateWithNewMfaData($state, $logger);
 
         $state['newBackupCodes'] = $newBackupCodes ?? null;
-        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE);
-        $url = SimpleSAML\Module::getModuleURL('mfa/new-backup-codes.php');
+        $stateId = State::saveState($state, self::STAGE_SENT_TO_NEW_BACKUP_CODES_PAGE);
+        $url = Module::getModuleURL('mfa/new-backup-codes.php');
         
         HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
@@ -488,7 +492,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         unset($state['Attributes']['manager_email']);
 
         // The following function call will never return.
-        SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
+        ProcessingChain::resumeProcessing($state);
         throw new \Exception('Failed to resume processing auth proc chain.');
     }
     
@@ -523,7 +527,7 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     /**
      * Apply this AuthProc Filter. It will either return (indicating that it
      * has completed) or it will redirect the user, in which case it will
-     * later call `SimpleSAML_Auth_ProcessingChain::resumeProcessing($state)`.
+     * later call `SimpleSAML\Auth\ProcessingChain::resumeProcessing($state)`.
      *
      * @param array &$state The current state.
      */
@@ -579,8 +583,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $state['employeeId'] = $employeeId;
         $state['mfaSetupUrl'] = $mfaSetupUrl;
         
-        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
-        $url = SimpleSAML\Module::getModuleURL('mfa/must-set-up-mfa.php');
+        $stateId = State::saveState($state, self::STAGE_SENT_TO_MFA_NEEDED_MESSAGE);
+        $url = Module::getModuleURL('mfa/must-set-up-mfa.php');
         
         HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
@@ -616,8 +620,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         /* Save state and redirect. */
         $state['employeeId'] = $employeeId;
         
-        $id = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
-        $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
+        $id = State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
+        $url = Module::getModuleURL('mfa/prompt-for-mfa.php');
 
         $mfaOption = self::getMfaOptionToUse($mfaOptions, LoginBrowser::getUserAgent());
         
@@ -697,8 +701,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $state['employeeId'] = $employeeId;
         $state['numBackupCodesRemaining'] = $numBackupCodesRemaining;
         
-        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_LOW_ON_BACKUP_CODES_NAG);
-        $url = SimpleSAML\Module::getModuleURL('mfa/low-on-backup-codes.php');
+        $stateId = State::saveState($state, self::STAGE_SENT_TO_LOW_ON_BACKUP_CODES_NAG);
+        $url = Module::getModuleURL('mfa/low-on-backup-codes.php');
         
         HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
@@ -716,8 +720,8 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
     {
         $state['employeeId'] = $employeeId;
         
-        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE);
-        $url = SimpleSAML\Module::getModuleURL('mfa/out-of-backup-codes.php');
+        $stateId = State::saveState($state, self::STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE);
+        $url = Module::getModuleURL('mfa/out-of-backup-codes.php');
         
         HTTP::redirectTrustedURL($url, ['StateId' => $stateId]);
     }
@@ -784,9 +788,9 @@ class sspmod_mfa_Auth_Process_Mfa extends SimpleSAML_Auth_ProcessingFilter
         $mfaOptions['manager'] = $mfaOption;
         $state['mfaOptions'] = $mfaOptions;
         $state['managerEmail'] = self::getManagerEmail($state);
-        $stateId = SimpleSAML_Auth_State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
+        $stateId = State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
 
-        $url = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php');
+        $url = Module::getModuleURL('mfa/prompt-for-mfa.php');
 
         HTTP::redirectTrustedURL($url, ['mfaId' => $mfaOption['id'], 'StateId' => $stateId]);
     }
