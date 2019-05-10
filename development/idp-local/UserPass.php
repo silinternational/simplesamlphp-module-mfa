@@ -59,7 +59,7 @@ class UserPass extends \SimpleSAML\Module\core\Auth\UserPassBase
 //                throw new \Exception('Invalid attributes for user '.$username.
 //                    ' in authentication source '.$this->authId.': '.$e->getMessage());
 //            }
-//            $this->users[$username.':'.$password] = $attributes;
+            $this->users[$username.':'.$password] = $attributes;
         }
     }
 
