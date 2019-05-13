@@ -44,12 +44,13 @@ class Mfa extends ProcessingFilter
     
     /** @var string */
     protected $loggerClass;
-    
+
     /**
      * Initialize this filter.
      *
-     * @param array $config  Configuration information about this filter.
-     * @param mixed $reserved  For future use.
+     * @param array $config Configuration information about this filter.
+     * @param mixed $reserved For future use.
+     * @throws \Exception
      */
     public function __construct($config, $reserved)
     {
@@ -173,7 +174,7 @@ class Mfa extends ProcessingFilter
             IdBrokerClient::ASSERT_VALID_BROKER_IP_CONFIG => $assertValidIp,
         ]);
     }
-    
+
     /**
      * Get the MFA type to use based on the available options.
      *
@@ -181,6 +182,7 @@ class Mfa extends ProcessingFilter
      * @param int $mfaId The ID of the desired MFA option.
      * @return array The MFA option to use.
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public static function getMfaOptionById($mfaOptions, $mfaId)
     {
@@ -198,7 +200,7 @@ class Mfa extends ProcessingFilter
             'No MFA option has an ID of ' . var_export($mfaId, true)
         );
     }
-    
+
     /**
      * Get the MFA type to use based on the available options.
      *
@@ -207,6 +209,7 @@ class Mfa extends ProcessingFilter
      *     for detecting U2F support.
      * @return array The MFA option to use.
      * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public static function getMfaOptionToUse($mfaOptions, $userAgent)
     {
@@ -277,13 +280,13 @@ class Mfa extends ProcessingFilter
         }
         return $template;
     }
-    
+
     /**
      * Return the saml:RelayState if it begins with "http" or "https". Otherwise
      * return an empty string.
      *
      * @param array $state
-     * @returns string
+     * @return string
      */
     protected static function getRelayStateUrl($state)
     {
@@ -382,7 +385,7 @@ class Mfa extends ProcessingFilter
         }
         return false;
     }
-    
+
     /**
      * Validate the given MFA submission. If successful, this function
      * will NOT return. If the submission does not pass validation, an error
@@ -397,6 +400,7 @@ class Mfa extends ProcessingFilter
      * @param string $mfaType The type of the MFA ('u2f', 'totp', 'backupcode').
      * @return void|string If validation fails, an error message to show to the
      *     end user will be returned.
+     * @throws \Sil\PhpEnv\EnvVarNotFoundException
      */
     public static function validateMfaSubmission(
         $mfaId,
@@ -597,6 +601,7 @@ class Mfa extends ProcessingFilter
      * @param array $state The state data.
      * @param string $employeeId The Employee ID of the user account.
      * @param array $mfaOptions Array of MFA options
+     * @throws \Exception
      */
     protected function redirectToMfaPrompt(&$state, $employeeId, $mfaOptions)
     {
@@ -640,6 +645,7 @@ class Mfa extends ProcessingFilter
      * @param $mfaOptions
      * @param $state
      * @return bool
+     * @throws \Sil\PhpEnv\EnvVarNotFoundException
      */
     public static function isRememberMeCookieValid(
         string $cookieHash,
@@ -733,6 +739,7 @@ class Mfa extends ProcessingFilter
      * @param string $employeeId
      * @param array $mfaOptions
      * @param string $rememberDuration
+     * @throws \Sil\PhpEnv\EnvVarNotFoundException
      */
     public static function setRememberMeCookies(
         string $employeeId,
