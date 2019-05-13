@@ -514,7 +514,7 @@ class Mfa extends ProcessingFilter
         // Tell the MFA-setup URL where the user is ultimately trying to go (if known).
         $currentDestination = self::getRelayStateUrl($state);
         if (! empty($currentDestination)) {
-            $mfaSetupUrl = SimpleSAML\Utils\HTTP::addURLParameters(
+            $mfaSetupUrl = HTTP::addURLParameters(
                 $mfaSetupUrl,
                 ['returnTo' => $currentDestination]
             );
