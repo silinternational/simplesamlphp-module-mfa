@@ -1,5 +1,7 @@
 <?php
 
+namespace SimpleSAML\Module\mfa\Auth\Process;
+
 use Psr\Log\LoggerInterface;
 use Sil\PhpEnv\Env;
 use Sil\Idp\IdBroker\Client\ServiceException;
@@ -18,7 +20,7 @@ use SimpleSAML\Utils\HTTP;
  *
  * See README.md for sample (and explanation of) expected configuration.
  */
-class sspmod_mfa_Auth_Process_Mfa extends ProcessingFilter
+class Mfa extends ProcessingFilter
 {
     const SESSION_TYPE = 'mfa';
     const STAGE_SENT_TO_LOW_ON_BACKUP_CODES_NAG = 'mfa:sent_to_low_on_backup_codes_nag';
@@ -92,12 +94,12 @@ class sspmod_mfa_Auth_Process_Mfa extends ProcessingFilter
      * @param string $attribute The name of the attribute.
      * @param mixed $value The value to check.
      * @param LoggerInterface $logger The logger.
-     * @throws Exception
+     * @throws \Exception
      */
     public static function validateConfigValue($attribute, $value, $logger)
     {
         if (empty($value) || !is_string($value)) {
-            $exception = new Exception(sprintf(
+            $exception = new \Exception(sprintf(
                 'The value we have for %s (%s) is empty or is not a string',
                 $attribute,
                 var_export($value, true)

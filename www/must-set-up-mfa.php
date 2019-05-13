@@ -5,7 +5,7 @@ use SimpleSAML\Auth\State;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error\BadRequest;
 use SimpleSAML\XHTML\Template;
-use sspmod_mfa_Auth_Process_Mfa as Mfa;
+use SimpleSAML\Module\mfa\Auth\Process\Mfa;
 
 $stateId = filter_input(INPUT_GET, 'StateId') ?? null;
 if (empty($stateId)) {
