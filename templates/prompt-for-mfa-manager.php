@@ -20,6 +20,9 @@ if (! empty($this->data['errorMessage'])) {
     <p>
         Enter code: <input type="text" id="mfaSubmission" name="mfaSubmission" />
         <br />
+        <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
+        <label for="rememberMe">Remember this computer for 30 days</label>
+        <br />
         <button type="submit" id="submitMfa" name="submitMfa"
                 style="padding: 4px 8px;">Submit</button>
     </p>
