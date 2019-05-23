@@ -10,7 +10,7 @@ use Sil\SspMfa\LoggerFactory;
 use SimpleSAML\Auth\State;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error\BadRequest;
-use SimpleSAML\Utilities;
+use SimpleSAML\Utils\HTTP;
 use SimpleSAML\XHTML\Template;
 use SimpleSAML\Module\mfa\Auth\Process\Mfa;
 
@@ -29,7 +29,7 @@ if (filter_has_var(INPUT_POST, 'send')) {
     $moduleUrl = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php', [
         'StateId' => $stateId,
     ]);
-    Utilities::redirect($moduleUrl);
+    HTTP::redirectTrustedURL($moduleUrl);
 }
 
 $globalConfig = Configuration::getInstance();
