@@ -11,12 +11,12 @@
   ],
   "minimum-stability": "stable",
   "require": {
-    "php": ">=7.0",
+    "php": ">=7.2",
     "ext-json": "*",
     "roave/security-advisories": "dev-master",
     "silinternational/php-env": "^2.1",
     "silinternational/psr3-adapters": "^1.1 || ^2.0",
-    "simplesamlphp/simplesamlphp": "~1.17.1",
+    "simplesamlphp/simplesamlphp": "~1.17.6",
     "silinternational/idp-id-broker-php-client": "^3.0",
     "sinergi/browser-detector": "^6.1"
   },
@@ -24,7 +24,7 @@
     "behat/behat": "^3.3",
     "behat/mink": "^1.7",
     "behat/mink-goutte-driver": "^1.2",
-    "phpunit/phpunit": "^6.2"
+    "phpunit/phpunit": "^8.4"
   },
   "autoload": {
     "psr-4": {
