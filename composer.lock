@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "62ed0e343a913541f076e5e7e116ec0e",
+    "content-hash": "0981a77cff8cb3e83ff6f309c77ffb0b",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -920,16 +920,16 @@
         },
         {
             "name": "robrichards/xmlseclibs",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/robrichards/xmlseclibs.git",
-                "reference": "406c68ac9124db033d079284b719958b829cb830"
+                "reference": "0a53d3c3aa87564910cae4ed01416441d3ae0db5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/406c68ac9124db033d079284b719958b829cb830",
-                "reference": "406c68ac9124db033d079284b719958b829cb830",
+                "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/0a53d3c3aa87564910cae4ed01416441d3ae0db5",
+                "reference": "0a53d3c3aa87564910cae4ed01416441d3ae0db5",
                 "shasum": ""
             },
             "require": {
@@ -954,7 +954,7 @@
                 "xml",
                 "xmldsig"
             ],
-            "time": "2018-11-15T11:59:02+00:00"
+            "time": "2019-11-05T11:44:22+00:00"
         },
         {
             "name": "silinternational/idp-id-broker-php-client",
@@ -1152,16 +1152,16 @@
         },
         {
             "name": "simplesamlphp/simplesamlphp",
-            "version": "v1.17.6",
+            "version": "v1.17.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/simplesamlphp/simplesamlphp.git",
-                "reference": "381bb09e98267c406386df747378564fef499a94"
+                "reference": "295937ae8672278cad73ec2c78af3749426263de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simplesamlphp/simplesamlphp/zipball/381bb09e98267c406386df747378564fef499a94",
-                "reference": "381bb09e98267c406386df747378564fef499a94",
+                "url": "https://api.github.com/repos/simplesamlphp/simplesamlphp/zipball/295937ae8672278cad73ec2c78af3749426263de",
+                "reference": "295937ae8672278cad73ec2c78af3749426263de",
                 "shasum": ""
             },
             "require": {
@@ -1177,7 +1177,7 @@
                 "gettext/gettext": "^4.6",
                 "jaimeperez/twig-configurable-i18n": "^2.0",
                 "php": ">=5.5",
-                "robrichards/xmlseclibs": "^3.0",
+                "robrichards/xmlseclibs": "^3.0.4",
                 "simplesamlphp/saml2": "^3.3",
                 "symfony/config": "^3.4 || ^4.0",
                 "symfony/dependency-injection": "^3.4 || ^4.0",
@@ -1240,7 +1240,7 @@
                 "sp",
                 "ws-federation"
             ],
-            "time": "2019-08-29T11:54:43+00:00"
+            "time": "2019-11-20T08:26:08+00:00"
         },
         {
             "name": "sinergi/browser-detector",
@@ -2950,6 +2950,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
