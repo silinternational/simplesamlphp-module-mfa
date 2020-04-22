@@ -13,10 +13,9 @@
   "require": {
     "php": ">=7.2",
     "ext-json": "*",
-    "roave/security-advisories": "dev-master",
     "silinternational/php-env": "^2.1",
     "silinternational/psr3-adapters": "^1.1 || ^2.0",
-    "simplesamlphp/simplesamlphp": "~1.17.7",
+    "simplesamlphp/simplesamlphp": "~1.17.7 || ~1.18.5",
     "silinternational/idp-id-broker-php-client": "^3.0",
     "sinergi/browser-detector": "^6.1"
   },
@@ -24,7 +23,8 @@
     "behat/behat": "^3.3",
     "behat/mink": "^1.7",
     "behat/mink-goutte-driver": "^1.2",
-    "phpunit/phpunit": "^8.4"
+    "phpunit/phpunit": "^8.4",
+    "roave/security-advisories": "dev-master"
   },
   "autoload": {
     "psr-4": {
