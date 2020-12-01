@@ -8,7 +8,6 @@ use Sil\Idp\IdBroker\Client\ServiceException;
 use Sil\Idp\IdBroker\Client\IdBrokerClient;
 use Sil\Psr3Adapters\Psr3SamlLogger;
 use Sil\SspMfa\LoggerFactory;
-use Sil\SspMfa\LoginBrowser;
 use SimpleSAML\Auth\ProcessingChain;
 use SimpleSAML\Auth\ProcessingFilter;
 use SimpleSAML\Auth\State;
@@ -205,23 +204,17 @@ class Mfa extends ProcessingFilter
      * Get the MFA type to use based on the available options.
      *
      * @param array[] $mfaOptions The available MFA options.
-     * @param string $userAgent The User-Agent sent by the user's browser, used
-     *     for detecting U2F support.
      * @return array The MFA option to use.
      * @throws \InvalidArgumentException
      * @throws \Exception
      */
-    public static function getMfaOptionToUse($mfaOptions, $userAgent)
+    public static function getMfaOptionToUse($mfaOptions)
     {
         if (empty($mfaOptions)) {
             throw new \Exception('No MFA options were provided.');
         }
         
-        if (LoginBrowser::supportsU2f($userAgent)) {
-            $mfaTypePriority = ['manager', 'u2f', 'totp', 'backupcode'];
-        } else {
-            $mfaTypePriority = ['manager', 'totp', 'backupcode', 'u2f'];
-        }
+        $mfaTypePriority = ['manager', 'u2f', 'totp', 'backupcode'];
         
         foreach ($mfaTypePriority as $mfaType) {
             foreach ($mfaOptions as $mfaOption) {
@@ -630,7 +623,7 @@ class Mfa extends ProcessingFilter
         $id = State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
         $url = Module::getModuleURL('mfa/prompt-for-mfa.php');
 
-        $mfaOption = self::getMfaOptionToUse($mfaOptions, LoginBrowser::getUserAgent());
+        $mfaOption = self::getMfaOptionToUse($mfaOptions);
         
         HTTP::redirectTrustedURL($url, [
             'mfaId' => $mfaOption['id'],

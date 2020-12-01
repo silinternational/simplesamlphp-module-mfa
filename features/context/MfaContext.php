@@ -10,7 +10,6 @@ use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
 use Sil\PhpEnv\Env;
 use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
-use Sil\SspMfa\LoginBrowser;
 
 /**
  * Defines application features from the specific context.
@@ -572,17 +571,6 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given the user's browser supports U2F
-     */
-    public function theUsersBrowserSupportsUf()
-    {
-        $userAgentWithU2f = self::USER_AGENT_WITH_U2F_SUPPORT;
-        Assert::assertTrue(LoginBrowser::supportsU2f($userAgentWithU2f));
-        
-        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithU2f);
-    }
-
-    /**
      * @Given I provide credentials that have U2F, TOTP
      */
     public function iProvideCredentialsThatHaveUfTotp()
@@ -636,35 +624,6 @@ class MfaContext implements Context
     public function iProvideCredentialsThatHaveBackupCodes()
     {
         $this->iProvideCredentialsThatNeedMfaAndHaveBackupCodesAvailable();
-    }
-
-    /**
-     * @Given the user's browser does not support U2F
-     */
-    public function theUsersBrowserDoesNotSupportUf()
-    {
-        $userAgentWithoutU2f = self::USER_AGENT_WITHOUT_U2F_SUPPORT;
-        Assert::assertFalse(LoginBrowser::supportsU2f($userAgentWithoutU2f));
-        
-        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithoutU2f);
-    }
-
-    /**
-     * @Then I should not see an error message about U2F being unsupported
-     */
-    public function iShouldNotSeeAnErrorMessageAboutUfBeingUnsupported()
-    {
-        $page = $this->session->getPage();
-        Assert::assertNotContains('USB Security Keys are not supported', $page->getContent());
-    }
-
-    /**
-     * @Then I should see an error message about U2F being unsupported
-     */
-    public function iShouldSeeAnErrorMessageAboutUfBeingUnsupported()
-    {
-        $page = $this->session->getPage();
-        Assert::assertContains('USB Security Keys are not supported', $page->getContent());
     }
 
     /**
