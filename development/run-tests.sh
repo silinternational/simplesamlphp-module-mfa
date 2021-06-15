@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Exit this script if a step fails
+set -e
+
 runny composer install --no-interaction --no-scripts --no-progress
 
 # Give composer time to install any new dependencies of this project
