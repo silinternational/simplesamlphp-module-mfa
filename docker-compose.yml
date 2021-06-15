@@ -130,6 +130,5 @@ services:
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default
       - COMPOSER_CACHE_DIR=/composer
-    user: "${DOCKER_UIDGID}"
     working_dir: /data
     command: ["/data/run-tests.sh"]
