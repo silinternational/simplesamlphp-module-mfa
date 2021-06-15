@@ -121,7 +121,6 @@ services:
       - ./development/run-tests.sh:/data/run-tests.sh
       - ./features:/data/features
       - ./src:/data/src
-      - ./vendor:/data/vendor
       - ${COMPOSER_CACHE_DIR}:/composer
     env_file:
       - ./common.env
