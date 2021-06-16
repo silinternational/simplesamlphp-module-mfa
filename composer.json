@@ -11,7 +11,7 @@
   ],
   "minimum-stability": "stable",
   "require": {
-    "php": ">=7.2",
+    "php": ">=7.3",
     "ext-json": "*",
     "silinternational/php-env": "^2.1",
     "silinternational/psr3-adapters": "^1.1 || ^2.0",
