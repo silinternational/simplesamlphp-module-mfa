@@ -14,7 +14,7 @@ services:
       - ./development/run-tests.sh:/data/run-tests.sh
       - ./development/symlink.sh:/data/symlink.sh
       - ./development/idp-local/UserPass.php:/data/vendor/simplesamlphp/simplesamlphp/modules/exampleauth/lib/Auth/Source/UserPass.php
-      - ./features:/data/features
+      - ./src:/data/src
       - ${COMPOSER_CACHE_DIR}:/composer
 
       # Revert to standard SSOService.php instead of using sildisco'saml20-idp-hosted
@@ -130,6 +130,5 @@ services:
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default
       - COMPOSER_CACHE_DIR=/composer
-    user: "${DOCKER_UIDGID}"
     working_dir: /data
     command: ["/data/run-tests.sh"]

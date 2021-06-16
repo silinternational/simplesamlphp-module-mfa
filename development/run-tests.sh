@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-runny ./setup-logentries.sh
+# Exit this script if a step fails
+set -e
 
-runny composer install --no-interaction --no-scripts --no-progress
+# Echo out the commands being run
+set -x
+
+composer install --no-interaction --no-scripts --no-progress
 
 # Give composer time to install any new dependencies of this project
 sleep 200
