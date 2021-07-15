@@ -10,6 +10,7 @@ use Behat\Mink\Session;
 use PHPUnit\Framework\Assert;
 use Sil\PhpEnv\Env;
 use Sil\SspMfa\Behat\fakes\FakeIdBrokerClient;
+use Sil\SspMfa\LoginBrowser;
 
 /**
  * Defines application features from the specific context.
@@ -21,7 +22,7 @@ class MfaContext implements Context
     protected $username = null;
     protected $password = null;
     
-    const USER_AGENT_WITHOUT_U2F_SUPPORT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299';
+    const USER_AGENT_WITHOUT_U2F_SUPPORT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15';
     const USER_AGENT_WITH_U2F_SUPPORT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36';
     
     /**
@@ -571,6 +572,20 @@ class MfaContext implements Context
     }
 
     /**
+     * @Given the user's browser supports U2F
+     */
+    public function theUsersBrowserSupportsUf()
+    {
+        $userAgentWithU2f = self::USER_AGENT_WITH_U2F_SUPPORT;
+        Assert::assertTrue(
+            LoginBrowser::supportsU2f($userAgentWithU2f),
+            'Update USER_AGENT_WITH_U2F_SUPPORT to a User Agent with U2F support'
+        );
+        
+        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithU2f);
+    }
+
+    /**
      * @Given I provide credentials that have U2F, TOTP
      */
     public function iProvideCredentialsThatHaveUfTotp()
@@ -624,6 +639,38 @@ class MfaContext implements Context
     public function iProvideCredentialsThatHaveBackupCodes()
     {
         $this->iProvideCredentialsThatNeedMfaAndHaveBackupCodesAvailable();
+    }
+
+    /**
+     * @Given the user's browser does not support U2F
+     */
+    public function theUsersBrowserDoesNotSupportUf()
+    {
+        $userAgentWithoutU2f = self::USER_AGENT_WITHOUT_U2F_SUPPORT;
+        Assert::assertFalse(
+            LoginBrowser::supportsU2f($userAgentWithoutU2f),
+            'Update USER_AGENT_WITHOUT_U2F_SUPPORT to a User Agent without U2F support'
+        );
+        
+        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithoutU2f);
+    }
+
+    /**
+     * @Then I should not see an error message about U2F being unsupported
+     */
+    public function iShouldNotSeeAnErrorMessageAboutUfBeingUnsupported()
+    {
+        $page = $this->session->getPage();
+        Assert::assertNotContains('USB Security Keys are not supported', $page->getContent());
+    }
+
+    /**
+     * @Then I should see an error message about U2F being unsupported
+     */
+    public function iShouldSeeAnErrorMessageAboutUfBeingUnsupported()
+    {
+        $page = $this->session->getPage();
+        Assert::assertContains('USB Security Keys are not supported', $page->getContent());
     }
 
     /**
