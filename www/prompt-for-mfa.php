@@ -8,6 +8,7 @@
  */
 
 use Sil\SspMfa\LoggerFactory;
+use Sil\SspMfa\LoginBrowser;
 use SimpleSAML\Auth\ProcessingChain;
 use SimpleSAML\Auth\State;
 use SimpleSAML\Configuration;
@@ -45,6 +46,7 @@ if (Mfa::isRememberMeCookieValid(base64_decode($cookieHash), $expireDate, $mfaOp
 }
 
 $mfaId = filter_input(INPUT_GET, 'mfaId');
+$userAgent = LoginBrowser::getUserAgent();
 
 if (empty($mfaId)) {
     $logger->critical(json_encode([
@@ -53,7 +55,7 @@ if (empty($mfaId)) {
     ]));
     
     // Pick an MFA ID and do a redirect to put that into the URL.
-    $mfaOption = Mfa::getMfaOptionToUse($mfaOptions);
+    $mfaOption = Mfa::getMfaOptionToUse($mfaOptions, $userAgent);
     $moduleUrl = SimpleSAML\Module::getModuleURL('mfa/prompt-for-mfa.php', [
         'mfaId' => $mfaOption['id'],
         'StateId' => $stateId,
@@ -100,6 +102,7 @@ $t->data['errorMessage'] = $errorMessage ?? null;
 $t->data['mfaOption'] = $mfaOption;
 $t->data['mfaOptions'] = $mfaOptions;
 $t->data['stateId'] = $stateId;
+$t->data['supportsU2f'] = LoginBrowser::supportsU2f($userAgent);
 $t->data['managerEmail'] = $state['managerEmail'];
 $t->show();
 

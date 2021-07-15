@@ -98,7 +98,6 @@ services:
     volumes:
       - ./development/run-tests.sh:/data/run-tests.sh
       - ./composer.json:/data/composer.json
-      - ./composer.lock:/data/composer.lock
       - ./features:/data/features
       - ./src:/data/src
     env_file:
@@ -107,5 +106,5 @@ services:
       - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default
+    encrypted_env_file: codeship.env.encrypted
     working_dir: /data
-    command: /data/run-tests.sh
