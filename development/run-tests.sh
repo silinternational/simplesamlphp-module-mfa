@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-runny composer install --no-interaction --no-scripts --no-progress
+set -e
+set -x
+
+composer install --no-interaction --no-scripts --no-progress
 
 # Give composer time to install any new dependencies of this project
 sleep 200
