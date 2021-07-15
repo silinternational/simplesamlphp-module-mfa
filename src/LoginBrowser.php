@@ -28,12 +28,9 @@ class LoginBrowser
         
         $browser = new Browser($userAgent);
         $browserName = $browser->getName();
-        $browserVersion = $browser->getVersion();
         
         // For now, simply set these to match the criteria in
-        // https://github.com/silinternational/idp-pw-ui/blob/master/app/mfa/u2f.service.js
-        return ($browserName === Browser::CHROME && $browserVersion >= 41)
-            || ($browserName === Browser::FIREFOX && $browserVersion >= 58)
-            || ($browserName === Browser::OPERA && $browserVersion >= 39);
+        // https://github.com/silinternational/idp-profile-ui/blob/master/src/2sv/key/u2f-api.js
+        return ($browserName !== Browser::SAFARI);
     }
 }
