@@ -577,7 +577,10 @@ class MfaContext implements Context
     public function theUsersBrowserSupportsUf()
     {
         $userAgentWithU2f = self::USER_AGENT_WITH_U2F_SUPPORT;
-        Assert::assertTrue(LoginBrowser::supportsU2f($userAgentWithU2f));
+        Assert::assertTrue(
+            LoginBrowser::supportsU2f($userAgentWithU2f),
+            'Update USER_AGENT_WITH_U2F_SUPPORT to a User Agent with U2F support'
+        );
         
         $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithU2f);
     }
@@ -644,7 +647,10 @@ class MfaContext implements Context
     public function theUsersBrowserDoesNotSupportUf()
     {
         $userAgentWithoutU2f = self::USER_AGENT_WITHOUT_U2F_SUPPORT;
-        Assert::assertFalse(LoginBrowser::supportsU2f($userAgentWithoutU2f));
+        Assert::assertFalse(
+            LoginBrowser::supportsU2f($userAgentWithoutU2f),
+            'Update USER_AGENT_WITHOUT_U2F_SUPPORT to a User Agent without U2F support'
+        );
         
         $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithoutU2f);
     }
