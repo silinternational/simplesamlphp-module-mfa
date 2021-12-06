@@ -149,14 +149,14 @@ $config = [
             ],
             'manager_email' => ['manager@example.com'],
         ],
-        'has_u2f:a' => [
-            'eduPersonPrincipalName' => ['HAS_U2F@mfaidp'],
+        'has_webauthn:a' => [
+            'eduPersonPrincipalName' => ['HAS_WEBAUTHN@mfaidp'],
             'eduPersonTargetID' => ['55555555-5555-5555-5555-555555555555'],
-            'sn' => ['U2F'],
+            'sn' => ['WebAuthn'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f@example.com'],
+            'mail' => ['has_webauthn@example.com'],
             'employeeNumber' => ['55555'],
-            'cn' => ['HAS_U2F'],
+            'cn' => ['HAS_WEBAUTHN'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -164,7 +164,7 @@ $config = [
                 'options' => [
                     [
                         'id' => '3',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ]
@@ -174,14 +174,14 @@ $config = [
                 'options' => [],
             ],
         ],
-        'has_u2f_and_mgr:a' => [
-            'eduPersonPrincipalName' => ['HAS_U2F@mfaidp'],
+        'has_webauthn_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['HAS_WEBAUTHN@mfaidp'],
             'eduPersonTargetID' => ['55555555-5555-5555-5555-555555555555'],
-            'sn' => ['U2F'],
+            'sn' => ['WebAuthn'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f@example.com'],
+            'mail' => ['has_webauthn@example.com'],
             'employeeNumber' => ['55555'],
-            'cn' => ['HAS_U2F'],
+            'cn' => ['HAS_WEBAUTHN'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -189,7 +189,7 @@ $config = [
                 'options' => [
                     [
                         'id' => '3',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ]
@@ -227,7 +227,7 @@ $config = [
                     ],
                     [
                         'id' => '3',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ],
@@ -351,14 +351,14 @@ $config = [
                 'options' => [],
             ],
         ],
-        'has_u2f_totp:a' => [
-            'eduPersonPrincipalName' => ['has_u2f_totp@mfaidp'],
+        'has_webauthn_totp:a' => [
+            'eduPersonPrincipalName' => ['has_webauthn_totp@mfaidp'],
             'eduPersonTargetID' => ['00000012-0012-0012-0012-000000000012'],
-            'sn' => ['U2F And TOTP'],
+            'sn' => ['WebAuthn And TOTP'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f_totp@example.com'],
+            'mail' => ['has_webauthn_totp@example.com'],
             'employeeNumber' => ['00012'],
-            'cn' => ['HAS_U2F_TOTP'],
+            'cn' => ['HAS_WEBAUTHN_TOTP'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -371,7 +371,7 @@ $config = [
                     ],
                     [
                         'id' => '121',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ],
@@ -381,14 +381,14 @@ $config = [
                 'options' => [],
             ],
         ],
-        'has_u2f_totp_and_mgr:a' => [
-            'eduPersonPrincipalName' => ['has_u2f_totp@mfaidp'],
+        'has_webauthn_totp_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_webauthn_totp@mfaidp'],
             'eduPersonTargetID' => ['00000012-0012-0012-0012-000000000012'],
-            'sn' => ['U2F And TOTP'],
+            'sn' => ['WebAuthn And TOTP'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f_totp@example.com'],
+            'mail' => ['has_webauthn_totp@example.com'],
             'employeeNumber' => ['00012'],
-            'cn' => ['HAS_U2F_TOTP'],
+            'cn' => ['HAS_WEBAUTHN_TOTP'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -401,7 +401,7 @@ $config = [
                     ],
                     [
                         'id' => '121',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ],
@@ -412,14 +412,14 @@ $config = [
             ],
             'manager_email' => ['manager@example.com'],
         ],
-        'has_u2f_backupcodes:a' => [
-            'eduPersonPrincipalName' => ['has_u2f_backupcodes@mfaidp'],
+        'has_webauthn_backupcodes:a' => [
+            'eduPersonPrincipalName' => ['has_webauthn_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000013-0013-0013-0013-000000000013'],
-            'sn' => ['U2F And Backup Codes'],
+            'sn' => ['WebAuthn And Backup Codes'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f_backupcodes@example.com'],
+            'mail' => ['has_webauthn_backupcodes@example.com'],
             'employeeNumber' => ['00013'],
-            'cn' => ['HAS_U2F_BACKUPCODES'],
+            'cn' => ['HAS_WEBAUTHN_BACKUPCODES'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -434,7 +434,7 @@ $config = [
                     ],
                     [
                         'id' => '131',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ],
@@ -444,14 +444,14 @@ $config = [
                 'options' => [],
             ],
         ],
-        'has_u2f_backupcodes_and_mgr:a' => [
-            'eduPersonPrincipalName' => ['has_u2f_backupcodes@mfaidp'],
+        'has_webauthn_backupcodes_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_webauthn_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000013-0013-0013-0013-000000000013'],
-            'sn' => ['U2F And Backup Codes'],
+            'sn' => ['WebAuthn And Backup Codes'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f_backupcodes@example.com'],
+            'mail' => ['has_webauthn_backupcodes@example.com'],
             'employeeNumber' => ['00013'],
-            'cn' => ['HAS_U2F_BACKUPCODES'],
+            'cn' => ['HAS_WEBAUTHN_BACKUPCODES'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -466,7 +466,7 @@ $config = [
                     ],
                     [
                         'id' => '131',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ],
@@ -477,14 +477,14 @@ $config = [
             ],
             'manager_email' => ['manager@example.com'],
         ],
-        'has_u2f_totp_backupcodes:a' => [
-            'eduPersonPrincipalName' => ['has_u2f_totp_backupcodes@mfaidp'],
+        'has_webauthn_totp_backupcodes:a' => [
+            'eduPersonPrincipalName' => ['has_webauthn_totp_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000014-0014-0014-0014-000000000014'],
-            'sn' => ['U2F, TOTP, And Backup Codes'],
+            'sn' => ['WebAuthn, TOTP, And Backup Codes'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f_totp_backupcodes@example.com'],
+            'mail' => ['has_webauthn_totp_backupcodes@example.com'],
             'employeeNumber' => ['00014'],
-            'cn' => ['HAS_U2F_TOTP_BACKUPCODES'],
+            'cn' => ['HAS_WEBAUTHN_TOTP_BACKUPCODES'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -504,7 +504,7 @@ $config = [
                     ],
                     [
                         'id' => '142',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ],
@@ -514,14 +514,14 @@ $config = [
                 'options' => [],
             ],
         ],
-        'has_u2f_totp_backupcodes_and_mgr:a' => [
-            'eduPersonPrincipalName' => ['has_u2f_totp_backupcodes@mfaidp'],
+        'has_webauthn_totp_backupcodes_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_webauthn_totp_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000014-0014-0014-0014-000000000014'],
-            'sn' => ['U2F, TOTP, And Backup Codes'],
+            'sn' => ['WebAuthn, TOTP, And Backup Codes'],
             'givenName' => ['Has'],
-            'mail' => ['has_u2f_totp_backupcodes@example.com'],
+            'mail' => ['has_webauthn_totp_backupcodes@example.com'],
             'employeeNumber' => ['00014'],
-            'cn' => ['HAS_U2F_TOTP_BACKUPCODES'],
+            'cn' => ['HAS_WEBAUTHN_TOTP_BACKUPCODES'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -541,7 +541,7 @@ $config = [
                     ],
                     [
                         'id' => '142',
-                        'type' => 'u2f',
+                        'type' => 'webauthn',
                         'data' => '',
                     ],
                 ],
