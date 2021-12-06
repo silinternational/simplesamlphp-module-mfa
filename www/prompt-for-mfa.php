@@ -102,7 +102,7 @@ $t->data['errorMessage'] = $errorMessage ?? null;
 $t->data['mfaOption'] = $mfaOption;
 $t->data['mfaOptions'] = $mfaOptions;
 $t->data['stateId'] = $stateId;
-$t->data['supportsU2f'] = LoginBrowser::supportsU2f($userAgent);
+$t->data['supportsWebAuthn'] = LoginBrowser::supportsWebAuthn($userAgent);
 $t->data['managerEmail'] = $state['managerEmail'];
 $t->show();
 

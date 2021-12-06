@@ -2,8 +2,10 @@
 $this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 ?>
-<?php if ($this->data['supportsU2f']): ?>
-    <script src="<?=SimpleSAML\Module::getModuleURL('mfa/u2f-api.js');?>"></script>
+<?php if ($this->data['supportsWebAuthn']): ?>
+    <script src="https://unpkg.com/@simplewebauthn/browser@4.1.0/dist/bundle/index.umd.min.js"
+            integrity="sha384-WiaH30NJIrU5UVPRVBjvWA8J1olK/4OMlboN6o6NTmQW7XExLsqc6OFbKvhFoPAj"
+            crossorigin="anonymous"></script>
     <script type="application/javascript">
         window.onload = function() {
 
@@ -15,7 +17,7 @@ $this->includeAtTemplateBase('includes/header.php');
           u2f.sign(mfa.appId, mfa.challenge, [mfa], function(response) {
             console.log(response);
             if (response.errorCode && response.errorCode != 0) {
-              alert("Error from U2F, code: " + response.errorCode);
+              alert("Error from WebAuthn, code: " + response.errorCode);
               return;
             }
             var mfaForm = document.getElementById('mfaForm');
@@ -28,7 +30,7 @@ $this->includeAtTemplateBase('includes/header.php');
 <?php endif; ?>
 <form method="post">
     <h2>USB Security Key</h2>
-    <?php if ($this->data['supportsU2f']): ?>
+    <?php if ($this->data['supportsWebAuthn']): ?>
         <p id="mfaInstructions">Please insert your security key and press its button.</p>
         <p>
             <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
@@ -53,7 +55,7 @@ $this->includeAtTemplateBase('includes/header.php');
         <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
-                if ($mfaOpt['type'] != 'u2f') {
+                if ($mfaOpt['type'] != 'webauthn') {
                     ?>
                     <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
                        htmlentities($mfaOpt['type'])

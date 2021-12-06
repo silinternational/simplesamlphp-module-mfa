@@ -206,7 +206,7 @@ class Mfa extends ProcessingFilter
      *
      * @param array[] $mfaOptions The available MFA options.
      * @param string $userAgent The User-Agent sent by the user's browser, used
-     *     for detecting U2F support.
+     *     for detecting WebAuthn support.
      * @return array The MFA option to use.
      * @throws \InvalidArgumentException
      * @throws \Exception
@@ -217,10 +217,10 @@ class Mfa extends ProcessingFilter
             throw new \Exception('No MFA options were provided.');
         }
         
-        if (LoginBrowser::supportsU2f($userAgent)) {
-            $mfaTypePriority = ['manager', 'u2f', 'totp', 'backupcode'];
+        if (LoginBrowser::supportsWebAuthn($userAgent)) {
+            $mfaTypePriority = ['manager', 'webauthn', 'totp', 'backupcode'];
         } else {
-            $mfaTypePriority = ['manager', 'totp', 'backupcode', 'u2f'];
+            $mfaTypePriority = ['manager', 'totp', 'backupcode', 'webauthn'];
         }
         
         foreach ($mfaTypePriority as $mfaType) {
@@ -257,8 +257,7 @@ class Mfa extends ProcessingFilter
     /**
      * Get the template identifier (string) to use for the specified MFA type.
      *
-     * @param string $mfaType The desired MFA type, such as 'u2f', 'totp', or
-     *     'backupcode'.
+     * @param string $mfaType The desired MFA type, such as 'webauthn', 'totp', or 'backupcode'.
      * @return string
      * @throws \InvalidArgumentException
      */
@@ -267,7 +266,7 @@ class Mfa extends ProcessingFilter
         $mfaOptionTemplates = [
             'backupcode' => 'mfa:prompt-for-mfa-backupcode.php',
             'totp' => 'mfa:prompt-for-mfa-totp.php',
-            'u2f' => 'mfa:prompt-for-mfa-u2f.php',
+            'webauthn' => 'mfa:prompt-for-mfa-webauthn.php',
             'manager' => 'mfa:prompt-for-mfa-manager.php',
         ];
         $template = $mfaOptionTemplates[$mfaType] ?? null;
@@ -397,7 +396,7 @@ class Mfa extends ProcessingFilter
      * @param array $state The array of state information.
      * @param bool $rememberMe Whether or not to set remember me cookies
      * @param LoggerInterface $logger A PSR-3 compatible logger.
-     * @param string $mfaType The type of the MFA ('u2f', 'totp', 'backupcode').
+     * @param string $mfaType The type of the MFA ('webauthn', 'totp', 'backupcode').
      * @return void|string If validation fails, an error message to show to the
      *     end user will be returned.
      * @throws \Sil\PhpEnv\EnvVarNotFoundException
