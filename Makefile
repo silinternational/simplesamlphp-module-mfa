@@ -11,6 +11,9 @@ bashtests:
 behat:
 	docker-compose run --rm tests bash -c "vendor/bin/behat --config=features/behat.yml --strict --stop-on-failure --append-snippets"
 
+brokerpma:
+	docker-compose up -d brokerPhpmyadmin
+
 clean:
 	docker-compose kill
 	docker system prune -f

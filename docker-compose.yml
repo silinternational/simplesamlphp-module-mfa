@@ -6,7 +6,9 @@ services:
     image: silintl/ssp-base:develop
     ports:
       - "52020:80"
-#      - "9000:9000"
+      # - "9000:9000"
+    depends_on:
+      - broker
     volumes:
       - ./:/mfa
       - ./development/enable-debug.sh:/data/enable-debug.sh
@@ -46,7 +48,7 @@ services:
       - REMEMBER_ME_SECRET=not-a-secret-570c5b18dacd45bd
       - THEME_USE=default
       - COMPOSER_CACHE_DIR=/composer
-#    user: "${DOCKER_UIDGID}"
+    # user: "${DOCKER_UIDGID}"
     command: ["/data/run-dev.sh"]
 
   mfasp:
@@ -62,6 +64,8 @@ services:
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
     ports:
       - "52021:80"
+    depends_on:
+      - broker
     environment:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=sp1
@@ -86,6 +90,8 @@ services:
       - ./development/sp-local/metadata/saml20-idp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-remote.php
     ports:
       - "52022:80"
+    depends_on:
+      - broker
     environment:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=sp1
@@ -108,13 +114,65 @@ services:
       - ./local.env
     environment:
       - COMPOSER_CACHE_DIR=/composer
-    user: "${DOCKER_UIDGID}"
+    # user: "${DOCKER_UIDGID}"
     working_dir: /data
+
+  broker:
+    image: silintl/idp-id-broker:featurewebauthn
+    # volumes:
+    #   - ./development/m991231_235959_insert_test_users.php:/data/console/migrations/m991231_235959_insert_test_users.php
+    ports:
+      - '8090:80'
+    depends_on:
+      - brokerDb
+    env_file:
+      - ./local.env
+    environment:
+      APP_ENV: 'dev'
+      API_ACCESS_KEYS: 'local-testing-abc123'
+      MIGRATE_PW_FROM_LDAP: 'false'
+      MYSQL_HOST: 'brokerDb'
+      MYSQL_DATABASE: 'broker'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'pass'
+      EMAILER_CLASS: Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+      EMAIL_SERVICE_baseUrl: 'dummy'
+      EMAIL_SERVICE_accessToken: 'dummy'
+      EMAIL_SERVICE_assertValidIp: 'false'
+      EMAIL_SIGNATURE: 'two red pills, please'
+      SUPPORT_EMAIL: 'support@example.org'
+      HELP_CENTER_URL: 'https://example.org/help'
+      PASSWORD_FORGOT_URL: 'https://example.org/forgot'
+      PASSWORD_PROFILE_URL: 'https://example.org/profile'
+    command: [ 'bash', '-c', 'whenavail brokerDb 3306 60 ./yii migrate --interactive=0 && ./run.sh' ]
+
+  brokerDb:
+    image: silintl/mariadb
+    ports:
+      - '3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'r00tp@ss!'
+      MYSQL_DATABASE: 'broker'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'pass'
+
+  brokerPhpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - '8091:80'
+    depends_on:
+      - brokerDb
+    environment:
+      PMA_HOST: 'brokerDb'
+      PMA_USER: 'user'
+      PMA_PASSWORD: 'pass'
 
   tests:
     image: silintl/ssp-base:develop
     volumes_from:
       - mfaidp
+    depends_on:
+      - broker
     volumes:
       - ./composer.json:/data/composer.json
       - ./composer.lock:/data/composer.lock
