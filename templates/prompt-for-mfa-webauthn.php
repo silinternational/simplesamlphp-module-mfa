@@ -8,23 +8,22 @@ $this->includeAtTemplateBase('includes/header.php');
             crossorigin="anonymous"></script>
     <script type="application/javascript">
         window.onload = function() {
-
-          console.log('data:');
-          console.log(<?=json_encode($this->data)?>);
-
-          var mfa = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT);?>;
-          console.log(mfa);
-          u2f.sign(mfa.appId, mfa.challenge, [mfa], function(response) {
-            console.log(response);
-            if (response.errorCode && response.errorCode != 0) {
-              alert("Error from WebAuthn, code: " + response.errorCode);
-              return;
+          console.log('View data:', <?= json_encode($this->data) ?>);
+          const loginChallenge = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT);?>;
+          console.log('loginChallenge:', loginChallenge);
+          SimpleWebAuthnBrowser.startAuthentication(loginChallenge.publicKey).then(
+            function(authenticationCredential) {
+              console.log('authenticationCredential:', authenticationCredential);
+              const mfaForm = document.getElementById('mfaForm');
+              const mfaResponse = document.getElementById('mfaSubmission');
+              mfaResponse.value = JSON.stringify(response);
+              mfaForm.submit();
             }
-            var mfaForm = document.getElementById('mfaForm');
-            var mfaResponse = document.getElementById('mfaSubmission');
-            mfaResponse.value = JSON.stringify(response);
-            mfaForm.submit();
-          });
+          ).catch(
+            function (error) {
+              console.error('Failed to start WebAuthn authentication:', error)
+            }
+          );
         }
     </script>
 <?php endif; ?>
