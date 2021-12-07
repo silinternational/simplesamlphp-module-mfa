@@ -165,7 +165,12 @@ $config = [
                     [
                         'id' => '3',
                         'type' => 'webauthn',
-                        'data' => '',
+                        'label' => 'Blue security key (work)',
+                        'created_utc' => '2017-10-24T20:40:57Z',
+                        'last_used_utc' => null,
+                        'data' => [
+                            // Response from "POST /webauthn/login" MFA API call.
+                        ],
                     ],
                 ]
             ],
