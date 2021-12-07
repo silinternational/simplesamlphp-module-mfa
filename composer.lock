@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d55e3c290341e8798c3f5a858a41e229",
+    "content-hash": "b707fedd6627f6b3ac1407d71f54faee",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -617,6 +617,21 @@
                 }
             ],
             "time": "2021-11-10T15:24:32+00:00"
+        },
+        {
+            "name": "npm-asset/simplewebauthn--browser",
+            "version": "v4.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MasterKale/SimpleWebAuthn.git",
+                "reference": "73090c98aaaf48aea660f74c965d6f4af14375eb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MasterKale/SimpleWebAuthn/zipball/73090c98aaaf48aea660f74c965d6f4af14375eb",
+                "reference": "73090c98aaaf48aea660f74c965d6f4af14375eb"
+            },
+            "type": "npm-asset"
         },
         {
             "name": "phpfastcache/riak-client",
