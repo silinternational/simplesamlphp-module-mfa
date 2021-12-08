@@ -17,6 +17,7 @@ clean:
 
 copyJsLib:
 	cp ./node_modules/@simplewebauthn/browser/dist/bundle/index.umd.min.js ./www/simplewebauthn/browser.js
+	cp ./node_modules/@simplewebauthn/browser/LICENSE.md ./www/simplewebauthn/LICENSE.md
 
 deps:
 	docker-compose run --rm composer bash -c "composer install --no-scripts"
