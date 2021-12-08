@@ -111,6 +111,14 @@ services:
     user: "${DOCKER_UIDGID}"
     working_dir: /data
 
+  node:
+    image: node:lts-alpine
+    volumes:
+      - ./package.json:/data/package.json
+      - ./package-lock.json:/data/package-lock.json
+      - ./node_modules:/data/node_modules
+    working_dir: /data
+
   tests:
     image: silintl/ssp-base:develop
     volumes_from:

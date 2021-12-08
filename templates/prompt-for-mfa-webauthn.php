@@ -3,9 +3,7 @@ $this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 ?>
 <?php if ($this->data['supportsWebAuthn']): ?>
-    <script src="https://unpkg.com/@simplewebauthn/browser@4.1.0/dist/bundle/index.umd.min.js"
-            integrity="sha384-WiaH30NJIrU5UVPRVBjvWA8J1olK/4OMlboN6o6NTmQW7XExLsqc6OFbKvhFoPAj"
-            crossorigin="anonymous"></script>
+    <script src="<?=SimpleSAML\Module::getModuleURL('mfa/simplewebauthn/browser.js');?>"></script>
     <script type="application/javascript">
         window.onload = function() {
           console.log('View data:', <?= json_encode($this->data) ?>);

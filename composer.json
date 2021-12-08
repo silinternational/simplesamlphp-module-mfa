@@ -18,7 +18,6 @@
   ],
   "require": {
     "php": ">=7.2",
-    "npm-asset/simplewebauthn--browser": "^4.1.0",
     "ext-json": "*",
     "silinternational/php-env": "^2.1",
     "silinternational/psr3-adapters": "^1.1 || ^2.0",

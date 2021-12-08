@@ -15,11 +15,18 @@ clean:
 	docker-compose kill
 	docker system prune -f
 
-composer:
-	docker-compose run --rm composer bash -c "composer install --no-scripts"
+copyJsLib:
+	cp ./node_modules/@simplewebauthn/browser/dist/bundle/index.umd.min.js ./www/simplewebauthn/browser.js
 
-composerupdate:
+deps:
+	docker-compose run --rm composer bash -c "composer install --no-scripts"
+	docker-compose run --rm node npm install --ignore-scripts
+	make copyJsLib
+
+depsupdate:
 	docker-compose run --rm composer bash -c "composer update --no-scripts"
+	docker-compose run --rm node npm update --ignore-scripts
+	make copyJsLib
 
 enabledebug:
 	docker-compose exec mfaidp bash -c "/data/enable-debug.sh"
