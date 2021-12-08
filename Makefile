@@ -35,7 +35,7 @@ enabledebug:
 ps:
 	docker-compose ps
 
-test: composer web
+test: deps web
 	@echo -------------------------------------------------------------------
 	@echo Bringing up mfaidp takes a long time due to composer.
 	@echo After this, you can use \"make behat\" to run the tests more quickly.
