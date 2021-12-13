@@ -34,6 +34,7 @@ Example (for `metadata/saml20-idp-hosted.php`):
             'idBrokerAssertValidIp' => Env::get('ID_BROKER_ASSERT_VALID_IP'),
             'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
             'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
+            'idpDomainName' => Env::get('IDP_DOMAIN_NAME'),
             'mfaSetupUrl' => Env::get('MFA_SETUP_URL'),
 
             // Optional:
@@ -52,6 +53,9 @@ can be autoloaded, to use as the logger within ExpiryDate.
 
 The `mfaSetupUrl` parameter is for the URL of where to send the user if they
 want/need to set up MFA.
+
+The `idpDomainName` parameter is used to assemble the Relying Party Origin
+(RP Origin) for WebAuthn MFA options.
 
 ## Testing Locally ##
 
