@@ -71,6 +71,7 @@ $metadata['http://mfaidp'] = [
             'idBrokerBaseUri' => Env::get('ID_BROKER_BASE_URI'),
             'idBrokerClientClass' => FakeIdBrokerClient::class,
             'idBrokerTrustedIpRanges' => Env::get('ID_BROKER_TRUSTED_IP_RANGES'),
+            'idpDomainName' => Env::get('IDP_DOMAIN_NAME'),
             'mfaSetupUrl' => Env::get('MFA_SETUP_URL_FOR_TESTS'), // *** DIFFERENT! ***
             'loggerClass' => Psr3SamlLogger::class,
         ],

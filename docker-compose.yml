@@ -37,6 +37,7 @@ services:
       - APPLICATION_ENV=dev
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
+      - IDP_DOMAIN_NAME=mfa-idp.local:52020
       - IDP_NAME=Local IdP
       - MFA_SETUP_URL=http://mfa-pw-manager.local:52022/module.php/core/authenticate.php?as=mfa-idp
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
