@@ -40,7 +40,7 @@ test: deps web
 	@echo Bringing up mfaidp takes a long time due to composer.
 	@echo After this, you can use \"make behat\" to run the tests more quickly.
 	@echo -------------------------------------------------------------------
-	sleep 200 # Give composer time to install any new dependencies of this project
+	docker-compose run --rm mfasp bash -c "whenavail mfaidp 80 200 echo mfaidp ready"
 	make behat
 
 web:
