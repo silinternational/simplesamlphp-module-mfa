@@ -31,6 +31,7 @@ class Mfa extends ProcessingFilter
     const STAGE_SENT_TO_OUT_OF_BACKUP_CODES_MESSAGE = 'mfa:sent_to_out_of_backup_codes_message';
 
     private $employeeIdAttr = null;
+    private $idpDomainName = null;
     private $mfaSetupUrl = null;
     
     private $idBrokerAccessToken = null;
@@ -66,6 +67,7 @@ class Mfa extends ProcessingFilter
             'employeeIdAttr',
             'idBrokerAccessToken',
             'idBrokerBaseUri',
+            'idpDomainName',
         ]);
         
         $tempTrustedIpRanges = $config['idBrokerTrustedIpRanges'] ?? '';
@@ -397,6 +399,7 @@ class Mfa extends ProcessingFilter
      * @param bool $rememberMe Whether or not to set remember me cookies
      * @param LoggerInterface $logger A PSR-3 compatible logger.
      * @param string $mfaType The type of the MFA ('webauthn', 'totp', 'backupcode').
+     * @param string $rpOrigin The Relying Party Origin (for WebAuthn)
      * @return void|string If validation fails, an error message to show to the
      *     end user will be returned.
      * @throws \Sil\PhpEnv\EnvVarNotFoundException
@@ -408,7 +411,8 @@ class Mfa extends ProcessingFilter
         $state,
         $rememberMe,
         LoggerInterface $logger,
-        string $mfaType
+        string $mfaType,
+        string $rpOrigin
     ) {
         if (empty($mfaId)) {
             return 'No MFA ID was provided.';
@@ -416,6 +420,8 @@ class Mfa extends ProcessingFilter
             return 'No Employee ID was provided.';
         } elseif (empty($mfaSubmission)) {
             return 'No MFA submission was provided.';
+        } elseif (empty($rpOrigin)) {
+            return 'No RP Origin was provided.';
         }
         
         try {
@@ -423,7 +429,8 @@ class Mfa extends ProcessingFilter
             $mfaDataFromBroker = $idBrokerClient->mfaVerify(
                 $mfaId,
                 $employeeId,
-                $mfaSubmission
+                $mfaSubmission,
+                $rpOrigin
             );
         } catch (\Throwable $t) {
             $message = 'Something went wrong while we were trying to do the '
@@ -625,6 +632,7 @@ class Mfa extends ProcessingFilter
         
         /* Save state and redirect. */
         $state['employeeId'] = $employeeId;
+        $state['rpOrigin'] = 'https://' . $this->idpDomainName;
         
         $id = State::saveState($state, self::STAGE_SENT_TO_MFA_PROMPT);
         $url = Module::getModuleURL('mfa/prompt-for-mfa.php');
