@@ -13,7 +13,7 @@ services:
       - ./development/idp-local/UserPass.php:/data/vendor/simplesamlphp/simplesamlphp/modules/exampleauth/lib/Auth/Source/UserPass.php
       - ./src:/data/src
 
-      # Revert to standard SSOService.php instead of using sildisco'saml20-idp-hosted
+      # Revert to standard SSOService.php instead of using sildisco's
       - ./development/idp-local/www_saml2_idp_SSOService.php:/data/vendor/simplesamlphp/simplesamlphp/www/saml2/idp/SSOService.php
 
       # Utilize custom certs
@@ -33,6 +33,7 @@ services:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
       - APPLICATION_ENV=test
+      - IDP_DOMAIN_NAME=mfaidp
       - IDP_NAME=Local IdP
       - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port

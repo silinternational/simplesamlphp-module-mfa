@@ -15,11 +15,19 @@ clean:
 	docker-compose kill
 	docker system prune -f
 
-composer:
-	docker-compose run --rm composer bash -c "composer install --no-scripts"
+copyJsLib:
+	cp ./node_modules/@simplewebauthn/browser/dist/bundle/index.umd.min.js ./www/simplewebauthn/browser.js
+	cp ./node_modules/@simplewebauthn/browser/LICENSE.md ./www/simplewebauthn/LICENSE.md
 
-composerupdate:
+deps:
+	docker-compose run --rm composer bash -c "composer install --no-scripts"
+	docker-compose run --rm node npm install --ignore-scripts
+	make copyJsLib
+
+depsupdate:
 	docker-compose run --rm composer bash -c "composer update --no-scripts"
+	docker-compose run --rm node npm update --ignore-scripts
+	make copyJsLib
 
 enabledebug:
 	docker-compose exec mfaidp bash -c "/data/enable-debug.sh"
@@ -27,12 +35,12 @@ enabledebug:
 ps:
 	docker-compose ps
 
-test: composer web
+test: deps web
 	@echo -------------------------------------------------------------------
 	@echo Bringing up mfaidp takes a long time due to composer.
 	@echo After this, you can use \"make behat\" to run the tests more quickly.
 	@echo -------------------------------------------------------------------
-	sleep 200 # Give composer time to install any new dependencies of this project
+	docker-compose run --rm mfasp bash -c "whenavail mfaidp 80 200 echo mfaidp ready"
 	make behat
 
 web:

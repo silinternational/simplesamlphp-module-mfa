@@ -2,33 +2,36 @@
 $this->data['header'] = '2-Step Verification';
 $this->includeAtTemplateBase('includes/header.php');
 ?>
-<?php if ($this->data['supportsU2f']): ?>
-    <script src="<?=SimpleSAML\Module::getModuleURL('mfa/u2f-api.js');?>"></script>
+<?php if ($this->data['supportsWebAuthn']): ?>
+    <?php
+    $webauthnJsFileURL = SimpleSAML\Module::getModuleURL('mfa/simplewebauthn/browser.js');
+    $webauthnJsFileHash = md5_file(__DIR__ . '/../www/simplewebauthn/browser.js');
+    ?>
+    <script src="<?= $webauthnJsFileURL ?>?v=<?= $webauthnJsFileHash ?>"></script>
     <script type="application/javascript">
         window.onload = function() {
-
-          console.log('data:');
-          console.log(<?=json_encode($this->data)?>);
-
-          var mfa = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT);?>;
-          console.log(mfa);
-          u2f.sign(mfa.appId, mfa.challenge, [mfa], function(response) {
-            console.log(response);
-            if (response.errorCode && response.errorCode != 0) {
-              alert("Error from U2F, code: " + response.errorCode);
-              return;
+          console.log('View data:', <?= json_encode($this->data) ?>);
+          const loginChallenge = <?php echo json_encode($this->data['mfaOption']['data'], JSON_PRETTY_PRINT);?>;
+          console.log('loginChallenge:', loginChallenge);
+          SimpleWebAuthnBrowser.startAuthentication(loginChallenge.publicKey).then(
+            function(authenticationCredential) {
+              console.log('authenticationCredential:', authenticationCredential);
+              const mfaForm = document.getElementById('mfaForm');
+              const mfaResponse = document.getElementById('mfaSubmission');
+              mfaResponse.value = JSON.stringify(response);
+              mfaForm.submit();
             }
-            var mfaForm = document.getElementById('mfaForm');
-            var mfaResponse = document.getElementById('mfaSubmission');
-            mfaResponse.value = JSON.stringify(response);
-            mfaForm.submit();
-          });
+          ).catch(
+            function (error) {
+              console.error('Failed to start WebAuthn authentication:', error)
+            }
+          );
         }
     </script>
 <?php endif; ?>
 <form method="post">
     <h2>USB Security Key</h2>
-    <?php if ($this->data['supportsU2f']): ?>
+    <?php if ($this->data['supportsWebAuthn']): ?>
         <p id="mfaInstructions">Please insert your security key and press its button.</p>
         <p>
             <input type="checkbox" name="rememberMe" id="rememberMe" value="true" checked="checked"/>
@@ -53,7 +56,7 @@ $this->includeAtTemplateBase('includes/header.php');
         <ul>
             <?php
             foreach ($this->data['mfaOptions'] as $mfaOpt) {
-                if ($mfaOpt['type'] != 'u2f') {
+                if ($mfaOpt['type'] != 'webauthn') {
                     ?>
                     <li><a href="prompt-for-mfa.php?StateId=<?= htmlentities($this->data['stateId']) ?>&mfaId=<?= htmlentities($mfaOpt['id']) ?>"><?=
                        htmlentities($mfaOpt['type'])
