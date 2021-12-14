@@ -29,11 +29,11 @@ Feature: Prompt for MFA credentials
     When I login
     Then I should see a prompt for a TOTP code
 
-  Scenario: Needs MFA, has U2F option available
-    Given I provide credentials that need MFA and have U2F available
-      And the user's browser supports U2F
+  Scenario: Needs MFA, has WebAuthn option available
+    Given I provide credentials that need MFA and have WebAuthn available
+      And the user's browser supports WebAuthn
     When I login
-    Then I should see a prompt for a U2F security key
+    Then I should see a prompt for a WebAuthn security key
 
   Scenario: Accepting a (non-rate-limited) correct MFA value
     Given I provide credentials that need MFA and have backup codes available
@@ -122,62 +122,62 @@ Feature: Prompt for MFA credentials
     When I click the remind-me-later button
     Then I should end up at my intended destination
 
-  Scenario Outline: Defaulting to another option when U2F is not supported
-    Given I provide credentials that have <U2F?><TOTP?><backup codes?>
-      And the user's browser <supports U2F or not>
+  Scenario Outline: Defaulting to another option when WebAuthn is not supported
+    Given I provide credentials that have <WebAuthn?><TOTP?><backup codes?>
+      And the user's browser <supports WebAuthn or not>
     When I login
     Then I should see a prompt for a <default MFA type>
 
     Examples:
-      | U2F? |  TOTP?   | backup codes?  | supports U2F or not  | default MFA type |
-      | U2F  |          |                | supports U2F         | U2F              |
-      | U2F  | , TOTP   |                | supports U2F         | U2F              |
-      | U2F  |          | , backup codes | supports U2F         | U2F              |
-      | U2F  | , TOTP   | , backup codes | supports U2F         | U2F              |
-      |      |   TOTP   |                | supports U2F         |   TOTP           |
-      |      |   TOTP   | , backup codes | supports U2F         |   TOTP           |
-      |      |          |   backup codes | supports U2F         |      backup code |
-      | U2F  |          |                | does not support U2F | U2F              |
-      | U2F  | , TOTP   |                | does not support U2F |   TOTP           |
-      | U2F  |          | , backup codes | does not support U2F |      backup code |
-      | U2F  | , TOTP   | , backup codes | does not support U2F |   TOTP           |
-      |      |   TOTP   |                | does not support U2F |   TOTP           |
-      |      |   TOTP   | , backup codes | does not support U2F |   TOTP           |
-      |      |          |   backup codes | does not support U2F |      backup code |
+      | WebAuthn? |  TOTP?   | backup codes?  | supports WebAuthn or not  | default MFA type |
+      | WebAuthn  |          |                | supports WebAuthn         | WebAuthn         |
+      | WebAuthn  | , TOTP   |                | supports WebAuthn         | WebAuthn         |
+      | WebAuthn  |          | , backup codes | supports WebAuthn         | WebAuthn         |
+      | WebAuthn  | , TOTP   | , backup codes | supports WebAuthn         | WebAuthn         |
+      |           |   TOTP   |                | supports WebAuthn         |   TOTP           |
+      |           |   TOTP   | , backup codes | supports WebAuthn         |   TOTP           |
+      |           |          |   backup codes | supports WebAuthn         |      backup code |
+      | WebAuthn  |          |                | does not support WebAuthn | WebAuthn         |
+      | WebAuthn  | , TOTP   |                | does not support WebAuthn |   TOTP           |
+      | WebAuthn  |          | , backup codes | does not support WebAuthn |      backup code |
+      | WebAuthn  | , TOTP   | , backup codes | does not support WebAuthn |   TOTP           |
+      |           |   TOTP   |                | does not support WebAuthn |   TOTP           |
+      |           |   TOTP   | , backup codes | does not support WebAuthn |   TOTP           |
+      |           |          |   backup codes | does not support WebAuthn |      backup code |
 
-  Scenario Outline: When to show the U2F-not-supported error message
-    Given I provide credentials that have U2F
-      And the user's browser <supports U2F or not>
+  Scenario Outline: When to show the WebAuthn-not-supported error message
+    Given I provide credentials that have WebAuthn
+      And the user's browser <supports WebAuthn or not>
     When I login
-    Then I <should or not> see an error message about U2F being unsupported
+    Then I <should or not> see an error message about WebAuthn being unsupported
 
     Examples:
-      | supports U2F or not  | should or not |
-      | supports U2F         | should not    |
-      | does not support U2F | should        |
+      | supports WebAuthn or not  | should or not |
+      | supports WebAuthn         | should not    |
+      | does not support WebAuthn | should        |
 
   Scenario Outline: When to show the link to send a manager rescue code
-    Given I provide credentials that have <U2F?><TOTP?><backup codes?>
+    Given I provide credentials that have <WebAuthn?><TOTP?><backup codes?>
     And the user <has or does not have> a manager email
     When I login
     Then I <should or should not> see a link to send a code to the user's manager
 
     Examples:
-      | U2F? |  TOTP?   | backup codes?  | has or does not have | should or should not |
-      | U2F  |          |                | has                  | should               |
-      | U2F  | , TOTP   |                | has                  | should               |
-      | U2F  |          | , backup codes | has                  | should               |
-      | U2F  | , TOTP   | , backup codes | has                  | should               |
-      |      |   TOTP   |                | has                  | should               |
-      |      |   TOTP   | , backup codes | has                  | should               |
-      |      |          |   backup codes | has                  | should               |
-      | U2F  |          |                | does not have        | should not           |
-      | U2F  | , TOTP   |                | does not have        | should not           |
-      | U2F  |          | , backup codes | does not have        | should not           |
-      | U2F  | , TOTP   | , backup codes | does not have        | should not           |
-      |      |   TOTP   |                | does not have        | should not           |
-      |      |   TOTP   | , backup codes | does not have        | should not           |
-      |      |          |   backup codes | does not have        | should not           |
+      | WebAuthn? |  TOTP?   | backup codes?  | has or does not have | should or should not |
+      | WebAuthn  |          |                | has                  | should               |
+      | WebAuthn  | , TOTP   |                | has                  | should               |
+      | WebAuthn  |          | , backup codes | has                  | should               |
+      | WebAuthn  | , TOTP   | , backup codes | has                  | should               |
+      |           |   TOTP   |                | has                  | should               |
+      |           |   TOTP   | , backup codes | has                  | should               |
+      |           |          |   backup codes | has                  | should               |
+      | WebAuthn  |          |                | does not have        | should not           |
+      | WebAuthn  | , TOTP   |                | does not have        | should not           |
+      | WebAuthn  |          | , backup codes | does not have        | should not           |
+      | WebAuthn  | , TOTP   | , backup codes | does not have        | should not           |
+      |           |   TOTP   |                | does not have        | should not           |
+      |           |   TOTP   | , backup codes | does not have        | should not           |
+      |           |          |   backup codes | does not have        | should not           |
 
   Scenario: Ask for a code to be sent to my manager
     Given I provide credentials that have backup codes

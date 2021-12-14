@@ -22,8 +22,8 @@ class MfaContext implements Context
     protected $username = null;
     protected $password = null;
     
-    const USER_AGENT_WITHOUT_U2F_SUPPORT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15';
-    const USER_AGENT_WITH_U2F_SUPPORT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36';
+    const USER_AGENT_WITHOUT_WEBAUTHN_SUPPORT = 'Mozilla/5.0 (Windows NT 10.0; Trident/7.0; rv:11.0) like Gecko';
+    const USER_AGENT_WITH_WEBAUTHN_SUPPORT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36';
     
     /**
      * The browser session, used for interacting with the website.
@@ -304,19 +304,19 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that need MFA and have U2F available
+     * @Given I provide credentials that need MFA and have WebAuthn available
      */
     public function iProvideCredentialsThatNeedMfaAndHaveUfAvailable()
     {
         // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'has_u2f';
+        $this->username = 'has_webauthn';
         $this->password = 'a';
     }
 
     /**
-     * @Then I should see a prompt for a U2F (security key)
+     * @Then I should see a prompt for a WebAuthn (security key)
      */
-    public function iShouldSeeAPromptForAUfSecurityKey()
+    public function iShouldSeeAPromptForAWebAuthn()
     {
         $page = $this->session->getPage();
         Assert::assertContains('<h2>USB Security Key</h2>', $page->getHtml());
@@ -564,7 +564,7 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that have U2F
+     * @Given I provide credentials that have WebAuthn
      */
     public function iProvideCredentialsThatHaveUf()
     {
@@ -572,46 +572,46 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given the user's browser supports U2F
+     * @Given the user's browser supports WebAuthn
      */
     public function theUsersBrowserSupportsUf()
     {
-        $userAgentWithU2f = self::USER_AGENT_WITH_U2F_SUPPORT;
+        $userAgentWithWebAuthn = self::USER_AGENT_WITH_WEBAUTHN_SUPPORT;
         Assert::assertTrue(
-            LoginBrowser::supportsU2f($userAgentWithU2f),
-            'Update USER_AGENT_WITH_U2F_SUPPORT to a User Agent with U2F support'
+            LoginBrowser::supportsWebAuthn($userAgentWithWebAuthn),
+            'Update USER_AGENT_WITH_WEBAUTHN_SUPPORT to a User Agent with WebAuthn support'
         );
         
-        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithU2f);
+        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithWebAuthn);
     }
 
     /**
-     * @Given I provide credentials that have U2F, TOTP
+     * @Given I provide credentials that have WebAuthn, TOTP
      */
     public function iProvideCredentialsThatHaveUfTotp()
     {
         // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'has_u2f_totp';
+        $this->username = 'has_webauthn_totp';
         $this->password = 'a';
     }
 
     /**
-     * @Given I provide credentials that have U2F, backup codes
+     * @Given I provide credentials that have WebAuthn, backup codes
      */
     public function iProvideCredentialsThatHaveUfBackupCodes()
     {
         // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'has_u2f_backupcodes';
+        $this->username = 'has_webauthn_backupcodes';
         $this->password = 'a';
     }
 
     /**
-     * @Given I provide credentials that have U2F, TOTP, backup codes
+     * @Given I provide credentials that have WebAuthn, TOTP, backup codes
      */
     public function iProvideCredentialsThatHaveUfTotpBackupCodes()
     {
         // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'has_u2f_totp_backupcodes';
+        $this->username = 'has_webauthn_totp_backupcodes';
         $this->password = 'a';
     }
 
@@ -642,21 +642,21 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given the user's browser does not support U2F
+     * @Given the user's browser does not support WebAuthn
      */
     public function theUsersBrowserDoesNotSupportUf()
     {
-        $userAgentWithoutU2f = self::USER_AGENT_WITHOUT_U2F_SUPPORT;
+        $userAgentWithoutWebAuthn = self::USER_AGENT_WITHOUT_WEBAUTHN_SUPPORT;
         Assert::assertFalse(
-            LoginBrowser::supportsU2f($userAgentWithoutU2f),
-            'Update USER_AGENT_WITHOUT_U2F_SUPPORT to a User Agent without U2F support'
+            LoginBrowser::supportsWebAuthn($userAgentWithoutWebAuthn),
+            'Update USER_AGENT_WITHOUT_WEBAUTHN_SUPPORT to a User Agent without WebAuthn support'
         );
         
-        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithoutU2f);
+        $this->driver->getClient()->setServerParameter('HTTP_USER_AGENT', $userAgentWithoutWebAuthn);
     }
 
     /**
-     * @Then I should not see an error message about U2F being unsupported
+     * @Then I should not see an error message about WebAuthn being unsupported
      */
     public function iShouldNotSeeAnErrorMessageAboutUfBeingUnsupported()
     {
@@ -665,7 +665,7 @@ class MfaContext implements Context
     }
 
     /**
-     * @Then I should see an error message about U2F being unsupported
+     * @Then I should see an error message about WebAuthn being unsupported
      */
     public function iShouldSeeAnErrorMessageAboutUfBeingUnsupported()
     {

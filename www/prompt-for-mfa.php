@@ -82,7 +82,8 @@ if (filter_has_var(INPUT_POST, 'submitMfa')) {
         $state,
         $rememberMe,
         $logger,
-        $mfaOption['type']
+        $mfaOption['type'],
+        $state['rpOrigin']
     );
     
     $logger->warning(json_encode([
@@ -102,7 +103,7 @@ $t->data['errorMessage'] = $errorMessage ?? null;
 $t->data['mfaOption'] = $mfaOption;
 $t->data['mfaOptions'] = $mfaOptions;
 $t->data['stateId'] = $stateId;
-$t->data['supportsU2f'] = LoginBrowser::supportsU2f($userAgent);
+$t->data['supportsWebAuthn'] = LoginBrowser::supportsWebAuthn($userAgent);
 $t->data['managerEmail'] = $state['managerEmail'];
 $t->show();
 

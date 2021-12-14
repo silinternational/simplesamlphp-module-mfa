@@ -17,7 +17,7 @@ services:
       - ./features:/data/features
       - ${COMPOSER_CACHE_DIR}:/composer
 
-      # Revert to standard SSOService.php instead of using sildisco'saml20-idp-hosted
+      # Revert to standard SSOService.php instead of using sildisco's
       - ./development/idp-local/www_saml2_idp_SSOService.php:/data/vendor/simplesamlphp/simplesamlphp/www/saml2/idp/SSOService.php
 
       # Utilize custom certs
@@ -37,6 +37,7 @@ services:
       - APPLICATION_ENV=dev
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
+      - IDP_DOMAIN_NAME=mfa-idp.local:52020
       - IDP_NAME=Local IdP
       - MFA_SETUP_URL=http://mfa-pw-manager.local:52022/module.php/core/authenticate.php?as=mfa-idp
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
@@ -109,6 +110,14 @@ services:
     environment:
       - COMPOSER_CACHE_DIR=/composer
     user: "${DOCKER_UIDGID}"
+    working_dir: /data
+
+  node:
+    image: node:lts-alpine
+    volumes:
+      - ./package.json:/data/package.json
+      - ./package-lock.json:/data/package-lock.json
+      - ./node_modules:/data/node_modules
     working_dir: /data
 
   tests:
