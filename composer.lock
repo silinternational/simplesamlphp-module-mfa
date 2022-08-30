@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e4717629f78ab3029ef4ad9e8b2659b",
+    "content-hash": "4306d4188c60dd59230e6bb2cfb090f9",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -399,16 +399,16 @@
         },
         {
             "name": "guzzlehttp/promises",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/promises.git",
-                "reference": "fe752aedc9fd8fcca3fe7ad05d419d32998a06da"
+                "reference": "b94b2807d85443f9719887892882d0329d1e2598"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/promises/zipball/fe752aedc9fd8fcca3fe7ad05d419d32998a06da",
-                "reference": "fe752aedc9fd8fcca3fe7ad05d419d32998a06da",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/b94b2807d85443f9719887892882d0329d1e2598",
+                "reference": "b94b2807d85443f9719887892882d0329d1e2598",
                 "shasum": ""
             },
             "require": {
@@ -463,7 +463,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/promises/issues",
-                "source": "https://github.com/guzzle/promises/tree/1.5.1"
+                "source": "https://github.com/guzzle/promises/tree/1.5.2"
             },
             "funding": [
                 {
@@ -479,7 +479,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-22T20:56:57+00:00"
+            "time": "2022-08-28T14:55:35+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -1116,12 +1116,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "bd4a45f60f097f0c44f77c6d72caa24ebc9b9f66"
+                "reference": "813f344375ecb72990801961d3e6b969ee27e6c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/bd4a45f60f097f0c44f77c6d72caa24ebc9b9f66",
-                "reference": "bd4a45f60f097f0c44f77c6d72caa24ebc9b9f66",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/813f344375ecb72990801961d3e6b969ee27e6c6",
+                "reference": "813f344375ecb72990801961d3e6b969ee27e6c6",
                 "shasum": ""
             },
             "conflict": {
@@ -1257,7 +1257,7 @@
                 "gaoming13/wechat-php-sdk": "<=1.10.2",
                 "genix/cms": "<=1.1.11",
                 "getgrav/grav": "<1.7.34",
-                "getkirby/cms": "<3.5.8",
+                "getkirby/cms": "<3.5.8.1",
                 "getkirby/panel": "<2.5.14",
                 "gilacms/gila": "<=1.11.4",
                 "globalpayments/php-sdk": "<2",
@@ -1624,7 +1624,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-08-22T17:06:07+00:00"
+            "time": "2022-08-29T18:04:39+00:00"
         },
         {
             "name": "robrichards/xmlseclibs",
@@ -1729,24 +1729,23 @@
         },
         {
             "name": "silinternational/php-env",
-            "version": "2.1.1",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/php-env.git",
-                "reference": "3906403fde599b04b82fd51b2c0ddc3a04fdd47e"
+                "reference": "d69cf17b7fc02cf6450d7d947634d07b7c2168af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/php-env/zipball/3906403fde599b04b82fd51b2c0ddc3a04fdd47e",
-                "reference": "3906403fde599b04b82fd51b2c0ddc3a04fdd47e",
+                "url": "https://api.github.com/repos/silinternational/php-env/zipball/d69cf17b7fc02cf6450d7d947634d07b7c2168af",
+                "reference": "d69cf17b7fc02cf6450d7d947634d07b7c2168af",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4"
+                "php": "^7.4 || ^8.0"
             },
             "require-dev": {
-                "johnkary/phpunit-speedtrap": "1.*",
-                "phpunit/phpunit": "^6.1"
+                "phpunit/phpunit": "^9.0"
             },
             "type": "library",
             "autoload": {
@@ -1761,9 +1760,9 @@
             "description": "Simple PHP library for getting (or requiring) environment variables, designed to handle true, false, and null more intelligently. If desired, an environment variable's value can be split into an array automatically.",
             "support": {
                 "issues": "https://github.com/silinternational/php-env/issues",
-                "source": "https://github.com/silinternational/php-env/tree/master"
+                "source": "https://github.com/silinternational/php-env/tree/3.1.0"
             },
-            "time": "2017-08-31T12:44:44+00:00"
+            "time": "2022-08-29T20:48:09+00:00"
         },
         {
             "name": "silinternational/psr3-adapters",
