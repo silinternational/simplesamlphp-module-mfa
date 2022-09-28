@@ -13,7 +13,7 @@ behat:
 
 clean:
 	docker-compose kill
-	docker system prune -f
+	docker-compose rm -f
 
 copyJsLib:
 	cp ./node_modules/@simplewebauthn/browser/dist/bundle/index.umd.min.js ./www/simplewebauthn/browser.js

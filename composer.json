@@ -19,9 +19,9 @@
   "require": {
     "php": ">=7.2",
     "ext-json": "*",
-    "silinternational/php-env": "^2.1",
-    "silinternational/psr3-adapters": "^1.1 || ^2.0",
-    "simplesamlphp/simplesamlphp": "~1.17.7 || ~1.18.5",
+    "silinternational/php-env": "^2.1 || ^3.0",
+    "silinternational/psr3-adapters": "^1.1 || ^2.0 || ^3.0",
+    "simplesamlphp/simplesamlphp": "~1.17.7 || ~1.18.5 || ~1.19.0",
     "silinternational/idp-id-broker-php-client": "^4.0.0",
     "sinergi/browser-detector": "^6.1"
   },
@@ -36,6 +36,12 @@
     "psr-4": {
       "Sil\\SspMfa\\": "src/",
       "Sil\\SspMfa\\Behat\\": "features/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "simplesamlphp/composer-module-installer": true,
+      "yiisoft/yii2-composer": true
     }
   }
 }
