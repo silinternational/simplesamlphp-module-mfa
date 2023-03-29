@@ -145,6 +145,32 @@ Feature: Prompt for MFA credentials
       |           |   TOTP   | , backup codes | does not support WebAuthn |   TOTP           |
       |           |          |   backup codes | does not support WebAuthn |      backup code |
 
+
+  Scenario: Defaulting to the manager despite having aused mfa
+    Given I provide credentials that have a manager and a used TOTP
+      And the user's browser supports WebAuthn
+    When I login
+    Then I should see a prompt for a manager rescue code
+
+  Scenario: Defaulting to a more recently used webauth mfa
+    Given I provide credentials that have a used WebAuthn and TOTP
+      And the user's browser supports WebAuthn
+    When I login
+    Then I should see a prompt for a WebAuthn
+
+  Scenario: Defaulting to totp despite a more recently used webauth mfa
+    Given I provide credentials that have a used WebAuthn and TOTP
+    And the user's browser does not support WebAuthn
+    When I login
+    Then I should see a prompt for a TOTP
+
+  Scenario: Defaulting to a more recently used totp mfa
+    Given I provide credentials that have a used TOTP and WebAuthn
+      And the user's browser supports WebAuthn
+    When I login
+    Then I should see a prompt for a TOTP
+
+
   Scenario Outline: When to show the WebAuthn-not-supported error message
     Given I provide credentials that have WebAuthn
       And the user's browser <supports WebAuthn or not>

@@ -1,6 +1,7 @@
 <?php
 namespace Sil\SspMfa\Behat\context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Mink\Driver\GoutteDriver;
 use Behat\Mink\Element\DocumentElement;
@@ -639,6 +640,34 @@ class MfaContext implements Context
     public function iProvideCredentialsThatHaveBackupCodes()
     {
         $this->iProvideCredentialsThatNeedMfaAndHaveBackupCodesAvailable();
+    }
+
+    /**
+     * @Given I provide credentials that have a manager and a used TOTP
+     */
+    public function iProvideCredentialsThatHaveManagerAndUsedTotp()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_used_totp_webauthn_and_mgr';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have a used WebAuthn and TOTP
+     */
+    public function iProvideCredentialsThatHaveUsedWebauthnAndTotp()
+    {
+        $this->username = 'has_used_webauthn_totp';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have a used TOTP and WebAuthn
+     */
+    public function iProvideCredentialsThatHaveUsedTotpAndWebauthn()
+    {
+        $this->username = 'has_used_totp_webauthn';
+        $this->password = 'a';
     }
 
     /**

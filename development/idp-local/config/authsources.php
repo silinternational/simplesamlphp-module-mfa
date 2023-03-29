@@ -557,6 +557,108 @@ $config = [
             ],
             'manager_email' => ['manager@example.com'],
         ],
+        'has_used_totp_webauthn_and_mgr:a' => [
+            'eduPersonPrincipalName' => ['has_used_totp_webauthn_and_mgr@mfaidp'],
+            'eduPersonTargetID' => ['00000114-0014-0014-0014-000000000014'],
+            'sn' => ['Used TOTP, WebAuthn, And Manager'],
+            'givenName' => ['Has'],
+            'mail' => ['has_used_totp_webauthn_and_mgr@example.com'],
+            'employeeNumber' => ['00114'],
+            'cn' => ['HAS_USED_TOTP_WEBAUTHN_AND_MANAGER'],
+            'profile_review' => 'no',
+            'mfa' => [
+                'prompt' => 'yes',
+                'add' => 'no',
+                'options' => [
+                    [
+                        'id' => '1140',
+                        'type' => 'totp',
+                        'last_used_utc' => '2001-01-01T00:00:00Z',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '1141',
+                        'type' => 'webauthn',
+                        'last_used_utc' => '2000-01-01T00:00:00Z',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '1142',
+                        'type' => 'manager',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'method' => [
+                'add' => 'no',
+                'options' => [],
+            ],
+            'manager_email' => ['manager@example.com'],
+        ],
+        'has_used_totp_webauthn:a' => [
+            'eduPersonPrincipalName' => ['has_used_totp_webauthn@mfaidp'],
+            'eduPersonTargetID' => ['00000214-0014-0014-0014-000000000014'],
+            'sn' => ['Used TOTP, And WebAuthn'],
+            'givenName' => ['Has'],
+            'mail' => ['has_used_totp_webauthn@example.com'],
+            'employeeNumber' => ['00214'],
+            'cn' => ['HAS_USED_TOTP_AND_WEBAUTHN'],
+            'profile_review' => 'no',
+            'mfa' => [
+                'prompt' => 'yes',
+                'add' => 'no',
+                'options' => [
+                    [
+                        'id' => '2140',
+                        'type' => 'totp',
+                        'last_used_utc' => '2001-01-01T00:00:00Z',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '2141',
+                        'type' => 'webauthn',
+                        'last_used_utc' => '2000-01-01T00:00:00Z',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'method' => [
+                'add' => 'no',
+                'options' => [],
+            ],
+        ],
+        'has_used_webauthn_totp:a' => [
+            'eduPersonPrincipalName' => ['has_used_webauthn_totp@mfaidp'],
+            'eduPersonTargetID' => ['00000314-0014-0014-0014-000000000014'],
+            'sn' => ['Used WebAuthn And TOTP'],
+            'givenName' => ['Has'],
+            'mail' => ['has_used_webauthn_totp@example.com'],
+            'employeeNumber' => ['00314'],
+            'cn' => ['HAS_USED_WEBAUTHN_AND_TOTP'],
+            'profile_review' => 'no',
+            'mfa' => [
+                'prompt' => 'yes',
+                'add' => 'no',
+                'options' => [
+                    [
+                        'id' => '3140',
+                        'type' => 'totp',
+                        'last_used_utc' => '2000-01-01T00:00:00Z',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '3141',
+                        'type' => 'webauthn',
+                        'last_used_utc' => '2001-01-01T00:00:00Z',
+                        'data' => '',
+                    ],
+                ],
+            ],
+            'method' => [
+                'add' => 'no',
+                'options' => [],
+            ],
+        ],
         'has_totp_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_totp_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000015-0015-0015-0015-000000000015'],
