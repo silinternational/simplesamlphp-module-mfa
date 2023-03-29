@@ -160,7 +160,7 @@ Feature: Prompt for MFA credentials
 
   Scenario: Defaulting to totp despite a more recently used webauth mfa
     Given I provide credentials that have a used WebAuthn and TOTP
-    And the user's browser does not support WebAuthn
+      And the user's browser does not support WebAuthn
     When I login
     Then I should see a prompt for a TOTP
 
