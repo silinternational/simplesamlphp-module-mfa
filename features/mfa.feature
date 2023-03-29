@@ -146,7 +146,7 @@ Feature: Prompt for MFA credentials
       |           |          |   backup codes | does not support WebAuthn |      backup code |
 
 
-  Scenario: Defaulting to the manager despite having aused mfa
+  Scenario: Defaulting to the manager despite having a used mfa
     Given I provide credentials that have a manager and a used TOTP
       And the user's browser supports WebAuthn
     When I login
