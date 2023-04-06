@@ -643,9 +643,9 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that have a manager and a used TOTP
+     * @Given I provide credentials that have a manager code and a used TOTP
      */
-    public function iProvideCredentialsThatHaveManagerAndUsedTotp()
+    public function iProvideCredentialsThatHaveManagerCodeAndUsedTotp()
     {
         // See `development/idp-local/config/authsources.php` for options.
         $this->username = 'has_used_totp_webauthn_and_mgr';

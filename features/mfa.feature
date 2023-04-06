@@ -147,7 +147,7 @@ Feature: Prompt for MFA credentials
 
 
   Scenario: Defaulting to the manager despite having a used mfa
-    Given I provide credentials that have a manager and a used TOTP
+    Given I provide credentials that have a manager code and a used TOTP
       And the user's browser supports WebAuthn
     When I login
     Then I should see a prompt for a manager rescue code
