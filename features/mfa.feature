@@ -160,7 +160,6 @@ Feature: Prompt for MFA credentials
       | TOTP        |  backup code      |  supports WebAuthn          |  backup code      |
       | backup code |  TOTP             |  supports WebAuthn          |  TOTP             |
       | TOTP        |  WebAuthn         |  does not support WebAuthn  |  TOTP             |
-      | TOTP        |  backup code      |  does not support WebAuthn  |  backup code      |
 
   Scenario: Defaulting to the manager code despite having a used mfa
     Given I provide credentials that have a manager code, a WebAuthn and a more recently used TOTP

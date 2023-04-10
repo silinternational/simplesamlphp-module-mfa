@@ -1,7 +1,6 @@
 <?php
 namespace Sil\SspMfa\Behat\context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Mink\Driver\GoutteDriver;
 use Behat\Mink\Element\DocumentElement;
