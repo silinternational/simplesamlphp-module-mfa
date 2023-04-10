@@ -146,7 +146,7 @@ Feature: Prompt for MFA credentials
       |           |          |   backup codes | does not support WebAuthn |      backup code |
 
 
-  Scenario: Defaulting to the manager despite having a used mfa
+  Scenario: Defaulting to the manager code despite having a used mfa
     Given I provide credentials that have a manager code, a WebAuthn and a more recently used TOTP
       And the user's browser supports WebAuthn
     When I login
@@ -172,7 +172,7 @@ Feature: Prompt for MFA credentials
 
   Scenario: Defaulting to more recently used backup codes
     Given I provide credentials that have a TOTP and more recently used backup codes
-    And the user's browser supports WebAuthn
+      And the user's browser supports WebAuthn
     When I login
     Then I should see a prompt for a backup code
 
