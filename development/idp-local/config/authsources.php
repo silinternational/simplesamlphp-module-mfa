@@ -659,6 +659,40 @@ $config = [
                 'options' => [],
             ],
         ],
+        'has_totp_and_more_recently_used_backup_codes:a' => [
+            'eduPersonPrincipalName' => ['has_totp_and_more_recently_used_backup_codes@mfaidp'],
+            'eduPersonTargetID' => ['00000314-0014-0014-0014-000000000014'],
+            'sn' => ['TOTP And More Recently Used Backup Codes'],
+            'givenName' => ['Has'],
+            'mail' => ['has_totp_and_more_recently_used_backup_codes@example.com'],
+            'employeeNumber' => ['00314'],
+            'cn' => ['HAS_TOTP_AND_MORE_RECENTLY_USED_BACKUP_CODES'],
+            'profile_review' => 'no',
+            'mfa' => [
+                'prompt' => 'yes',
+                'add' => 'no',
+                'options' => [
+                    [
+                        'id' => '4140',
+                        'type' => 'totp',
+                        'last_used_utc' => '2000-01-01T00:00:00Z',
+                        'data' => '',
+                    ],
+                    [
+                        'id' => '4141',
+                        'type' => 'backupcode',
+                        'last_used_utc' => '2011-01-01T00:00:00Z',
+                        'data' => [
+                            'count' => 10,
+                        ],
+                    ],
+                ],
+            ],
+            'method' => [
+                'add' => 'no',
+                'options' => [],
+            ],
+        ],
         'has_totp_backupcodes:a' => [
             'eduPersonPrincipalName' => ['has_totp_backupcodes@mfaidp'],
             'eduPersonTargetID' => ['00000015-0015-0015-0015-000000000015'],

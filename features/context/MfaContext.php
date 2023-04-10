@@ -671,6 +671,15 @@ class MfaContext implements Context
     }
 
     /**
+     * @Given I provide credentials that have a TOTP and more recently used backup codes
+     */
+    public function IProvideCredentialsThatHaveTotpAndMoreRecentlyUsedBackupCodes()
+    {
+        $this->username = 'has_totp_and_more_recently_used_backup_codes';
+        $this->password = 'a';
+    }
+
+    /**
      * @Given the user's browser does not support WebAuthn
      */
     public function theUsersBrowserDoesNotSupportUf()

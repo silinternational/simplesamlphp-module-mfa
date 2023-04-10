@@ -170,6 +170,11 @@ Feature: Prompt for MFA credentials
     When I login
     Then I should see a prompt for a TOTP
 
+  Scenario: Defaulting to more recently used backup codes
+    Given I provide credentials that have a TOTP and more recently used backup codes
+    And the user's browser supports WebAuthn
+    When I login
+    Then I should see a prompt for a backup code
 
   Scenario Outline: When to show the WebAuthn-not-supported error message
     Given I provide credentials that have WebAuthn
