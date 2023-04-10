@@ -147,25 +147,25 @@ Feature: Prompt for MFA credentials
 
 
   Scenario: Defaulting to the manager despite having a used mfa
-    Given I provide credentials that have a manager code and a used TOTP
+    Given I provide credentials that have a manager code and a TOTP used more recently than a WebAuthn
       And the user's browser supports WebAuthn
     When I login
     Then I should see a prompt for a manager rescue code
 
-  Scenario: Defaulting to a more recently used webauth mfa
-    Given I provide credentials that have a used WebAuthn and TOTP
+  Scenario: Defaulting to a more recently used webauthn mfa
+    Given I provide credentials that have a WebAuthn used more recently than a TOTP
       And the user's browser supports WebAuthn
     When I login
     Then I should see a prompt for a WebAuthn
 
   Scenario: Defaulting to totp despite a more recently used webauth mfa
-    Given I provide credentials that have a used WebAuthn and TOTP
+    Given I provide credentials that have a WebAuthn used more recently than a TOTP
       And the user's browser does not support WebAuthn
     When I login
     Then I should see a prompt for a TOTP
 
   Scenario: Defaulting to a more recently used totp mfa
-    Given I provide credentials that have a used TOTP and WebAuthn
+    Given I provide credentials that have a TOTP used more recently than a WebAuthn
       And the user's browser supports WebAuthn
     When I login
     Then I should see a prompt for a TOTP

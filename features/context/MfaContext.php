@@ -643,30 +643,30 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that have a manager code and a used TOTP
+     * @Given I provide credentials that have a manager code and a TOTP used more recently than a WebAuthn
      */
-    public function iProvideCredentialsThatHaveManagerCodeAndUsedTotp()
+    public function IProvideCredentialsThatHaveManagerCodeAndTotpUsedMoreRecentlyThanWebAuthn()
     {
         // See `development/idp-local/config/authsources.php` for options.
-        $this->username = 'has_used_totp_webauthn_and_mgr';
+        $this->username = 'has_mgr_code_webauthn_and_more_recently_used_totp';
         $this->password = 'a';
     }
 
     /**
-     * @Given I provide credentials that have a used WebAuthn and TOTP
+     * @Given I provide credentials that have a WebAuthn used more recently than a TOTP
      */
-    public function iProvideCredentialsThatHaveUsedWebauthnAndTotp()
+    public function IProvideCredentialsThatHaveWebAuthnUsedMoreRecentlyThanTotp()
     {
-        $this->username = 'has_used_webauthn_totp';
+        $this->username = 'has_totp_and_more_recently_used_webauthn';
         $this->password = 'a';
     }
 
     /**
-     * @Given I provide credentials that have a used TOTP and WebAuthn
+     * @Given I provide credentials that have a TOTP used more recently than a WebAuthn
      */
-    public function iProvideCredentialsThatHaveUsedTotpAndWebauthn()
+    public function iProvideCredentialsThatHaveTotpUsedMoreRecentlyThanWebAuthn()
     {
-        $this->username = 'has_used_totp_webauthn';
+        $this->username = 'has_webauthn_and_more_recently_used_totp';
         $this->password = 'a';
     }
 

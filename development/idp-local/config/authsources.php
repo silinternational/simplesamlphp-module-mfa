@@ -557,14 +557,14 @@ $config = [
             ],
             'manager_email' => ['manager@example.com'],
         ],
-        'has_used_totp_webauthn_and_mgr:a' => [
-            'eduPersonPrincipalName' => ['has_used_totp_webauthn_and_mgr@mfaidp'],
+        'has_mgr_code_webauthn_and_more_recently_used_totp:a' => [
+            'eduPersonPrincipalName' => ['has_mgr_code_webauthn_and_more_recently_used_totp@mfaidp'],
             'eduPersonTargetID' => ['00000114-0014-0014-0014-000000000014'],
-            'sn' => ['Used TOTP, WebAuthn, And Manager'],
+            'sn' => ['Manager Code, WebAuthn, More Recently Used TOTP'],
             'givenName' => ['Has'],
-            'mail' => ['has_used_totp_webauthn_and_mgr@example.com'],
+            'mail' => ['has_mgr_code_webauthn_and_more_recently_used_totp@example.com'],
             'employeeNumber' => ['00114'],
-            'cn' => ['HAS_USED_TOTP_WEBAUTHN_AND_MANAGER'],
+            'cn' => ['HAS_MGR_CODE_WEBAUTHN_AND_MORE_RECENTLY_USED_TOTP'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -573,7 +573,7 @@ $config = [
                     [
                         'id' => '1140',
                         'type' => 'totp',
-                        'last_used_utc' => '2001-01-01T00:00:00Z',
+                        'last_used_utc' => '2011-01-01T00:00:00Z',
                         'data' => '',
                     ],
                     [
@@ -595,14 +595,14 @@ $config = [
             ],
             'manager_email' => ['manager@example.com'],
         ],
-        'has_used_totp_webauthn:a' => [
-            'eduPersonPrincipalName' => ['has_used_totp_webauthn@mfaidp'],
+        'has_webauthn_and_more_recently_used_totp:a' => [
+            'eduPersonPrincipalName' => ['has_webauthn_and_more_recently_used_totp@mfaidp'],
             'eduPersonTargetID' => ['00000214-0014-0014-0014-000000000014'],
-            'sn' => ['Used TOTP, And WebAuthn'],
+            'sn' => ['WebAuthn And More Recently Used TOTP'],
             'givenName' => ['Has'],
-            'mail' => ['has_used_totp_webauthn@example.com'],
+            'mail' => ['has_webauthn_and_more_recently_used_totp@example.com'],
             'employeeNumber' => ['00214'],
-            'cn' => ['HAS_USED_TOTP_AND_WEBAUTHN'],
+            'cn' => ['HAS_WEBAUTHN_AND_MORE_RECENTLY_USED_TOTP'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -611,7 +611,7 @@ $config = [
                     [
                         'id' => '2140',
                         'type' => 'totp',
-                        'last_used_utc' => '2001-01-01T00:00:00Z',
+                        'last_used_utc' => '2011-01-01T00:00:00Z',
                         'data' => '',
                     ],
                     [
@@ -627,14 +627,14 @@ $config = [
                 'options' => [],
             ],
         ],
-        'has_used_webauthn_totp:a' => [
-            'eduPersonPrincipalName' => ['has_used_webauthn_totp@mfaidp'],
+        'has_totp_and_more_recently_used_webauthn:a' => [
+            'eduPersonPrincipalName' => ['has_totp_and_more_recently_used_webauthn@mfaidp'],
             'eduPersonTargetID' => ['00000314-0014-0014-0014-000000000014'],
-            'sn' => ['Used WebAuthn And TOTP'],
+            'sn' => ['TOTP And More Recently Used Webauthn'],
             'givenName' => ['Has'],
-            'mail' => ['has_used_webauthn_totp@example.com'],
+            'mail' => ['has_totp_and_more_recently_used_webauthn@example.com'],
             'employeeNumber' => ['00314'],
-            'cn' => ['HAS_USED_WEBAUTHN_AND_TOTP'],
+            'cn' => ['HAS_TOTP_AND_MORE_RECENTLY_USED_WEBAUTHN'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -649,7 +649,7 @@ $config = [
                     [
                         'id' => '3141',
                         'type' => 'webauthn',
-                        'last_used_utc' => '2001-01-01T00:00:00Z',
+                        'last_used_utc' => '2011-01-01T00:00:00Z',
                         'data' => '',
                     ],
                 ],
