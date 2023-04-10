@@ -659,14 +659,14 @@ $config = [
                 'options' => [],
             ],
         ],
-        'has_totp_and_more_recently_used_backup_codes:a' => [
-            'eduPersonPrincipalName' => ['has_totp_and_more_recently_used_backup_codes@mfaidp'],
-            'eduPersonTargetID' => ['00000314-0014-0014-0014-000000000014'],
-            'sn' => ['TOTP And More Recently Used Backup Codes'],
+        'has_totp_and_more_recently_used_backup_code:a' => [
+            'eduPersonPrincipalName' => ['has_totp_and_more_recently_used_backup_code@mfaidp'],
+            'eduPersonTargetID' => ['00000414-0014-0014-0014-000000000014'],
+            'sn' => ['TOTP And More Recently Used Backup Code'],
             'givenName' => ['Has'],
-            'mail' => ['has_totp_and_more_recently_used_backup_codes@example.com'],
-            'employeeNumber' => ['00314'],
-            'cn' => ['HAS_TOTP_AND_MORE_RECENTLY_USED_BACKUP_CODES'],
+            'mail' => ['has_totp_and_more_recently_used_backup_code@example.com'],
+            'employeeNumber' => ['00414'],
+            'cn' => ['HAS_TOTP_AND_MORE_RECENTLY_USED_BACKUP_CODE'],
             'profile_review' => 'no',
             'mfa' => [
                 'prompt' => 'yes',
@@ -685,6 +685,40 @@ $config = [
                         'data' => [
                             'count' => 10,
                         ],
+                    ],
+                ],
+            ],
+            'method' => [
+                'add' => 'no',
+                'options' => [],
+            ],
+        ],
+        'has_backup_code_and_more_recently_used_totp:a' => [
+            'eduPersonPrincipalName' => ['has_backup_code_and_more_recently_used_totp@mfaidp'],
+            'eduPersonTargetID' => ['00000514-0014-0014-0014-000000000014'],
+            'sn' => ['Backup Code And More Recently Used TOTP'],
+            'givenName' => ['Has'],
+            'mail' => ['has_backup_code_and_more_recently_used_totp@example.com'],
+            'employeeNumber' => ['00514'],
+            'cn' => ['HAS_BACKUP_CODE_AND_MORE_RECENTLY_USED_TOTP'],
+            'profile_review' => 'no',
+            'mfa' => [
+                'prompt' => 'yes',
+                'add' => 'no',
+                'options' => [
+                    [
+                        'id' => '5140',
+                        'type' => 'backupcode',
+                        'last_used_utc' => '2000-01-01T00:00:00Z',
+                        'data' => [
+                            'count' => 10,
+                        ],
+                    ],
+                    [
+                        'id' => '5141',
+                        'type' => 'totp',
+                        'last_used_utc' => '2011-01-01T00:00:00Z',
+                        'data' => '',
                     ],
                 ],
             ],

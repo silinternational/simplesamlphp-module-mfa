@@ -653,29 +653,56 @@ class MfaContext implements Context
     }
 
     /**
-     * @Given I provide credentials that have a TOTP and a more recently used WebAuthn
+     * @Given I provide credentials that have a used WebAuthn
      */
-    public function IProvideCredentialsThatHaveTotpAndMoreRecentlyUsedWebAuthn()
+    public function IProvideCredentialsThatHaveUsedWebAuthn()
     {
-        $this->username = 'has_totp_and_more_recently_used_webauthn';
+        $this->username = 'has_webauthn_';
         $this->password = 'a';
     }
 
     /**
-     * @Given I provide credentials that have a WebAuthn and a more recently used TOTP
+     * @Given I provide credentials that have a used TOTP
      */
-    public function iProvideCredentialsThatHaveWebAuthnAndMoreRecentlyUsedTotp()
+    public function IProvideCredentialsThatHaveUsedTotp()
     {
-        $this->username = 'has_webauthn_and_more_recently_used_totp';
+        $this->username = 'has_totp_';
         $this->password = 'a';
     }
 
     /**
-     * @Given I provide credentials that have a TOTP and more recently used backup codes
+     * @Given I provide credentials that have a used backup code
      */
-    public function IProvideCredentialsThatHaveTotpAndMoreRecentlyUsedBackupCodes()
+    public function IProvideCredentialsThatHaveUsedBackupCode()
     {
-        $this->username = 'has_totp_and_more_recently_used_backup_codes';
+        $this->username = 'has_backup_code_';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given and I have a more recently used TOTP
+     */
+    public function IHaveMoreRecentlyUsedTotp()
+    {
+        $this->username .= 'and_more_recently_used_totp';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given and I have a more recently used Webauthn
+     */
+    public function IHaveMoreRecentlyUsedWebauthn()
+    {
+        $this->username .= 'and_more_recently_used_webauthn';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given and I have a more recently used backup code
+     */
+    public function IHaveMoreRecentlyUsedBackupCode()
+    {
+        $this->username .= 'and_more_recently_used_backup_code';
         $this->password = 'a';
     }
 
