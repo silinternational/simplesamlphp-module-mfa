@@ -218,11 +218,22 @@ class Mfa extends ProcessingFilter
         if (empty($mfaOptions)) {
             throw new \Exception('No MFA options were provided.');
         }
-        
+
+        $recentMfa = self::getMostRecentUsedMfaOption($mfaOptions);
+        $mfaTypePriority = ['manager'];
+
         if (LoginBrowser::supportsWebAuthn($userAgent)) {
-            $mfaTypePriority = ['manager', 'webauthn', 'totp', 'backupcode'];
+            if (isset($recentMfa['type'])) {
+                $mfaTypePriority[] = $recentMfa['type'];
+            }
+            // Doubling up a type shouldn't be a problem.
+            array_push($mfaTypePriority, 'webauthn', 'totp', 'backupcode');
         } else {
-            $mfaTypePriority = ['manager', 'totp', 'backupcode', 'webauthn'];
+            // Browser doesn't support webauthn, so ensure that's the last option
+            if (isset($recentMfa['type']) && $recentMfa['type'] != 'webauthn') {
+                $mfaTypePriority[] = $recentMfa['type'];
+            }
+            array_push($mfaTypePriority, 'totp', 'backupcode', 'webauthn');
         }
         
         foreach ($mfaTypePriority as $mfaType) {
@@ -234,6 +245,25 @@ class Mfa extends ProcessingFilter
         }
 
         return $mfaOptions[0];
+    }
+
+    /**
+     * Get the MFA to use based on the one used most recently.
+     *
+     * @param array[] $mfaOptions The available MFA options.
+     * @return ?array The MFA option to use.
+     */
+    private static function getMostRecentUsedMfaOption($mfaOptions) {
+        $recentMfa = null;
+        $recentDate = '1991-01-01T00:00:00Z';
+
+        foreach ($mfaOptions as $mfaOption) {
+            if (isset($mfaOption['last_used_utc']) && $mfaOption['last_used_utc'] > $recentDate) {
+                $recentMfa = $mfaOption;
+                $recentDate = $mfaOption['last_used_utc'];
+            }
+        }
+        return $recentMfa;
     }
     
     /**
