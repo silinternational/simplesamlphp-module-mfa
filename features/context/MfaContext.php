@@ -642,6 +642,70 @@ class MfaContext implements Context
     }
 
     /**
+     * @Given I provide credentials that have a manager code, a WebAuthn and a more recently used TOTP
+     */
+    public function IProvideCredentialsThatHaveManagerCodeWebauthnAndMoreRecentlyUsedTotp()
+    {
+        // See `development/idp-local/config/authsources.php` for options.
+        $this->username = 'has_mgr_code_webauthn_and_more_recently_used_totp';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have a used WebAuthn
+     */
+    public function IProvideCredentialsThatHaveUsedWebAuthn()
+    {
+        $this->username = 'has_webauthn_';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have a used TOTP
+     */
+    public function IProvideCredentialsThatHaveUsedTotp()
+    {
+        $this->username = 'has_totp_';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given I provide credentials that have a used backup code
+     */
+    public function IProvideCredentialsThatHaveUsedBackupCode()
+    {
+        $this->username = 'has_backup_code_';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given and I have a more recently used TOTP
+     */
+    public function IHaveMoreRecentlyUsedTotp()
+    {
+        $this->username .= 'and_more_recently_used_totp';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given and I have a more recently used Webauthn
+     */
+    public function IHaveMoreRecentlyUsedWebauthn()
+    {
+        $this->username .= 'and_more_recently_used_webauthn';
+        $this->password = 'a';
+    }
+
+    /**
+     * @Given and I have a more recently used backup code
+     */
+    public function IHaveMoreRecentlyUsedBackupCode()
+    {
+        $this->username .= 'and_more_recently_used_backup_code';
+        $this->password = 'a';
+    }
+
+    /**
      * @Given the user's browser does not support WebAuthn
      */
     public function theUsersBrowserDoesNotSupportUf()
