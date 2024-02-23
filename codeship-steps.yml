@@ -1,3 +1,0 @@
-- name: tests
-  service: tests
-  command: 'bash -c "rm -f /data/composer.lock && /data/run-tests.sh"'

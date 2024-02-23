@@ -1,0 +1,14 @@
+name: Test
+
+on:
+  push:
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Unit tests
+        run: docker-compose -f actions-services.yml run --rm tests bash -c "rm -f /data/composer.lock && /data/run-tests.sh"

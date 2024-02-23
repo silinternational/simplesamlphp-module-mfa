@@ -1,7 +1,7 @@
-version: '2'
+version: '3'
 
 services:
-  
+
   mfaidp:
     image: silintl/ssp-base:develop
     volumes:
@@ -25,10 +25,9 @@ services:
       # Utilize custom metadata
       - ./development/idp-local/metadata/saml20-idp-hosted.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-idp-hosted.php
       - ./development/idp-local/metadata/saml20-sp-remote.php:/data/vendor/simplesamlphp/simplesamlphp/metadata/saml20-sp-remote.php
-    
+
     env_file:
       - ./common.env
-    encrypted_env_file: codeship.env.encrypted
     environment:
       - ADMIN_EMAIL=john_doe@there.com
       - ADMIN_PASS=a
@@ -47,7 +46,7 @@ services:
       - REMEMBER_ME_SECRET=not-a-secret-570c5b18dacd45bd
       - THEME_USE=default
     command: /data/run-dev.sh
-  
+
   mfasp:
     image: silintl/ssp-base:develop
     volumes:
@@ -67,7 +66,7 @@ services:
       - SAML20_IDP_ENABLE=false
       - ADMIN_PROTECT_INDEX_PAGE=false
       - THEME_USE=default
-  
+
   mfapwmanager:
     image: silintl/ssp-base:develop
     volumes:
@@ -89,7 +88,7 @@ services:
       - SAML20_IDP_ENABLE=false
       - ADMIN_PROTECT_INDEX_PAGE=false
       - THEME_USE=default
-  
+
   tests:
     image: silintl/ssp-base:develop
     depends_on:
@@ -107,5 +106,4 @@ services:
       - MFA_SETUP_URL=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - MFA_SETUP_URL_FOR_TESTS=http://mfapwmanager/module.php/core/authenticate.php?as=mfa-idp-no-port
       - THEME_USE=default
-    encrypted_env_file: codeship.env.encrypted
     working_dir: /data
